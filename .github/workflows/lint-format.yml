@@ -1,0 +1,33 @@
+name: 🖌️ lint & format
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: run lint
+        run: pnpm lint
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: run format
+        run: pnpm format
