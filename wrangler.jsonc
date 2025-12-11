@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "skuz-link",
+  "compatibility_date": "2025-12-02",
+  "main": "./.output/server/index.mjs",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./.output/public/"
+  },
+  "routes": [
+    {
+      "pattern": "skuz.link",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
