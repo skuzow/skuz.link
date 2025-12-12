@@ -1,5 +1,4 @@
 import tailwindcss from '@tailwindcss/vite';
-import locales from './i18n/locales';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -20,7 +19,18 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: 'en',
-    locales
+    locales: [
+      {
+        code: 'en',
+        name: 'English',
+        file: 'en-US.json'
+      },
+      {
+        code: 'es',
+        name: 'Español',
+        file: 'es-ES.json'
+      }
+    ]
   },
 
   nitro: {
