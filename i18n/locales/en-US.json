@@ -1,3 +1,17 @@
 {
-  "description": "Url shortener"
+  "description": "Url shortener",
+  "nav": {
+    "home": "Home",
+    "header": {
+      "lang": {
+        "button": "Toggle language"
+      },
+      "theme": {
+        "button": "Toggle theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    }
+  }
 }

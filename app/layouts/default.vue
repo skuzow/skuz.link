@@ -58,8 +58,8 @@ useSeoMeta({
 
 <template>
   <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
-    <!-- <NavHeader /> -->
-    <main class="mb-4 max-w-6xl p-4 md:my-11 md:px-8">
+    <NavHeader />
+    <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
       <slot />
     </main>
     <!-- <NavFooter /> -->

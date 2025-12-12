@@ -1,3 +1,17 @@
 {
-  "description": "Acortador de urls"
+  "description": "Acortador de urls",
+  "nav": {
+    "home": "Inicio",
+    "header": {
+      "lang": {
+        "button": "Alternar idioma"
+      },
+      "theme": {
+        "button": "Alternar tema",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      }
+    }
+  }
 }
