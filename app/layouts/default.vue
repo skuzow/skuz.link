@@ -1,4 +1,12 @@
 <script lang="ts" setup>
+import { Theme, ThemeColor } from '@/constants/theme.constant';
+
+const colorMode = useColorMode();
+
+const themeColor = computed(() =>
+  colorMode.value === Theme.DARK ? ThemeColor.DARK : ThemeColor.LIGHT
+);
+
 if (import.meta.server) {
   useHead({
     link: [
@@ -14,6 +22,7 @@ if (import.meta.server) {
 }
 
 useSeoMeta({
+  themeColor: themeColor,
   author: 'Alejandro Porras - skuzow',
   keywords: 'skuz, link, url, shortener',
 
