@@ -1,3 +1,3 @@
 <template>
-  <h1>Hello world</h1>
+  <h1>{{ $t('description') }}</h1>
 </template>

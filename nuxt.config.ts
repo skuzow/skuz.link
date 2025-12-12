@@ -4,11 +4,33 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', 'shadcn-nuxt', 'nitro-cloudflare-dev'],
 
   css: ['~/assets/css/tailwind.css'],
   vite: {
     plugins: [tailwindcss()]
+  },
+
+  modules: [
+    '@nuxt/eslint',
+    '@nuxtjs/i18n',
+    'shadcn-nuxt',
+    'nitro-cloudflare-dev'
+  ],
+
+  i18n: {
+    defaultLocale: 'en',
+    locales: [
+      {
+        code: 'en',
+        name: 'English',
+        file: 'en-US.json'
+      },
+      {
+        code: 'es',
+        name: 'Español',
+        file: 'es-ES.json'
+      }
+    ]
   },
 
   nitro: {
