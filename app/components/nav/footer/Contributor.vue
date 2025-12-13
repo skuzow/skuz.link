@@ -1,10 +1,13 @@
 <script lang="ts" setup>
+import type { Contributor } from '@/types/contributor.type';
+
 interface Props {
-  username: string;
-  avatar: string;
+  contributor: Contributor;
 }
 
-const { username, avatar } = defineProps<Props>();
+const { contributor } = defineProps<Props>();
+
+const { username, avatar } = contributor;
 
 const avatarFallback: string = username.substring(0, 2).toUpperCase();
 </script>

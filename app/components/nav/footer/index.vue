@@ -1,23 +1,9 @@
 <script lang="ts" setup>
 import { AtSignIcon } from 'lucide-vue-next';
 
+import { contributors } from '@/constants/contributors.constant';
+
 const currentYear: number = new Date().getFullYear();
-
-interface Contributor {
-  username: string;
-  avatar: string;
-}
-
-const contributors: Contributor[] = [
-  {
-    username: 'Kiaruexe',
-    avatar: 'https://avatars.githubusercontent.com/u/125899948'
-  },
-  {
-    username: 'skuzow',
-    avatar: 'https://avatars.githubusercontent.com/u/61398114'
-  }
-];
 </script>
 
 <template>
@@ -39,8 +25,8 @@ const contributors: Contributor[] = [
         </NuxtLink>
 
         <ul class="flex -space-x-2">
-          <li v-for="{ username, avatar } in contributors" :key="username">
-            <NavFooterContributor :username="username" :avatar="avatar" />
+          <li v-for="contributor in contributors" :key="contributor.username">
+            <NavFooterContributor :contributor="contributor" />
           </li>
         </ul>
       </section>
