@@ -12,6 +12,9 @@
         "dark": "Oscuro",
         "system": "Sistema"
       }
+    },
+    "footer": {
+      "contact": "Contactar"
     }
   }
 }

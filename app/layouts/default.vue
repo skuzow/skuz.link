@@ -62,6 +62,6 @@ useSeoMeta({
     <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
       <slot />
     </main>
-    <!-- <NavFooter /> -->
+    <NavFooter />
   </div>
 </template>
