@@ -17,6 +17,7 @@ const avatarFallback: string = username.substring(0, 2).toUpperCase();
           :to="`https://github.com/${username}`"
           :title="username"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <UiAvatar class="ring-background ring-2">
             <UiAvatarImage :src="avatar" :alt="`@${username}`" />
