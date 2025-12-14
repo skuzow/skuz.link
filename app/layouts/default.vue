@@ -36,7 +36,13 @@ if (import.meta.server) {
 useHead({
   htmlAttrs: {
     lang: locale
-  }
+  },
+  link: [
+    {
+      rel: 'sitemap',
+      href: '/sitemap.xml'
+    }
+  ]
 });
 
 useSeoMeta({

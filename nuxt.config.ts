@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxtjs/i18n',
     '@nuxtjs/robots',
+    '@nuxtjs/sitemap',
     'shadcn-nuxt',
     'nitro-cloudflare-dev'
   ],
@@ -36,7 +37,9 @@ export default defineNuxtConfig({
   },
 
   site: {
-    indexable: false // TODO: remove when ready to launch
+    indexable: false // TODO: remove when ready to launch,
+    // url: 'https://skuz.link',
+    // name: 'skuz.link'
   },
   robots: {
     disallow: ['/links']
