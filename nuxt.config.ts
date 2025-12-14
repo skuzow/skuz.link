@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@nuxt/eslint',
     '@nuxtjs/i18n',
+    '@nuxtjs/robots',
     'shadcn-nuxt',
     'nitro-cloudflare-dev'
   ],
@@ -32,6 +33,13 @@ export default defineNuxtConfig({
         file: 'es-ES.json'
       }
     ]
+  },
+
+  site: {
+    indexable: false // TODO: remove when ready to launch
+  },
+  robots: {
+    disallow: ['/links']
   },
 
   nitro: {
