@@ -36,7 +36,24 @@ if (import.meta.server) {
 useHead({
   htmlAttrs: {
     lang: locale
-  }
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/svg+xml',
+      href: '/favicon.svg'
+    },
+    {
+      rel: 'mask-icon',
+      href: '/favicon.svg',
+      color: '#FFFFFF'
+    },
+
+    {
+      rel: 'sitemap',
+      href: '/sitemap.xml'
+    }
+  ]
 });
 
 useSeoMeta({
