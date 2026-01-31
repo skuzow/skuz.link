@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
+import { generateRuntimeConfig } from './server/utils/runtimeConfig';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -45,11 +46,16 @@ export default defineNuxtConfig({
     disallow: ['/links']
   },
 
+  runtimeConfig: generateRuntimeConfig(),
+
   nitro: {
     preset: 'cloudflare_module',
     cloudflare: {
       deployConfig: true,
       nodeCompat: true
+    },
+    imports: {
+      dirs: ['./server/utils']
     }
   }
 });
