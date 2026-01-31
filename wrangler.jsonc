@@ -19,9 +19,10 @@
   },
   "d1_databases": [
     {
-      "binding": "db-dev",
+      "binding": "db",
       "database_name": "skuz-link-dev",
-      "database_id": "5a373b32-0ca5-416e-9eb7-934746b6eff7"
+      "database_id": "5a373b32-0ca5-416e-9eb7-934746b6eff7",
+      "migrations_dir": "server/database/migrations"
     }
   ]
 }

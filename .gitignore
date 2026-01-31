@@ -30,7 +30,7 @@ logs
 
 # database
 server/database/migrations
-server/database/dev.db
+*.db
 
 # coverage
 tests/coverage
