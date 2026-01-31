@@ -10,43 +10,42 @@ import { runtimeConfig } from './runtimeConfig';
 let authInstance: ReturnType<typeof betterAuth>;
 
 export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
-  if (!authInstance) {
-    const generatedAuth = betterAuth({
-      appName: 'skuz.link',
-      baseURL: runtimeConfig.public.baseUrl,
-      trustedOrigins: [
-        'http://localhost:3000',
-        'http://localhost:8787',
-        runtimeConfig.public.baseUrl
-      ],
-      secret: runtimeConfig.betterAuth.secret,
-      database: drizzleAdapter(getDB(event), {
-        provider: 'sqlite',
-        schema
-      }),
-      account: {
-        accountLinking: {
-          enabled: true
-        }
-      },
-      socialProviders: {
-        google: {
-          clientId: runtimeConfig.google.clientId,
-          clientSecret: runtimeConfig.google.clientSecret
-        },
-        github: {
-          clientId: runtimeConfig.github.clientId,
-          clientSecret: runtimeConfig.github.clientSecret
-        }
-      },
-      plugins: [admin()]
-    });
+  if (authInstance) return authInstance;
 
-    if (!event) return generatedAuth;
-    authInstance = generatedAuth;
-  }
+  const generatedAuth = betterAuth({
+    appName: 'skuz.link',
+    baseURL: runtimeConfig.public.baseUrl,
+    trustedOrigins: [
+      'http://localhost:3000',
+      'http://localhost:8787',
+      runtimeConfig.public.baseUrl
+    ],
+    secret: runtimeConfig.betterAuth.secret,
+    database: drizzleAdapter(getDB(event), {
+      provider: 'sqlite',
+      schema
+    }),
+    account: {
+      accountLinking: {
+        enabled: true
+      }
+    },
+    socialProviders: {
+      google: {
+        clientId: runtimeConfig.google.clientId,
+        clientSecret: runtimeConfig.google.clientSecret
+      },
+      github: {
+        clientId: runtimeConfig.github.clientId,
+        clientSecret: runtimeConfig.github.clientSecret
+      }
+    },
+    plugins: [admin()]
+  });
 
-  return authInstance;
+  if (event) authInstance = generatedAuth;
+
+  return generatedAuth;
 };
 
 // for cli
