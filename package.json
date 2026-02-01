@@ -12,6 +12,7 @@
     "format:fix": "prettier --write .",
     "auth:schema": "pnpm dlx @better-auth/cli generate --config server/utils/auth.ts --output server/database/schema/auth.ts -y",
     "db:generate": "drizzle-kit generate --config ./server/database/drizzle.config.ts",
+    "db:migrate-local": "wrangler d1 migrations apply skuz-link-dev --local",
     "db:migrate": "drizzle-kit migrate --config ./server/database/drizzle.config.ts",
     "build": "nuxt build",
     "preview": "wrangler dev",

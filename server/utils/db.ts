@@ -8,6 +8,7 @@ export const getDB = (
   event?: H3Event<EventHandlerRequest>,
   dbSchema?: typeof schema
 ) => {
+  // for cli
   if (!event) return drizzle(runtimeConfig.database.url, { schema: dbSchema });
 
   return drizzle(event.context.cloudflare.env.db, { schema: dbSchema });
