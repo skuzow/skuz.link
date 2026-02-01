@@ -3,6 +3,7 @@
   "nav": {
     "home": "Inicio",
     "header": {
+      "login": "Iniciar sesión",
       "lang": {
         "button": "Alternar idioma"
       },
@@ -15,6 +16,18 @@
     },
     "footer": {
       "contact": "Contactar"
+    }
+  },
+  "auth": {
+    "google": "Continuar con Google",
+    "github": "Continuar con Github"
+  },
+  "login": {
+    "description": "Inicia sesión para gestionar tus links."
+  },
+  "toast": {
+    "auth": {
+      "error": "Error al iniciar sesión con"
     }
   }
 }

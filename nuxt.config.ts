@@ -48,6 +48,10 @@ export default defineNuxtConfig({
 
   runtimeConfig: generateRuntimeConfig(),
 
+  imports: {
+    dirs: ['lib']
+  },
+
   nitro: {
     preset: 'cloudflare_module',
     cloudflare: {

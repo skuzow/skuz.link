@@ -1,3 +1,7 @@
+<script lang="ts" setup>
+const { isAuthenticated } = useAuth();
+</script>
+
 <template>
   <header class="bg-background/80 sticky top-0 z-10 py-2.5 backdrop-blur-md">
     <nav
@@ -20,9 +24,17 @@
           <NavHeaderDropdownTheme />
         </li>
 
-        <!-- <li v-if="isAuthenticated" class="hidden md:flex">
-          <LazyNavHeaderDropdownUser hydrate-on-visible />
-        </li> -->
+        <li v-if="isAuthenticated" class="hidden md:flex">
+          <!-- <LazyNavHeaderDropdownUser hydrate-on-visible /> -->
+        </li>
+
+        <li v-else>
+          <NuxtLinkLocale to="/login" :title="$t('nav.header.login')">
+            <UiButton variant="secondary">
+              {{ $t('nav.header.login') }}
+            </UiButton>
+          </NuxtLinkLocale>
+        </li>
       </ul>
     </nav>
   </header>
