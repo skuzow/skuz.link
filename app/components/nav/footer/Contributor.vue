@@ -8,8 +8,6 @@ interface Props {
 const { contributor } = defineProps<Props>();
 
 const { username, avatar } = contributor;
-
-const avatarFallback: string = username.substring(0, 2).toUpperCase();
 </script>
 
 <template>
@@ -24,7 +22,7 @@ const avatarFallback: string = username.substring(0, 2).toUpperCase();
         >
           <UiAvatar class="ring-background ring-2">
             <UiAvatarImage :src="avatar" :alt="`@${username}`" />
-            <UiAvatarFallback>{{ avatarFallback }}</UiAvatarFallback>
+            <UiAvatarFallback>{{ abbreviate(username) }}</UiAvatarFallback>
           </UiAvatar>
         </NuxtLink>
       </UiTooltipTrigger>
