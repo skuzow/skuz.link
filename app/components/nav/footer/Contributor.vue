@@ -20,7 +20,7 @@ const { username, avatar } = contributor;
           target="_blank"
           rel="noopener noreferrer"
         >
-          <UiAvatar class="ring-background ring-2">
+          <UiAvatar shape="circle" class="ring-background ring-2">
             <UiAvatarImage :src="avatar" :alt="`@${username}`" />
             <UiAvatarFallback>{{ abbreviate(username) }}</UiAvatarFallback>
           </UiAvatar>
