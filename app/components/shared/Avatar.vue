@@ -13,6 +13,7 @@ interface Props {
   loading?: 'lazy' | 'eager';
   decoding?: 'async' | 'auto' | 'sync';
   alt?: string;
+  pointer?: boolean;
   user: User | typeof authUser.value;
 }
 
@@ -24,25 +25,29 @@ const {
   loading,
   decoding = 'async',
   alt = 'Avatar',
+  pointer = true,
   user
 } = defineProps<Props>();
 </script>
 
 <template>
   <UiAvatar
+    v-if="user"
     :size="size"
     :shape="shape"
     :user="user"
     :class="
       cn(
-        !user?.image &&
+        pointer && 'cursor-pointer',
+        pointer &&
+          !user.image &&
           'transition-all duration-200 hover:brightness-95 dark:hover:brightness-110'
       )
     "
   >
     <UiAvatarImage
-      v-if="user?.image"
-      :src="user?.image"
+      v-if="user.image"
+      :src="user.image"
       :width="width"
       :height="height"
       :loading="loading"
@@ -51,8 +56,8 @@ const {
       :alt="alt"
     />
 
-    <UiAvatarFallback v-else>
-      {{ abbreviate(user!.name) }}
+    <UiAvatarFallback>
+      {{ abbreviate(user.name) }}
     </UiAvatarFallback>
   </UiAvatar>
 </template>
