@@ -3,6 +3,7 @@ import 'vue-sonner/style.css';
 </script>
 
 <template>
+  <LazyAuthSettings />
   <LazyAlertProvider />
   <UiToaster />
 
