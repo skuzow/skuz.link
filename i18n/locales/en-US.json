@@ -6,6 +6,11 @@
     "home": "Home",
     "header": {
       "login": "Login",
+      "user": {
+        "links": "Links",
+        "settings": "Settings",
+        "logout": "Logout"
+      },
       "lang": {
         "button": "Toggle language"
       },

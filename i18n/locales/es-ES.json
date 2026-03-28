@@ -6,6 +6,11 @@
     "home": "Inicio",
     "header": {
       "login": "Iniciar sesión",
+      "user": {
+        "links": "Links",
+        "settings": "Ajustes",
+        "logout": "Cerrar sesión"
+      },
       "lang": {
         "button": "Alternar idioma"
       },

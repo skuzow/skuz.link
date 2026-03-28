@@ -24,8 +24,8 @@ const { isAuthenticated } = useAuth();
           <NavHeaderDropdownTheme />
         </li>
 
-        <li v-if="isAuthenticated" class="hidden md:flex">
-          <!-- <LazyNavHeaderDropdownUser hydrate-on-visible /> -->
+        <li v-if="isAuthenticated">
+          <NavHeaderDropdownUser />
         </li>
 
         <li v-else>
