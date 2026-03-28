@@ -1,5 +1,7 @@
 {
   "description": "Url shortener",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
   "nav": {
     "home": "Home",
     "header": {

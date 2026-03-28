@@ -1,5 +1,7 @@
 {
   "description": "Acortador de urls",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
   "nav": {
     "home": "Inicio",
     "header": {
