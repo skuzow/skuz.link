@@ -37,8 +37,7 @@ export const useAuthProviders = () => {
   };
 
   const showErrorToast = (provider: string, description?: string) => {
-    toast.error({
-      title: `${$t('toast.auth.error')} ${provider}`,
+    toast.error(`${$t('toast.auth.error')} ${provider}`, {
       description
     });
   };
