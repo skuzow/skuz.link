@@ -14,7 +14,7 @@ import { Settings2Icon } from 'lucide-vue-next';
     <div
       class="flex max-h-[75dvh] flex-col gap-y-4 overflow-y-auto p-6 pt-4 text-sm"
     >
-      <!-- <AuthSettingsProfile /> -->
+      <AuthSettingsProfile />
 
       <AuthSettingsSessions />
 

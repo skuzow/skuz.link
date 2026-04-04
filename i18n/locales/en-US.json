@@ -2,6 +2,7 @@
   "description": "Url shortener",
   "cancel": "Cancel",
   "confirm": "Confirm",
+  "save": "Save changes",
   "nav": {
     "home": "Home",
     "header": {
@@ -38,6 +39,10 @@
     "google": "Continue with Google",
     "github": "Continue with Github",
     "settings": {
+      "profile": {
+        "title": "Profile",
+        "button": "Update profile"
+      },
       "sessions": {
         "title": "Sessions",
         "button": "Revoke",
@@ -76,6 +81,9 @@
     "auth": {
       "error": "Error signing in with",
       "settings": {
+        "profile": {
+          "title": "Profile updated successfully"
+        },
         "sessions": {
           "error": "Error revoking session",
           "title": "Session revoked successfully"

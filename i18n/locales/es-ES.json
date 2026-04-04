@@ -2,6 +2,7 @@
   "description": "Acortador de urls",
   "cancel": "Cancelar",
   "confirm": "Confirmar",
+  "save": "Guardar cambios",
   "nav": {
     "home": "Inicio",
     "header": {
@@ -38,6 +39,10 @@
     "google": "Continuar con Google",
     "github": "Continuar con Github",
     "settings": {
+      "profile": {
+        "title": "Perfil",
+        "button": "Actualizar perfil"
+      },
       "sessions": {
         "title": "Sesiones",
         "button": "Revocar",
@@ -76,6 +81,9 @@
     "auth": {
       "error": "Error al iniciar sesión con",
       "settings": {
+        "profile": {
+          "title": "Perfil actualizado con éxito"
+        },
         "sessions": {
           "error": "Error al revocar la sesión",
           "title": "Sesión revocada con éxito"
