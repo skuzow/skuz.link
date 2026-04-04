@@ -25,6 +25,15 @@
       "contact": "Contactar"
     }
   },
+  "form": {
+    "name": "Nombre",
+    "required": "es obligatorio",
+    "least": "debe ser como mínimo",
+    "most": "debe ser como máximo",
+    "characters": "caracteres",
+    "use": "está en uso",
+    "example": "Ejemplo de"
+  },
   "auth": {
     "google": "Continuar con Google",
     "github": "Continuar con Github",
