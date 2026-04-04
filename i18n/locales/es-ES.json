@@ -35,6 +35,12 @@
         "current": "Actual"
       },
       "account": {
+        "linked": {
+          "title": "Cuentas conectadas",
+          "credential": "Credenciales",
+          "button": "Desconectar",
+          "link": "Conectar cuenta"
+        },
         "delete": {
           "title": "Eliminar cuenta",
           "description": "Esta acción es irreversible"
@@ -66,6 +72,15 @@
           "title": "Sesión revocada con éxito"
         },
         "account": {
+          "linked": {
+            "unlink": {
+              "error": "Error al desvincular la cuenta",
+              "title": "Cuenta desvinculada con éxito"
+            },
+            "link": {
+              "error": "Error al vincular la cuenta"
+            }
+          },
           "delete": {
             "error": "Error al eliminar la cuenta",
             "title": "Cuenta eliminada con éxito"

@@ -18,7 +18,7 @@ import { Settings2Icon } from 'lucide-vue-next';
 
       <AuthSettingsSessions />
 
-      <!-- <AuthSettingsAccountLinked /> -->
+      <AuthSettingsAccountLinked />
 
       <AuthSettingsAccountDelete />
     </div>

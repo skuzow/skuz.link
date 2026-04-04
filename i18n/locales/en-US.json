@@ -35,6 +35,12 @@
         "current": "Current"
       },
       "account": {
+        "linked": {
+          "title": "Linked accounts",
+          "credential": "Credentials",
+          "button": "Unlink",
+          "link": "Link account"
+        },
         "delete": {
           "title": "Delete account",
           "description": "This action is irreversible"
@@ -66,6 +72,15 @@
           "title": "Session revoked successfully"
         },
         "account": {
+          "linked": {
+            "unlink": {
+              "error": "Error unlinking account",
+              "title": "Account unlinked successfully"
+            },
+            "link": {
+              "error": "Error linking account"
+            }
+          },
           "delete": {
             "error": "Error deleting account",
             "title": "Account deleted successfully"
