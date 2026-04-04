@@ -30,6 +30,14 @@ export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
         enabled: true
       }
     },
+    user: {
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (_user, _request) => {
+          // TODO: delete all user links
+        }
+      }
+    },
     socialProviders: {
       google: {
         clientId: runtimeConfig.google.clientId,

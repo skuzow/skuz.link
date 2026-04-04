@@ -27,14 +27,42 @@
   },
   "auth": {
     "google": "Continuar con Google",
-    "github": "Continuar con Github"
+    "github": "Continuar con Github",
+    "settings": {
+      "account": {
+        "delete": {
+          "title": "Eliminar cuenta",
+          "description": "Esta acción es irreversible"
+        }
+      }
+    }
   },
   "login": {
     "description": "Inicia sesión para gestionar tus links."
   },
+  "alert": {
+    "auth": {
+      "settings": {
+        "account": {
+          "delete": {
+            "title": "¿Estás seguro de que quieres eliminar tu cuenta?",
+            "description": "Esta acción es irreversible."
+          }
+        }
+      }
+    }
+  },
   "toast": {
     "auth": {
-      "error": "Error al iniciar sesión con"
+      "error": "Error al iniciar sesión con",
+      "settings": {
+        "account": {
+          "delete": {
+            "error": "Error al eliminar la cuenta",
+            "title": "Cuenta eliminada con éxito"
+          }
+        }
+      }
     }
   }
 }
