@@ -16,7 +16,7 @@ import { Settings2Icon } from 'lucide-vue-next';
     >
       <!-- <AuthSettingsProfile /> -->
 
-      <!-- <AuthSettingsSessions /> -->
+      <AuthSettingsSessions />
 
       <!-- <AuthSettingsAccountLinked /> -->
 

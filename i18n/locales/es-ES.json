@@ -29,6 +29,11 @@
     "google": "Continuar con Google",
     "github": "Continuar con Github",
     "settings": {
+      "sessions": {
+        "title": "Sesiones",
+        "button": "Revocar",
+        "current": "Actual"
+      },
       "account": {
         "delete": {
           "title": "Eliminar cuenta",
@@ -56,6 +61,10 @@
     "auth": {
       "error": "Error al iniciar sesión con",
       "settings": {
+        "sessions": {
+          "error": "Error al revocar la sesión",
+          "title": "Sesión revocada con éxito"
+        },
         "account": {
           "delete": {
             "error": "Error al eliminar la cuenta",

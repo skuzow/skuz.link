@@ -29,6 +29,11 @@
     "google": "Continue with Google",
     "github": "Continue with Github",
     "settings": {
+      "sessions": {
+        "title": "Sessions",
+        "button": "Revoke",
+        "current": "Current"
+      },
       "account": {
         "delete": {
           "title": "Delete account",
@@ -56,6 +61,10 @@
     "auth": {
       "error": "Error signing in with",
       "settings": {
+        "sessions": {
+          "error": "Error revoking session",
+          "title": "Session revoked successfully"
+        },
         "account": {
           "delete": {
             "error": "Error deleting account",
