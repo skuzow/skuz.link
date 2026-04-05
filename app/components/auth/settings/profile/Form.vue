@@ -21,7 +21,7 @@ const { isLoadingUpdateProfile, updateProfile, closeUpdateProfile } =
         :user="authUser"
       />
 
-      <form class="flex w-full flex-col gap-y-6" @submit="updateProfile">
+      <form class="w-full space-y-6" @submit="updateProfile">
         <UiFormField v-slot="{ componentField }" :name="FormInput.NAME">
           <UiFormItem>
             <UiFormLabel>{{ $t('form.name') }}</UiFormLabel>
