@@ -5,7 +5,7 @@ const isUpdateProfileOpen: Ref<boolean> = ref(false);
 </script>
 
 <template>
-  <section :class="{ 'border-b': !isUpdateProfileOpen }">
+  <section>
     <h3 class="py-4 font-bold">
       {{ $t('auth.settings.profile.title') }}
     </h3>

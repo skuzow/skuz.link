@@ -11,7 +11,7 @@ const { isLoadingUpdateProfile, updateProfile, closeUpdateProfile } =
 
 <template>
   <UiCard>
-    <UiCardContent class="flex flex-col gap-6 md:flex-row">
+    <UiCardContent class="flex flex-col gap-6 sm:flex-row">
       <SharedAvatar
         size="base"
         :width="64"

@@ -11,16 +11,16 @@ import { Settings2Icon } from 'lucide-vue-next';
       </UiDialogTitle>
     </UiDialogHeader>
 
-    <div
-      class="flex max-h-[75dvh] flex-col gap-y-4 overflow-y-auto p-6 pt-4 text-sm"
-    >
+    <div class="max-h-[75dvh] space-y-4 overflow-y-auto p-6 pt-4 text-sm">
       <AuthSettingsProfile />
 
-      <AuthSettingsSessions />
+      <UiAccordion type="multiple" class="space-y-4">
+        <AuthSettingsSessions />
 
-      <AuthSettingsAccountLinked />
+        <AuthSettingsAccountLinked />
 
-      <AuthSettingsAccountDelete />
+        <AuthSettingsAccountDelete />
+      </UiAccordion>
     </div>
   </UiDialogContent>
 </template>

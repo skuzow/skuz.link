@@ -40,23 +40,19 @@ const deleteAccount = async () => {
 </script>
 
 <template>
-  <section>
-    <UiAccordion type="single" collapsible>
-      <UiAccordionItem value="delete-account" class="border-b-transparent">
-        <UiAccordionTrigger>
-          <h3 class="font-bold">
-            {{ $t('auth.settings.account.delete.title') }}
-          </h3>
-        </UiAccordionTrigger>
-        <UiAccordionContent class="flex items-center justify-between pl-2.5">
-          <p>{{ $t('auth.settings.account.delete.description') }}</p>
+  <UiAccordionItem value="delete-account" class="border-b-transparent">
+    <UiAccordionTrigger>
+      <h3 class="font-bold">
+        {{ $t('auth.settings.account.delete.title') }}
+      </h3>
+    </UiAccordionTrigger>
+    <UiAccordionContent class="flex items-center justify-between pl-2.5">
+      <p>{{ $t('auth.settings.account.delete.description') }}</p>
 
-          <UiButton variant="destructive" @click="deleteAccount">
-            <IconLoader v-if="isLoadingDeleteAccount" class="mr-2" />
-            {{ $t('auth.settings.account.delete.title') }}
-          </UiButton>
-        </UiAccordionContent>
-      </UiAccordionItem>
-    </UiAccordion>
-  </section>
+      <UiButton variant="destructive" @click="deleteAccount">
+        <IconLoader v-if="isLoadingDeleteAccount" class="mr-2" />
+        {{ $t('auth.settings.account.delete.title') }}
+      </UiButton>
+    </UiAccordionContent>
+  </UiAccordionItem>
 </template>
