@@ -35,7 +35,6 @@ const {
     v-if="user"
     :size="size"
     :shape="shape"
-    :user="user"
     :class="
       cn(
         pointer && 'cursor-pointer',

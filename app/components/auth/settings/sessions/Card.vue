@@ -52,7 +52,6 @@ const clickRevokeSession = async () => {
 
 <template>
   <UiCard
-    :session="session"
     class="flex flex-col justify-between gap-y-3 p-3 sm:flex-row sm:items-center sm:gap-y-0"
   >
     <div>
