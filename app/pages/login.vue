@@ -9,7 +9,7 @@ seoMeta({
 
 <template>
   <section
-    class="mx-auto flex h-full max-w-xs flex-col justify-center gap-y-10"
+    class="mx-auto flex h-10/12 max-w-xs flex-col justify-center gap-y-10"
   >
     <div class="flex flex-col items-center gap-y-6 text-center">
       <NavLogo :size="28" />
