@@ -29,7 +29,6 @@ logs
 !.dev.vars.example
 
 # database
-server/database/migrations
 *.db
 
 # coverage
