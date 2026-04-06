@@ -1,6 +1,7 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
-import type { LibSQLDatabase } from 'drizzle-orm/libsql';
-import { drizzle } from 'drizzle-orm/d1';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
+import { drizzle as drizzleD1 } from 'drizzle-orm/d1';
+import { drizzle as drizzleLibsql } from 'drizzle-orm/libsql';
 import * as schema from '../database/schema';
 import { runtimeConfig } from './runtimeConfig';
 
@@ -9,19 +10,19 @@ export const getDB = (
   dbSchema?: typeof schema
 ) => {
   // for cli
-  if (!event) return drizzle(runtimeConfig.database.url, { schema: dbSchema });
+  if (!event)
+    return drizzleLibsql(runtimeConfig.database.url, { schema: dbSchema });
 
-  return drizzle(event.context.cloudflare.env.db, { schema: dbSchema });
+  return drizzleD1(event.context.cloudflare.env.db, { schema: dbSchema });
 };
 
 export const useDB = async (
   event: H3Event<EventHandlerRequest>
-): Promise<LibSQLDatabase<typeof schema>> => {
-  if (event && event.context.db) return event.context.db;
+): Promise<DrizzleD1Database<typeof schema>> => {
+  if (event.context.db) return event.context.db;
 
   const dbInstance = getDB(event, schema);
-
-  if (event) event.context.db = dbInstance;
+  event.context.db = dbInstance;
 
   return dbInstance;
 };
