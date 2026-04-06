@@ -56,8 +56,16 @@ export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
   return generatedAuth;
 };
 
-// for cli
-export const auth = useAuth();
+let _auth: ReturnType<typeof betterAuth>;
+
+// for cli: pnpm auth:schema
+const isAuthSchemaCommand = process.argv.some((arg) =>
+  arg.includes('server/database/schema/auth.ts')
+);
+
+if (isAuthSchemaCommand) _auth = useAuth();
+
+export const auth = _auth!;
 
 export const getAuthSession = async (event: H3Event<EventHandlerRequest>) => {
   const auth = useAuth(event);
