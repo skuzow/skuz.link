@@ -29,8 +29,5 @@ logs
 !.dev.vars.example
 worker-configuration.d.ts
 
-# database
-*.db
-
 # coverage
 tests/coverage
