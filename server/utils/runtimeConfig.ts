@@ -7,9 +7,6 @@ export const generateRuntimeConfig = () => ({
   public: {
     baseUrl: process.env.NUXT_APP_URL as string
   },
-  database: {
-    url: process.env.NUXT_DATABASE_URL as string
-  },
   betterAuth: {
     secret: process.env.NUXT_BETTER_AUTH_SECRET as string
   },
