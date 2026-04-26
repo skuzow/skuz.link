@@ -14,11 +14,11 @@ export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
 
   const generatedAuth = betterAuth({
     appName: 'skuz.link',
-    baseURL: runtimeConfig.public.baseUrl,
+    baseURL: runtimeConfig.betterAuth.url,
     trustedOrigins: [
       'http://localhost:3000',
       'http://localhost:8787',
-      runtimeConfig.public.baseUrl
+      runtimeConfig.betterAuth.url
     ],
     secret: runtimeConfig.betterAuth.secret,
     database: drizzleAdapter(getDB(event), {

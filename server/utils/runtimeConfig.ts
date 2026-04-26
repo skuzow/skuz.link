@@ -4,10 +4,8 @@ import { config } from 'dotenv';
 let runtimeConfigInstance: NitroRuntimeConfig;
 
 export const generateRuntimeConfig = () => ({
-  public: {
-    baseUrl: process.env.NUXT_APP_URL as string
-  },
   betterAuth: {
+    url: process.env.NUXT_BETTER_AUTH_URL as string,
     secret: process.env.NUXT_BETTER_AUTH_SECRET as string
   },
   google: {
