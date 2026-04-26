@@ -10,6 +10,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "auth:schema": "pnpm dlx @better-auth/cli generate --config server/utils/auth.ts --output server/database/schema/auth.ts -y",
+    "db:generate": "drizzle-kit generate --config ./server/database/drizzle.config.ts",
+    "db:migrate-local": "wrangler d1 migrations apply skuz-link-dev --local",
+    "db:migrate-dev": "wrangler d1 migrations apply skuz-link-dev --remote",
+    "db:migrate-pro": "wrangler d1 migrations apply skuz-link-pro --remote",
+    "db:studio": "pnpm dlx d1s",
     "build": "nuxt build",
     "preview": "wrangler dev",
     "deploy": "wrangler deploy",
@@ -20,20 +26,32 @@
     "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/robots": "5.6.7",
     "@nuxtjs/sitemap": "7.4.9",
+    "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.1.0",
+    "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
     "lucide-vue-next": "^0.556.0",
     "nuxt": "^4.2.1",
     "reka-ui": "^2.6.1",
     "shadcn-nuxt": "2.4.2",
     "tailwind-merge": "^3.4.0",
+    "vaul-vue": "^0.4.1",
+    "vee-validate": "^4.15.1",
     "vue": "^3.5.25",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "vue-sonner": "^2.0.9",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.18",
     "@nuxt/eslint": "^1.11.0",
     "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "^25.0.2",
+    "d1s": "^0.2.13",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "nitro-cloudflare-dev": "^0.2.2",
@@ -42,7 +60,7 @@
     "tailwindcss": "^4.1.17",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5.9.3",
-    "wrangler": "^4.53.0"
+    "wrangler": "^4.61.1"
   },
-  "packageManager": "pnpm@10.25.0"
+  "packageManager": "pnpm@10.28.2"
 }
