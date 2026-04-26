@@ -31,3 +31,7 @@ worker-configuration.d.ts
 
 # coverage
 tests/coverage
+
+# agents
+.agents
+skills-lock.json
