@@ -15,7 +15,14 @@
   ],
   "preview_urls": true,
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "traces": {
+      "enabled": true
+    },
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
   },
   "d1_databases": [
     {
