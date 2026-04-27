@@ -23,8 +23,7 @@ if (typeof useRuntimeConfig !== 'undefined') {
 } else {
   // for cli: pnpm auth:schema
   config();
-  runtimeConfigInstance =
-    generateRuntimeConfig() as unknown as NitroRuntimeConfig;
+  runtimeConfigInstance = generateRuntimeConfig() as NitroRuntimeConfig;
 }
 
 export const runtimeConfig = runtimeConfigInstance;
