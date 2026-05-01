@@ -25,6 +25,12 @@ export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
       provider: 'sqlite',
       schema
     }),
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60
+      }
+    },
     account: {
       accountLinking: {
         enabled: true
