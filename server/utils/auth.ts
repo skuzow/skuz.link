@@ -70,9 +70,8 @@ export const auth = _auth!;
 export const getAuthSession = async (event: H3Event<EventHandlerRequest>) => {
   const auth = useAuth(event);
 
-  const headers = event.headers;
   const session = await auth.api.getSession({
-    headers
+    headers: event.headers
   });
 
   return session;
