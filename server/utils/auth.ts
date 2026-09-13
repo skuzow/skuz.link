@@ -7,12 +7,8 @@ import * as schema from '../database/schema';
 import { getDB } from './db';
 import { runtimeConfig } from './runtimeConfig';
 
-let authInstance: ReturnType<typeof betterAuth>;
-
-export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
-  if (authInstance) return authInstance;
-
-  const generatedAuth = betterAuth({
+const createAuth = (event?: H3Event<EventHandlerRequest>) => {
+  return betterAuth({
     appName: 'skuz.link',
     baseURL: runtimeConfig.betterAuth.url,
     trustedOrigins: [
@@ -56,13 +52,23 @@ export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
     },
     plugins: [admin()]
   });
+};
+
+type AuthInstance = ReturnType<typeof createAuth>;
+
+let authInstance: AuthInstance | undefined;
+
+export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
+  if (authInstance) return authInstance;
+
+  const generatedAuth = createAuth(event);
 
   if (event) authInstance = generatedAuth;
 
   return generatedAuth;
 };
 
-let _auth: ReturnType<typeof betterAuth>;
+let _auth: AuthInstance | undefined;
 
 // for cli: pnpm auth:schema
 const isAuthSchemaCommand = process.argv.some((arg) =>
@@ -71,7 +77,7 @@ const isAuthSchemaCommand = process.argv.some((arg) =>
 
 if (isAuthSchemaCommand) _auth = useAuth();
 
-export const auth = _auth!;
+export const auth = _auth;
 
 export const getAuthSession = async (event: H3Event<EventHandlerRequest>) => {
   const auth = useAuth(event);
