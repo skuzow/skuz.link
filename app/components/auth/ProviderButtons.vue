@@ -8,15 +8,15 @@ const {
 </script>
 
 <template>
-  <UiButton variant="outline" @click="loginWithGoogle">
-    <IconLoader v-if="isLoadingWithGoogle" class="mr-2" />
-    <IconGoogle v-else class="mr-2" />
+  <UiButton variant="outline" class="gap-4" @click="loginWithGoogle">
+    <IconLoader v-if="isLoadingWithGoogle" />
+    <IconGoogle v-else />
     {{ $t('auth.google') }}
   </UiButton>
 
-  <UiButton variant="outline" @click="loginWithGithub">
-    <IconLoader v-if="isLoadingWithGithub" class="mr-2" />
-    <IconGithub v-else class="mr-2" />
+  <UiButton variant="outline" class="gap-4" @click="loginWithGithub">
+    <IconLoader v-if="isLoadingWithGithub" />
+    <IconGithub v-else />
     {{ $t('auth.github') }}
   </UiButton>
 </template>
