@@ -16,26 +16,17 @@ const colorMode = useColorMode();
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="font-medium">
-      <UiDropdownMenuItem
-        class="gap-2"
-        @click="colorMode.preference = Theme.LIGHT"
-      >
+      <UiDropdownMenuItem @click="colorMode.preference = Theme.LIGHT">
         <SunIcon :size="16" />
         <span>{{ $t('nav.header.theme.light') }}</span>
       </UiDropdownMenuItem>
 
-      <UiDropdownMenuItem
-        class="gap-2"
-        @click="colorMode.preference = Theme.DARK"
-      >
+      <UiDropdownMenuItem @click="colorMode.preference = Theme.DARK">
         <MoonIcon :size="16" />
         <span>{{ $t('nav.header.theme.dark') }}</span>
       </UiDropdownMenuItem>
 
-      <UiDropdownMenuItem
-        class="gap-2"
-        @click="colorMode.preference = Theme.SYSTEM"
-      >
+      <UiDropdownMenuItem @click="colorMode.preference = Theme.SYSTEM">
         <LaptopMinimalIcon :size="16" />
         <span>{{ $t('nav.header.theme.system') }}</span>
       </UiDropdownMenuItem>

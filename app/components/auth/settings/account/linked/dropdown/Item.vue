@@ -36,7 +36,7 @@ const clickLinkAccount = async (provider: AuthProvider) => {
 </script>
 
 <template>
-  <UiDropdownMenuItem class="gap-2" @click="clickLinkAccount(provider)">
+  <UiDropdownMenuItem @click="clickLinkAccount(provider)">
     <IconLoader v-if="isLoadingLinkAccount" />
     <component :is="authProviderIconMap[provider]" v-else />
     <span>{{ titleCase(provider) }}</span>

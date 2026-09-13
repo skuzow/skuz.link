@@ -19,14 +19,14 @@ const { openAuthSettings } = useAuthSettings();
       <UiDropdownMenuSeparator />
 
       <UiDropdownMenuGroup>
-        <NuxtLinkLocale to="/links" :title="$t('nav.header.user.links')">
-          <UiDropdownMenuItem class="gap-2">
+        <UiDropdownMenuItem as-child>
+          <NuxtLinkLocale to="/links" :title="$t('nav.header.user.links')">
             <LinkIcon :size="16" />
             <span>{{ $t('nav.header.user.links') }}</span>
-          </UiDropdownMenuItem>
-        </NuxtLinkLocale>
+          </NuxtLinkLocale>
+        </UiDropdownMenuItem>
 
-        <UiDropdownMenuItem class="gap-2" @click="openAuthSettings">
+        <UiDropdownMenuItem @click="openAuthSettings">
           <Settings2Icon :size="16" />
           <span>{{ $t('nav.header.user.settings') }}</span>
         </UiDropdownMenuItem>
@@ -34,7 +34,7 @@ const { openAuthSettings } = useAuthSettings();
 
       <UiDropdownMenuSeparator />
 
-      <UiDropdownMenuItem class="gap-2" @click="signOut">
+      <UiDropdownMenuItem @click="signOut">
         <LogOutIcon :size="16" />
         <span>{{ $t('nav.header.user.logout') }}</span>
       </UiDropdownMenuItem>

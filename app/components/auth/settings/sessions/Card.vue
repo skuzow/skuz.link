@@ -78,7 +78,7 @@ const clickRevokeSession = async () => {
 
     <div class="text-end">
       <UiButton
-        class="text-destructive hover:text-destructive gap-x-2"
+        class="text-destructive hover:text-destructive"
         variant="ghost"
         @click="clickRevokeSession"
       >

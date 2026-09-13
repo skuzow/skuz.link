@@ -13,16 +13,18 @@ const switchLocalePath = useSwitchLocalePath();
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="font-medium">
-      <NuxtLink
+      <UiDropdownMenuItem
         v-for="{ code, name } in locales"
         :key="code"
-        :to="switchLocalePath(code)"
-        :title="code.toUpperCase()"
+        as-child
       >
-        <UiDropdownMenuItem>
+        <NuxtLink
+          :to="switchLocalePath(code)"
+          :title="code.toUpperCase()"
+        >
           <span>{{ name }}</span>
-        </UiDropdownMenuItem>
-      </NuxtLink>
+        </NuxtLink>
+      </UiDropdownMenuItem>
     </UiDropdownMenuContent>
   </UiDropdownMenu>
 </template>

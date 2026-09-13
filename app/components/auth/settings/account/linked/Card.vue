@@ -69,7 +69,7 @@ const clickUnlinkAccount = async () => {
     </div>
 
     <UiButton
-      class="text-destructive hover:text-destructive gap-x-2"
+      class="text-destructive hover:text-destructive"
       variant="ghost"
       :disabled="length === 1"
       @click="clickUnlinkAccount"
