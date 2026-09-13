@@ -1,10 +1,9 @@
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@prisma/client'
-  - better-sqlite3
-  - esbuild
-  - node
-  - sharp
-  - unrs-resolver
-  - vue-demi
-  - workerd
+allowBuilds:
+  '@prisma/client': true
+  better-sqlite3: true
+  esbuild: true
+  node: true
+  sharp: true
+  unrs-resolver: true
+  vue-demi: true
+  workerd: true
