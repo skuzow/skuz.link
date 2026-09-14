@@ -10,6 +10,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "typecheck": "nuxi typecheck",
     "auth:schema": "better-auth generate --config server/utils/auth.ts --output server/database/schema/auth.ts -y",
     "db:generate": "drizzle-kit generate --config ./server/database/drizzle.config.ts",
     "db:migrate-local": "wrangler d1 migrations apply skuz-link-dev --local",
@@ -60,6 +61,7 @@
     "tailwindcss": "^4.3.3",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5.9.3",
+    "vue-tsc": "^3.3.11",
     "wrangler": "^4.131.1"
   },
   "packageManager": "pnpm@12.4.1"
