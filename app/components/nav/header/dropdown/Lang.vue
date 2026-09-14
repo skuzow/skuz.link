@@ -18,10 +18,7 @@ const switchLocalePath = useSwitchLocalePath();
         :key="code"
         as-child
       >
-        <NuxtLink
-          :to="switchLocalePath(code)"
-          :title="code.toUpperCase()"
-        >
+        <NuxtLink :to="switchLocalePath(code)" :title="code.toUpperCase()">
           <span>{{ name }}</span>
         </NuxtLink>
       </UiDropdownMenuItem>
