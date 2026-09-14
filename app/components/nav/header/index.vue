@@ -1,9 +1,24 @@
 <script lang="ts" setup>
+import { cn } from '@/lib/utils';
+
+interface Props {
+  isLanding?: boolean;
+}
+
+const { isLanding = false } = defineProps<Props>();
+
 const { isAuthenticated } = useAuth();
 </script>
 
 <template>
-  <header class="bg-background/80 sticky top-0 z-10 py-2.5 backdrop-blur-md">
+  <header
+    :class="
+      cn(
+        'sticky top-0 z-10 py-2.5',
+        !isLanding && 'bg-background/80 backdrop-blur-md'
+      )
+    "
+  >
     <nav
       class="mx-auto flex w-full max-w-368 flex-1 justify-between px-4 md:px-8"
     >
