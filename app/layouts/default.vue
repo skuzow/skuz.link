@@ -59,7 +59,6 @@ useHead({
 useSeoMeta({
   themeColor: themeColor,
   author: 'Alejandro Porras - skuzow',
-  keywords: 'skuz, link, url, shortener',
 
   twitterCard: 'summary_large_image',
   twitterSite: '@skuzow',

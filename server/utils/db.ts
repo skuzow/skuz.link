@@ -7,7 +7,11 @@ export const getDB = (
   event?: H3Event<EventHandlerRequest>,
   dbSchema?: typeof schema
 ) => {
-  return drizzle(event?.context.cloudflare.env.db ?? {}, { schema: dbSchema });
+  const d1 = event?.context.cloudflare.env.db;
+
+  return drizzle((d1 ?? {}) as Parameters<typeof drizzle>[0], {
+    schema: dbSchema
+  });
 };
 
 export const useDB = async (

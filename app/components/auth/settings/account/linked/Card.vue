@@ -31,7 +31,7 @@ const clickUnlinkAccount = async () => {
   isLoadingUnlinkAccount.value = true;
 
   const { error } = await unlinkAccount({
-    providerId: account.providerId
+    accountId: account.id
   });
 
   isLoadingUnlinkAccount.value = false;

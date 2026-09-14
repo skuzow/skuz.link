@@ -58,7 +58,7 @@ type AuthInstance = ReturnType<typeof createAuth>;
 
 let authInstance: AuthInstance | undefined;
 
-export const useAuth = (event?: H3Event<EventHandlerRequest>) => {
+export const getAuth = (event?: H3Event<EventHandlerRequest>) => {
   if (authInstance) return authInstance;
 
   const generatedAuth = createAuth(event);
@@ -75,12 +75,12 @@ const isAuthSchemaCommand = process.argv.some((arg) =>
   arg.includes('server/database/schema/auth.ts')
 );
 
-if (isAuthSchemaCommand) _auth = useAuth();
+if (isAuthSchemaCommand) _auth = getAuth();
 
 export const auth = _auth;
 
 export const getAuthSession = async (event: H3Event<EventHandlerRequest>) => {
-  const auth = useAuth(event);
+  const auth = getAuth(event);
 
   const session = await auth.api.getSession({
     headers: event.headers
