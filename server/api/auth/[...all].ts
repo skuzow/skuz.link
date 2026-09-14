@@ -1,5 +1,5 @@
 export default defineEventHandler((event) => {
-  const auth = useAuth(event);
+  const auth = getAuth(event);
 
   return auth.handler(toWebRequest(event));
 });

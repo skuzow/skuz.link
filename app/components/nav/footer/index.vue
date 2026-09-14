@@ -17,15 +17,15 @@ const currentYear: number = new Date().getFullYear();
       </div>
 
       <section class="flex items-center gap-x-1 md:gap-x-4">
-        <NuxtLink
-          to="mailto:contact@skuz.link"
-          :title="$t('nav.footer.contact')"
-        >
-          <UiButton variant="link" class="flex gap-x-1">
+        <UiButton as-child variant="link" class="gap-1">
+          <NuxtLink
+            to="mailto:contact@skuz.link"
+            :title="$t('nav.footer.contact')"
+          >
             <AtSignIcon :size="16" />
             {{ $t('nav.footer.contact') }}
-          </UiButton>
-        </NuxtLink>
+          </NuxtLink>
+        </UiButton>
 
         <ul class="flex -space-x-2">
           <li v-for="contributor in contributors" :key="contributor.username">

@@ -1,8 +1,6 @@
 import type { NitroRuntimeConfig } from 'nitropack/types';
 import { config } from 'dotenv';
 
-let runtimeConfigInstance: NitroRuntimeConfig;
-
 export const generateRuntimeConfig = () => ({
   betterAuth: {
     url: process.env.NUXT_BETTER_AUTH_URL as string,
@@ -18,12 +16,7 @@ export const generateRuntimeConfig = () => ({
   }
 });
 
-if (typeof useRuntimeConfig !== 'undefined') {
-  runtimeConfigInstance = useRuntimeConfig();
-} else {
-  // for cli: pnpm auth:schema
-  config();
-  runtimeConfigInstance = generateRuntimeConfig() as NitroRuntimeConfig;
-}
+// for cli: pnpm auth:schema
+if (!process.env.NUXT_BETTER_AUTH_SECRET) config();
 
-export const runtimeConfig = runtimeConfigInstance;
+export const runtimeConfig = generateRuntimeConfig() as NitroRuntimeConfig;

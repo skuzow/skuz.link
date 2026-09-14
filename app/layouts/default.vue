@@ -3,8 +3,9 @@ import { Theme, ThemeColor } from '@/constants/theme.constant';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { locale, locales } = useI18n();
-
 const colorMode = useColorMode();
+const route = useRoute();
+const localePath = useLocalePath();
 
 type LocaleCode = (typeof locales.value)[number]['code'];
 
@@ -14,10 +15,10 @@ const ogLocales: Record<LocaleCode, string> = {
 };
 
 const ogLocale = computed(() => ogLocales[locale.value as LocaleCode]);
-
 const themeColor = computed(() =>
   colorMode.value === Theme.DARK ? ThemeColor.DARK : ThemeColor.LIGHT
 );
+const isLanding = computed(() => route.path === localePath('/'));
 
 if (import.meta.server) {
   useHead({
@@ -59,7 +60,6 @@ useHead({
 useSeoMeta({
   themeColor: themeColor,
   author: 'Alejandro Porras - skuzow',
-  keywords: 'skuz, link, url, shortener',
 
   twitterCard: 'summary_large_image',
   twitterSite: '@skuzow',
@@ -75,7 +75,9 @@ useSeoMeta({
 
 <template>
   <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
-    <NavHeader />
+    <LandingGrid v-if="isLanding" />
+
+    <NavHeader :is-landing="isLanding" />
     <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
       <slot />
     </main>

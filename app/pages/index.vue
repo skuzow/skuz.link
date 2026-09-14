@@ -3,5 +3,5 @@ seoMeta();
 </script>
 
 <template>
-  <h1>{{ $t('description') }}</h1>
+  <LandingHero />
 </template>
