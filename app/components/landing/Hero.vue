@@ -5,7 +5,7 @@ import { RocketIcon } from 'lucide-vue-next';
 <template>
   <SharedFadeIn as-child>
     <section
-      class="flex h-full -translate-y-4 flex-col items-center justify-center gap-y-6 text-center 2xl:-translate-y-16"
+      class="flex h-11/12 flex-col items-center justify-center gap-y-6 text-center"
     >
       <NavLogo :size="48" />
 
