@@ -47,9 +47,7 @@ class LinkRepository {
 
       return link;
     } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new LinkAlreadyInUseError();
-      }
+      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
 
       throw error;
     }
@@ -72,9 +70,7 @@ class LinkRepository {
 
       return link;
     } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new LinkAlreadyInUseError();
-      }
+      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
 
       throw error;
     }

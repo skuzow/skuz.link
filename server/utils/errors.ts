@@ -5,8 +5,11 @@ export class LinkAlreadyInUseError extends Error {
   }
 }
 
-export const isUniqueConstraintError = (error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
+const UNIQUE_CONSTRAINT_ERROR_REGEX: RegExp = /UNIQUE constraint failed/i;
 
-  return /UNIQUE constraint failed/i.test(message);
+export const isUniqueConstraintError = (error: unknown) => {
+  return (
+    error instanceof Error &&
+    UNIQUE_CONSTRAINT_ERROR_REGEX.test(`${error.message} ${error.cause ?? ''}`)
+  );
 };
