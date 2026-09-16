@@ -10,9 +10,7 @@ export const useAuthUpdateProfile = () => {
   const emit = getCurrentInstance()!.emit;
 
   const { t: $t } = useI18n();
-
   const { updateAuthUser } = useAuth();
-
   const { requiredMessage, minMessage, maxMessage } = useFormMessage();
 
   const isLoadingUpdateProfile: Ref<boolean> = ref(false);
