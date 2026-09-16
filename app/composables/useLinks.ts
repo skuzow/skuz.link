@@ -1,23 +1,13 @@
 import type { Link } from '#shared/types/link.type';
 import { toast } from 'vue-sonner';
 
-type LinksResponse = {
-  statusCode: number;
-  statusMessage: string;
-  body: {
-    links: Link[];
-  };
-};
-
 export const useLinks = async () => {
+  const { $api } = useNuxtApp();
   const { t: $t } = useI18n();
   const { alert } = useAlert();
 
-  const { data, pending, refresh, error } = await useFetch<LinksResponse>(
-    '/api/links',
-    {
-      key: 'links'
-    }
+  const { data, pending, refresh, error } = await useAsyncData('links', () =>
+    $api.link.getAll()
   );
 
   const searchQuery = shallowRef('');
@@ -72,9 +62,7 @@ export const useLinks = async () => {
     isDeleting.value = true;
 
     try {
-      await $fetch(`/api/links/${link.id}`, {
-        method: 'DELETE'
-      });
+      await $api.link.delete(link.id);
 
       toast.success($t('toast.links.delete.title'));
 
