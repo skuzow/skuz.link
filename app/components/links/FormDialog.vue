@@ -42,7 +42,11 @@ watch(open, (isOpen) => {
       </UiDialogHeader>
 
       <form class="flex flex-col gap-6" @submit="submit">
-        <UiFormField v-slot="{ componentField }" :name="FormInput.LINK">
+        <UiFormField
+          v-slot="{ componentField }"
+          :name="FormInput.LINK"
+          :validate-on-blur="false"
+        >
           <UiFormItem>
             <UiFormLabel>{{ $t('form.link') }}</UiFormLabel>
             <UiInputGroup>
@@ -64,7 +68,11 @@ watch(open, (isOpen) => {
           </UiFormItem>
         </UiFormField>
 
-        <UiFormField v-slot="{ componentField }" :name="FormInput.REDIRECT_URL">
+        <UiFormField
+          v-slot="{ componentField }"
+          :name="FormInput.REDIRECT_URL"
+          :validate-on-blur="false"
+        >
           <UiFormItem>
             <UiFormLabel>{{ $t('form.redirectUrl') }}</UiFormLabel>
             <UiFormControl>
