@@ -28,6 +28,13 @@
   },
   "form": {
     "name": "Nombre",
+    "link": "Link",
+    "redirectUrl": "URL de redirección",
+    "linkPlaceholder": "github",
+    "redirectUrlPlaceholder": "https://ejemplo.com",
+    "linkFormat": "solo puede contener minúsculas, números, guiones y guiones bajos",
+    "linkReserved": "está reservado",
+    "urlFormat": "debe ser una URL http(s) válida",
     "required": "es obligatorio",
     "least": "debe ser como mínimo",
     "most": "debe ser como máximo",
@@ -65,6 +72,36 @@
   "login": {
     "description": "Inicia sesión para gestionar tus links."
   },
+  "links": {
+    "empty": {
+      "title": "Aún no tienes links",
+      "description": "Crea tu primer link corto para empezar a compartir.",
+      "button": "Crear link"
+    },
+    "search": {
+      "placeholder": "Buscar por nombre",
+      "empty": {
+        "title": "No se encontraron links",
+        "description": "Prueba con otro nombre."
+      }
+    },
+    "create": {
+      "title": "Crear link",
+      "description": "Indica la ruta corta y la URL a la que redirigir.",
+      "button": "Crear link"
+    },
+    "edit": {
+      "title": "Editar link",
+      "description": "Actualiza la ruta corta o la URL de redirección.",
+      "button": "Editar"
+    },
+    "delete": {
+      "button": "Eliminar"
+    },
+    "copy": "Copiar",
+    "actions": "Acciones del link",
+    "clicks": "{n} clics"
+  },
   "landing": {
     "headline": {
       "first": "Acorta tus enlaces,",
@@ -82,6 +119,12 @@
             "description": "Esta acción es irreversible."
           }
         }
+      }
+    },
+    "links": {
+      "delete": {
+        "title": "¿Estás seguro de que quieres eliminar este link?",
+        "description": "Esta acción es irreversible."
       }
     }
   },
@@ -112,6 +155,21 @@
           }
         }
       }
+    },
+    "links": {
+      "create": {
+        "title": "Link creado con éxito"
+      },
+      "edit": {
+        "title": "Link actualizado con éxito"
+      },
+      "delete": {
+        "title": "Link eliminado con éxito"
+      },
+      "copy": {
+        "title": "Link copiado"
+      },
+      "error": "Ha ocurrido un error con tus links"
     }
   }
 }

@@ -75,7 +75,7 @@ useSeoMeta({
 
 <template>
   <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
-    <LandingGrid v-if="isLanding" />
+    <LandingGridBackground v-if="isLanding" />
 
     <NavHeader :is-landing="isLanding" />
     <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">

@@ -1,0 +1,75 @@
+export const LINK_SLUG_MIN: number = 1;
+export const LINK_SLUG_MAX: number = 64;
+export const LINK_REDIRECT_URL_MAX: number = 2048;
+
+export const LINK_SLUG_REGEX: RegExp = /^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
+
+export const RESERVED_LINK_SLUGS: ReadonlySet<string> = new Set([
+  // app
+  'login',
+  'logout',
+  'signup',
+  'signin',
+  'sign-up',
+  'sign-in',
+  'register',
+  'auth',
+  'account',
+  'settings',
+  'profile',
+  'links',
+  'link',
+  'api',
+  'admin',
+  'dashboard',
+  'en',
+  'es',
+
+  // legal
+  'legal',
+  'legal-notice',
+  'privacy',
+  'privacy-policy',
+  'terms',
+  'terms-of-service',
+  'terms-and-conditions',
+  'tos',
+  'cookies',
+  'cookie-policy',
+  'cookie-settings',
+  'imprint',
+  'impressum',
+  'disclaimer',
+  'gdpr',
+  'rgpd',
+  'dmca',
+  'license',
+  'licenses',
+  'copyright',
+  'security',
+  'accessibility',
+  'aviso-legal',
+  'privacidad',
+  'politica-de-privacidad',
+  'terminos',
+  'terminos-y-condiciones',
+  'condiciones',
+  'politica-de-cookies',
+  'accesibilidad',
+
+  // site
+  'about',
+  'contact',
+  'help',
+  'support',
+  'faq',
+  'status',
+  'pricing',
+  'blog',
+  'docs',
+  'changelog',
+  'trust',
+  'sitemap',
+  'robots',
+  'health'
+]);

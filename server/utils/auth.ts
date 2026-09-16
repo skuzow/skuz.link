@@ -6,6 +6,7 @@ import { admin } from 'better-auth/plugins';
 import * as schema from '../database/schema';
 import { getDB } from './db';
 import { runtimeConfig } from './runtimeConfig';
+import { useRepository } from './repository';
 
 const createAuth = (event?: H3Event<EventHandlerRequest>) => {
   return betterAuth({
@@ -35,8 +36,12 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
     user: {
       deleteUser: {
         enabled: true,
-        beforeDelete: async (_user, _request) => {
-          // TODO: delete all user links
+        beforeDelete: async (user) => {
+          if (!event) return;
+
+          const repository = await useRepository(event);
+
+          await repository.link.deleteAllByUserId(user.id);
         }
       }
     },
