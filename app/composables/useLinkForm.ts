@@ -16,7 +16,7 @@ export const useLinkForm = (options: {
   const { requiredMessage, minMessage, maxMessage, alreadyUseMessage } =
     useFormMessage();
 
-  const isLoading = shallowRef(false);
+  const isLoading: Ref<boolean> = ref(false);
 
   const linkErrorMap: z.ZodErrorMap = (issue, ctx) => {
     const input = issue.path[0] as FormInput;
@@ -71,14 +71,6 @@ export const useLinkForm = (options: {
     });
   };
 
-  watch(
-    currentLink,
-    (link) => {
-      resetWithLink(link);
-    },
-    { immediate: true }
-  );
-
   const submit = form.handleSubmit(async (values) => {
     if (isLoading.value) return;
 
@@ -96,11 +88,13 @@ export const useLinkForm = (options: {
       }
 
       await options.onSuccess();
-      resetWithLink(null);
     } catch (error) {
-      const statusCode = (error as { statusCode?: number }).statusCode;
+      const isConflict =
+        error instanceof Error &&
+        'statusCode' in error &&
+        error.statusCode === 409;
 
-      if (statusCode === 409) {
+      if (isConflict) {
         form.setErrors({
           slug: alreadyUseMessage(FormInput.SLUG)
         });

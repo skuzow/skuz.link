@@ -14,10 +14,7 @@ const emit = defineEmits<{
 
 const { isLoading, isEditing, submit, resetWithLink } = useLinkForm({
   link: () => props.link,
-  onSuccess: async () => {
-    open.value = false;
-    emit('success');
-  }
+  onSuccess: () => emit('success')
 });
 
 watch(open, (isOpen) => {

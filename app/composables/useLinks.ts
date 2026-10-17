@@ -6,7 +6,7 @@ export const useLinks = async () => {
   const { t: $t } = useI18n();
   const { alert } = useAlert();
 
-  const { data, pending, refresh, error } = await useAsyncData('links', () =>
+  const { data, pending, refresh } = await useAsyncData('links', () =>
     $api.link.getAll()
   );
 
@@ -76,19 +76,15 @@ export const useLinks = async () => {
 
   return {
     pending,
-    error,
     searchQuery,
     isFormOpen,
     editingLink,
-    links,
     filteredLinks,
     hasLinks,
     hasFilteredLinks,
     openCreate,
     openEdit,
-    closeForm,
     onFormSuccess,
-    deleteLink,
-    refresh
+    deleteLink
   };
 };
