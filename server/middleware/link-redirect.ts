@@ -3,12 +3,6 @@ import {
   isReservedLinkSlug,
   normalizeLinkSlug
 } from '#shared/schemas/link.schema';
-import {
-  clientLinkRedirect,
-  readCachedLinkRedirect,
-  scheduleLinkClick,
-  scheduleStoreLinkRedirect
-} from '~~/server/utils/link-redirect-cache';
 
 export default defineEventHandler(async (event) => {
   if (event.method !== 'GET') return;

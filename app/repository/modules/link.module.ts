@@ -1,4 +1,4 @@
-import type { Link, LinkCreation, LinkUpdate } from '#shared/types/link.type';
+import type { Link, LinkCreation } from '#shared/types/link.type';
 
 import HttpFactory from '@/repository/factory';
 import Routes from '@/repository/routes.client';
@@ -21,7 +21,7 @@ class LinkModule extends HttpFactory {
     });
   }
 
-  async update(id: string, dto: LinkUpdate) {
+  async update(id: string, dto: LinkCreation) {
     return this.call<{ link: Link }>({
       method: 'PUT',
       url: this.ROUTE.FetchId(id),

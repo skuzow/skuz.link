@@ -38,5 +38,3 @@ export const LinkCreationSchema = z.object({
   slug: LinkSlugSchema,
   redirectUrl: LinkRedirectUrlSchema
 });
-
-export const LinkUpdateSchema = LinkCreationSchema;

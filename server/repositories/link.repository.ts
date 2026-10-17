@@ -1,4 +1,4 @@
-import type { Link, LinkCreation, LinkUpdate } from '#shared/types/link.type';
+import type { Link, LinkCreation } from '#shared/types/link.type';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { links } from '~~/server/database/schema';
 import {
@@ -30,58 +30,38 @@ class LinkRepository {
   }
 
   async create(userId: string, data: LinkCreation): Promise<Link> {
-    try {
-      const [link] = await this.db
+    const [link] = await this.withUniqueSlug(() =>
+      this.db
         .insert(links)
         .values({
+          ...data,
           id: crypto.randomUUID(),
-          slug: data.slug,
-          redirectUrl: data.redirectUrl,
           userId
         })
-        .returning();
+        .returning()
+    );
 
-      if (!link) {
-        throw new Error('Link was not created');
-      }
-
-      return link;
-    } catch (error) {
-      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
-
-      throw error;
+    if (!link) {
+      throw new Error('Link was not created');
     }
+
+    return link;
   }
 
-  async update(id: string, data: LinkUpdate): Promise<Link> {
-    try {
-      const [link] = await this.db
-        .update(links)
-        .set({
-          slug: data.slug,
-          redirectUrl: data.redirectUrl
-        })
-        .where(eq(links.id, id))
-        .returning();
+  async update(id: string, data: LinkCreation): Promise<Link> {
+    const [link] = await this.withUniqueSlug(() =>
+      this.db.update(links).set(data).where(eq(links.id, id)).returning()
+    );
 
-      if (!link) {
-        throw new Error('Link was not updated');
-      }
-
-      return link;
-    } catch (error) {
-      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
-
-      throw error;
+    if (!link) {
+      throw new Error('Link was not updated');
     }
+
+    return link;
   }
 
   async delete(id: string) {
     await this.db.delete(links).where(eq(links.id, id));
-  }
-
-  async deleteAllByUserId(userId: string) {
-    await this.db.delete(links).where(eq(links.userId, userId));
   }
 
   async findRedirectUrlBySlug(slug: string): Promise<string | null> {
@@ -103,6 +83,16 @@ class LinkRepository {
         clicks: sql`${links.clicks} + 1`
       })
       .where(eq(links.slug, slug));
+  }
+
+  private async withUniqueSlug<T>(operation: () => Promise<T>): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
+
+      throw error;
+    }
   }
 }
 

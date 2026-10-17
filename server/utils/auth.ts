@@ -50,8 +50,6 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
               purgeLinkRedirect(requestURL.origin, link.slug)
             )
           );
-
-          await repository.link.deleteAllByUserId(user.id);
         }
       }
     },

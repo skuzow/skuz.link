@@ -1,20 +1,14 @@
-import { LinkUpdateSchema } from '#shared/schemas/link.schema';
-import { LinkAlreadyInUseError } from '~~/server/utils/errors';
-import { purgeLinkRedirect } from '~~/server/utils/link-redirect-cache';
+import { LinkCreationSchema } from '#shared/schemas/link.schema';
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
-  const id = getRouterParam(event, 'id');
-
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid fields'
-    });
-  }
+  const { repository, link: ownedLink } = await requireOwnedLink(
+    event,
+    user.id
+  );
 
   const body = await readBody(event);
-  const result = LinkUpdateSchema.safeParse(body);
+  const result = LinkCreationSchema.safeParse(body);
 
   if (!result.success) {
     throw createError({
@@ -24,18 +18,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const repository = await useRepository(event);
-  const ownedLink = await repository.link.findOwnedById(id, user.id);
-
-  if (!ownedLink) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Link not found'
-    });
-  }
-
   try {
-    const link = await repository.link.update(id, result.data);
+    const link = await repository.link.update(ownedLink.id, result.data);
 
     const requestURL = getRequestURL(event);
     await purgeLinkRedirect(requestURL.origin, ownedLink.slug);
@@ -48,13 +32,6 @@ export default defineEventHandler(async (event) => {
       }
     };
   } catch (error) {
-    if (error instanceof LinkAlreadyInUseError) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: 'Link already in use'
-      });
-    }
-
-    throw error;
+    throw toLinkConflictError(error);
   }
 });

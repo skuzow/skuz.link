@@ -1,30 +1,11 @@
-import { purgeLinkRedirect } from '~~/server/utils/link-redirect-cache';
-
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
-  const id = getRouterParam(event, 'id');
+  const { repository, link } = await requireOwnedLink(event, user.id);
 
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid fields'
-    });
-  }
-
-  const repository = await useRepository(event);
-  const ownedLink = await repository.link.findOwnedById(id, user.id);
-
-  if (!ownedLink) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Link not found'
-    });
-  }
-
-  await repository.link.delete(id);
+  await repository.link.delete(link.id);
 
   const requestURL = getRequestURL(event);
-  await purgeLinkRedirect(requestURL.origin, ownedLink.slug);
+  await purgeLinkRedirect(requestURL.origin, link.slug);
 
   return {
     statusCode: 200,

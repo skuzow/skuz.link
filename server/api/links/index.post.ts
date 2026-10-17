@@ -1,5 +1,4 @@
 import { LinkCreationSchema } from '#shared/schemas/link.schema';
-import { LinkAlreadyInUseError } from '~~/server/utils/errors';
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
@@ -27,13 +26,6 @@ export default defineEventHandler(async (event) => {
       }
     };
   } catch (error) {
-    if (error instanceof LinkAlreadyInUseError) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: 'Link already in use'
-      });
-    }
-
-    throw error;
+    throw toLinkConflictError(error);
   }
 });
