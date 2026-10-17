@@ -44,11 +44,11 @@ watch(open, (isOpen) => {
       <form class="flex flex-col gap-6" @submit="submit">
         <UiFormField
           v-slot="{ componentField }"
-          :name="FormInput.LINK"
+          :name="FormInput.SLUG"
           :validate-on-blur="false"
         >
           <UiFormItem>
-            <UiFormLabel>{{ $t('form.link') }}</UiFormLabel>
+            <UiFormLabel>{{ $t('form.slug') }}</UiFormLabel>
             <UiInputGroup>
               <UiInputGroupAddon>
                 <UiInputGroupText>/</UiInputGroupText>
@@ -59,7 +59,7 @@ watch(open, (isOpen) => {
                   autocapitalize="none"
                   autocomplete="off"
                   spellcheck="false"
-                  :placeholder="$t('form.linkPlaceholder')"
+                  :placeholder="$t('form.slugPlaceholder')"
                   v-bind="componentField"
                 />
               </UiFormControl>

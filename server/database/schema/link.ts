@@ -6,7 +6,7 @@ export const links = sqliteTable(
   'links',
   {
     id: text('id').primaryKey(),
-    link: text('link').notNull().unique(),
+    slug: text('slug').notNull().unique(),
     redirectUrl: text('redirect_url').notNull(),
     userId: text('user_id')
       .notNull()

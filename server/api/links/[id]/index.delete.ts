@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   await repository.link.delete(id);
 
   const requestURL = getRequestURL(event);
-  await purgeLinkRedirect(requestURL.origin, ownedLink.link);
+  await purgeLinkRedirect(requestURL.origin, ownedLink.slug);
 
   return {
     statusCode: 200,

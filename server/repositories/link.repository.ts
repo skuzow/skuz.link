@@ -35,7 +35,7 @@ class LinkRepository {
         .insert(links)
         .values({
           id: crypto.randomUUID(),
-          link: data.link,
+          slug: data.slug,
           redirectUrl: data.redirectUrl,
           userId
         })
@@ -58,7 +58,7 @@ class LinkRepository {
       const [link] = await this.db
         .update(links)
         .set({
-          link: data.link,
+          slug: data.slug,
           redirectUrl: data.redirectUrl
         })
         .where(eq(links.id, id))
@@ -90,7 +90,7 @@ class LinkRepository {
         redirectUrl: links.redirectUrl
       })
       .from(links)
-      .where(eq(links.link, slug))
+      .where(eq(links.slug, slug))
       .limit(1);
 
     return link?.redirectUrl ?? null;
@@ -102,7 +102,7 @@ class LinkRepository {
       .set({
         clicks: sql`${links.clicks} + 1`
       })
-      .where(eq(links.link, slug));
+      .where(eq(links.slug, slug));
   }
 }
 

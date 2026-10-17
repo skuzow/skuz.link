@@ -21,8 +21,8 @@ const emit = defineEmits<{
 const { t: $t } = useI18n();
 const requestURL = useRequestURL();
 
-const shortPath = computed(() => `/${props.link.link}`);
-const shortUrl = computed(() => `${requestURL.origin}/${props.link.link}`);
+const shortPath = computed(() => `/${props.link.slug}`);
+const shortUrl = computed(() => `${requestURL.origin}/${props.link.slug}`);
 
 const copyLink = async () => {
   try {

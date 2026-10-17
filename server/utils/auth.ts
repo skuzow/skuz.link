@@ -47,7 +47,7 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
 
           await Promise.all(
             userLinks.map((link) =>
-              purgeLinkRedirect(requestURL.origin, link.link)
+              purgeLinkRedirect(requestURL.origin, link.slug)
             )
           );
 

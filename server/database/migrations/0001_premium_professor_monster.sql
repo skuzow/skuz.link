@@ -1,6 +1,6 @@
 CREATE TABLE `links` (
 	`id` text PRIMARY KEY NOT NULL,
-	`link` text NOT NULL,
+	`slug` text NOT NULL,
 	`redirect_url` text NOT NULL,
 	`user_id` text NOT NULL,
 	`clicks` integer DEFAULT 0 NOT NULL,
@@ -9,5 +9,5 @@ CREATE TABLE `links` (
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `links_link_unique` ON `links` (`link`);--> statement-breakpoint
+CREATE UNIQUE INDEX `links_slug_unique` ON `links` (`slug`);--> statement-breakpoint
 CREATE INDEX `links_userId_idx` ON `links` (`user_id`);

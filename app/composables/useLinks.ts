@@ -22,7 +22,7 @@ export const useLinks = async () => {
 
     if (!query) return links.value;
 
-    return links.value.filter((link) => link.link.includes(query));
+    return links.value.filter((link) => link.slug.includes(query));
   });
 
   const hasLinks = computed(() => links.value.length > 0);

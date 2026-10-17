@@ -1,5 +1,5 @@
 export enum FormInput {
   NAME = 'name',
-  LINK = 'link',
+  SLUG = 'slug',
   REDIRECT_URL = 'redirectUrl'
 }

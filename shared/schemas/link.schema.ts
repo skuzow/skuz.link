@@ -32,7 +32,7 @@ export const LinkRedirectUrlSchema = z
   .refine((url) => url.startsWith('http://') || url.startsWith('https://'));
 
 export const LinkCreationSchema = z.object({
-  link: LinkSlugSchema,
+  slug: LinkSlugSchema,
   redirectUrl: LinkRedirectUrlSchema
 });
 

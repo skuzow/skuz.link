@@ -26,27 +26,27 @@ export const useLinkForm = (options: {
   const isLoading = shallowRef(false);
 
   const LinkFormSchema = z.object({
-    link: z
+    slug: z
       .string({
-        required_error: requiredMessage(FormInput.LINK)
+        required_error: requiredMessage(FormInput.SLUG)
       })
       .transform(normalizeLinkSlug)
       .pipe(
         z
           .string()
           .min(LINK_SLUG_MIN, {
-            message: minMessage(FormInput.LINK, LINK_SLUG_MIN)
+            message: minMessage(FormInput.SLUG, LINK_SLUG_MIN)
           })
           .max(LINK_SLUG_MAX, {
-            message: maxMessage(FormInput.LINK, LINK_SLUG_MAX)
+            message: maxMessage(FormInput.SLUG, LINK_SLUG_MAX)
           })
           .regex(LINK_SLUG_REGEX, {
-            message: `${$t('form.link')} ${$t('form.linkFormat')}.`
+            message: `${$t('form.slug')} ${$t('form.slugFormat')}.`
           })
           .refine(
             (slug) => !RESERVED_LINK_SLUGS.has(slug) && !slug.startsWith('_'),
             {
-              message: `${$t('form.link')} ${$t('form.linkReserved')}.`
+              message: `${$t('form.slug')} ${$t('form.slugReserved')}.`
             }
           )
       ),
@@ -82,7 +82,7 @@ export const useLinkForm = (options: {
   const resetWithLink = (link?: Link | null) => {
     form.resetForm({
       values: {
-        link: link?.link ?? '',
+        slug: link?.slug ?? '',
         redirectUrl: link?.redirectUrl ?? ''
       }
     });
@@ -119,7 +119,7 @@ export const useLinkForm = (options: {
 
       if (statusCode === 409) {
         form.setErrors({
-          link: alreadyUseMessage(FormInput.LINK)
+          slug: alreadyUseMessage(FormInput.SLUG)
         });
       } else {
         toast.error($t('toast.links.error'));
