@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { LinkIcon } from 'lucide-vue-next';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     search?: boolean;
   }>(),
@@ -13,6 +13,17 @@ withDefaults(
 const emit = defineEmits<{
   create: [];
 }>();
+
+const { t: $t } = useI18n();
+
+const title = computed(() =>
+  props.search ? $t('links.search.empty.title') : $t('links.empty.title')
+);
+const description = computed(() =>
+  props.search
+    ? $t('links.search.empty.description')
+    : $t('links.empty.description')
+);
 </script>
 
 <template>
@@ -21,16 +32,8 @@ const emit = defineEmits<{
       <UiEmptyMedia variant="icon">
         <LinkIcon />
       </UiEmptyMedia>
-      <UiEmptyTitle>
-        {{ search ? $t('links.search.empty.title') : $t('links.empty.title') }}
-      </UiEmptyTitle>
-      <UiEmptyDescription>
-        {{
-          search
-            ? $t('links.search.empty.description')
-            : $t('links.empty.description')
-        }}
-      </UiEmptyDescription>
+      <UiEmptyTitle>{{ title }}</UiEmptyTitle>
+      <UiEmptyDescription>{{ description }}</UiEmptyDescription>
     </UiEmptyHeader>
     <UiEmptyContent v-if="!search">
       <UiButton @click="emit('create')">

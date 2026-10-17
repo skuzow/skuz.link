@@ -15,10 +15,10 @@ const emit = defineEmits<{
         <SearchIcon />
       </UiInputGroupAddon>
       <UiInputGroupInput
+        v-model="searchQuery"
         type="search"
         :placeholder="$t('links.search.placeholder')"
-        :model-value="searchQuery"
-        @update:model-value="searchQuery = String($event)"
+        :aria-label="$t('links.search.placeholder')"
       />
     </UiInputGroup>
 

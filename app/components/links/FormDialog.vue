@@ -17,6 +17,17 @@ const { isLoading, isEditing, submit, resetWithLink } = useLinkForm({
   onSuccess: () => emit('success')
 });
 
+const { t: $t } = useI18n();
+
+const title = computed(() =>
+  isEditing.value ? $t('links.edit.title') : $t('links.create.title')
+);
+const description = computed(() =>
+  isEditing.value
+    ? $t('links.edit.description')
+    : $t('links.create.description')
+);
+
 watch(open, (isOpen) => {
   if (isOpen) resetWithLink(props.link);
 });
@@ -26,16 +37,8 @@ watch(open, (isOpen) => {
   <UiDialog v-model:open="open">
     <UiDialogContent>
       <UiDialogHeader>
-        <UiDialogTitle>
-          {{ isEditing ? $t('links.edit.title') : $t('links.create.title') }}
-        </UiDialogTitle>
-        <UiDialogDescription>
-          {{
-            isEditing
-              ? $t('links.edit.description')
-              : $t('links.create.description')
-          }}
-        </UiDialogDescription>
+        <UiDialogTitle>{{ title }}</UiDialogTitle>
+        <UiDialogDescription>{{ description }}</UiDialogDescription>
       </UiDialogHeader>
 
       <form class="flex flex-col gap-6" @submit="submit">
