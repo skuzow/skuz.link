@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import { LINKS_GRID_ITEM_CLASS, LINKS_GRID_LIST_CLASS } from './grid-layout';
+import {
+  LINKS_GRID_ITEM_CLASS,
+  LINKS_GRID_LIST_CLASS
+} from '@/constants/links.constant';
 </script>
 
 <template>

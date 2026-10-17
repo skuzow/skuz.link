@@ -9,14 +9,14 @@ class LinkModule extends HttpFactory {
   async getAll() {
     return this.call<{ links: Link[] }>({
       method: 'GET',
-      url: this.ROUTE.Fetch()
+      url: this.ROUTE.Links()
     });
   }
 
   async create(dto: LinkCreation) {
     return this.call<{ link: Link }>({
       method: 'POST',
-      url: this.ROUTE.Fetch(),
+      url: this.ROUTE.Links(),
       body: dto
     });
   }
@@ -24,7 +24,7 @@ class LinkModule extends HttpFactory {
   async update(id: string, dto: LinkCreation) {
     return this.call<{ link: Link }>({
       method: 'PUT',
-      url: this.ROUTE.FetchId(id),
+      url: this.ROUTE.LinkById(id),
       body: dto
     });
   }
@@ -32,7 +32,7 @@ class LinkModule extends HttpFactory {
   async delete(id: string) {
     return this.call({
       method: 'DELETE',
-      url: this.ROUTE.FetchId(id)
+      url: this.ROUTE.LinkById(id)
     });
   }
 }

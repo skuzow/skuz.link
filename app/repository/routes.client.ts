@@ -6,8 +6,8 @@ const PREFIX = {
 
 const Routes = {
   Link: {
-    Fetch: () => PREFIX.LINK,
-    FetchId: (id: string) => `${PREFIX.LINK}/${id}`
+    Links: () => PREFIX.LINK,
+    LinkById: (id: string) => `${PREFIX.LINK}/${id}`
   }
 };
 
