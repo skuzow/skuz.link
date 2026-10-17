@@ -1,3 +1,5 @@
+import { purgeLinkRedirect } from '~~/server/utils/link-redirect-cache';
+
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
   const id = getRouterParam(event, 'id');
@@ -20,6 +22,9 @@ export default defineEventHandler(async (event) => {
   }
 
   await repository.link.delete(id);
+
+  const requestURL = getRequestURL(event);
+  await purgeLinkRedirect(requestURL.origin, ownedLink.link);
 
   return {
     statusCode: 200,

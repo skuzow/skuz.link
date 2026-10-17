@@ -3,11 +3,19 @@ import {
   RESERVED_LINK_SLUGS
 } from '#shared/constants/link.constant';
 import { normalizeLinkSlug } from '#shared/schemas/link.schema';
+import {
+  clientLinkRedirect,
+  readCachedLinkRedirect,
+  scheduleLinkClick,
+  scheduleStoreLinkRedirect
+} from '~~/server/utils/link-redirect-cache';
 
 export default defineEventHandler(async (event) => {
   if (event.method !== 'GET') return;
 
-  const pathname = getRequestURL(event).pathname;
+  const requestURL = getRequestURL(event);
+
+  const pathname = requestURL.pathname;
   if (pathname.startsWith('/api') || pathname.startsWith('/_')) return;
 
   const segments = pathname.split('/').filter(Boolean);
@@ -24,8 +32,18 @@ export default defineEventHandler(async (event) => {
   }
 
   const repository = await useRepository(event);
-  const updated = await repository.link.incrementClicksBySlug(slug);
-  if (!updated) return;
 
-  return sendRedirect(event, updated.redirectUrl, 302);
+  const cached = await readCachedLinkRedirect(requestURL.origin, slug);
+  if (cached) {
+    scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+    return cached;
+  }
+
+  const redirectUrl = await repository.link.findRedirectUrlBySlug(slug);
+  if (!redirectUrl) return;
+
+  scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+  scheduleStoreLinkRedirect(event, requestURL.origin, slug, redirectUrl);
+
+  return clientLinkRedirect(redirectUrl);
 });

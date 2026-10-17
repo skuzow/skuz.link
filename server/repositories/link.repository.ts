@@ -84,20 +84,25 @@ class LinkRepository {
     await this.db.delete(links).where(eq(links.userId, userId));
   }
 
-  async incrementClicksBySlug(
-    slug: string
-  ): Promise<{ redirectUrl: string } | null> {
-    const [updated] = await this.db
+  async findRedirectUrlBySlug(slug: string): Promise<string | null> {
+    const [link] = await this.db
+      .select({
+        redirectUrl: links.redirectUrl
+      })
+      .from(links)
+      .where(eq(links.link, slug))
+      .limit(1);
+
+    return link?.redirectUrl ?? null;
+  }
+
+  async incrementClicksBySlug(slug: string): Promise<void> {
+    await this.db
       .update(links)
       .set({
         clicks: sql`${links.clicks} + 1`
       })
-      .where(eq(links.link, slug))
-      .returning({
-        redirectUrl: links.redirectUrl
-      });
-
-    return updated ?? null;
+      .where(eq(links.link, slug));
   }
 }
 

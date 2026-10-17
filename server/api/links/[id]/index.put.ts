@@ -1,5 +1,6 @@
 import { LinkUpdateSchema } from '#shared/schemas/link.schema';
 import { LinkAlreadyInUseError } from '~~/server/utils/errors';
+import { purgeLinkRedirect } from '~~/server/utils/link-redirect-cache';
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
@@ -35,6 +36,9 @@ export default defineEventHandler(async (event) => {
 
   try {
     const link = await repository.link.update(id, result.data);
+
+    const requestURL = getRequestURL(event);
+    await purgeLinkRedirect(requestURL.origin, ownedLink.link);
 
     return {
       statusCode: 200,
