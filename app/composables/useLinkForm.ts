@@ -5,14 +5,7 @@ import { useForm } from 'vee-validate';
 import { toast } from 'vue-sonner';
 
 import { FormInput } from '@/constants/form.constant';
-import {
-  LINK_SLUG_MIN,
-  LINK_SLUG_MAX,
-  LINK_REDIRECT_URL_MAX,
-  LINK_SLUG_REGEX,
-  RESERVED_LINK_SLUGS
-} from '#shared/constants/link.constant';
-import { normalizeLinkSlug } from '#shared/schemas/link.schema';
+import { LinkCreationSchema } from '#shared/schemas/link.schema';
 
 export const useLinkForm = (options: {
   link: MaybeRefOrGetter<Link | null | undefined>;
@@ -25,55 +18,45 @@ export const useLinkForm = (options: {
 
   const isLoading = shallowRef(false);
 
-  const LinkFormSchema = z.object({
-    slug: z
-      .string({
-        required_error: requiredMessage(FormInput.SLUG)
-      })
-      .transform(normalizeLinkSlug)
-      .pipe(
-        z
-          .string()
-          .min(LINK_SLUG_MIN, {
-            message: minMessage(FormInput.SLUG, LINK_SLUG_MIN)
-          })
-          .max(LINK_SLUG_MAX, {
-            message: maxMessage(FormInput.SLUG, LINK_SLUG_MAX)
-          })
-          .regex(LINK_SLUG_REGEX, {
-            message: `${$t('form.slug')} ${$t('form.slugFormat')}.`
-          })
-          .refine(
-            (slug) => !RESERVED_LINK_SLUGS.has(slug) && !slug.startsWith('_'),
-            {
-              message: `${$t('form.slug')} ${$t('form.slugReserved')}.`
-            }
-          )
-      ),
-    redirectUrl: z
-      .string({
-        required_error: requiredMessage(FormInput.REDIRECT_URL)
-      })
-      .trim()
-      .min(1, {
-        message: requiredMessage(FormInput.REDIRECT_URL)
-      })
-      .max(LINK_REDIRECT_URL_MAX, {
-        message: maxMessage(FormInput.REDIRECT_URL, LINK_REDIRECT_URL_MAX)
-      })
-      .url({
-        message: `${$t('form.redirectUrl')} ${$t('form.urlFormat')}.`
-      })
-      .refine(
-        (url) => url.startsWith('http://') || url.startsWith('https://'),
-        {
-          message: `${$t('form.redirectUrl')} ${$t('form.urlFormat')}.`
+  const linkErrorMap: z.ZodErrorMap = (issue, ctx) => {
+    const input = issue.path[0] as FormInput;
+
+    switch (issue.code) {
+      case z.ZodIssueCode.invalid_type:
+        if (issue.received === z.ZodParsedType.undefined) {
+          return { message: requiredMessage(input) };
         }
-      )
-  });
+        break;
+      case z.ZodIssueCode.too_small:
+        if (Number(issue.minimum) <= 1) {
+          return { message: requiredMessage(input) };
+        }
+        return { message: minMessage(input, Number(issue.minimum)) };
+      case z.ZodIssueCode.too_big:
+        return { message: maxMessage(input, Number(issue.maximum)) };
+      case z.ZodIssueCode.invalid_string:
+      case z.ZodIssueCode.custom:
+        return { message: formatMessage(input, issue.code) };
+    }
+
+    return { message: ctx.defaultError };
+  };
+
+  const formatMessage = (input: FormInput, code: z.ZodIssueCode) => {
+    if (input === FormInput.REDIRECT_URL) {
+      return `${$t('form.redirectUrl')} ${$t('form.urlFormat')}.`;
+    }
+
+    const reason =
+      code === z.ZodIssueCode.custom ? 'form.slugReserved' : 'form.slugFormat';
+
+    return `${$t('form.slug')} ${$t(reason)}.`;
+  };
 
   const form = useForm({
-    validationSchema: toTypedSchema(LinkFormSchema)
+    validationSchema: toTypedSchema(LinkCreationSchema, {
+      errorMap: linkErrorMap
+    })
   });
 
   const currentLink = computed(() => toValue(options.link));

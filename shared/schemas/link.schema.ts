@@ -11,6 +11,9 @@ import {
 export const normalizeLinkSlug = (value: string) =>
   value.trim().replace(/^\/+/, '').toLowerCase();
 
+export const isReservedLinkSlug = (slug: string) =>
+  RESERVED_LINK_SLUGS.has(slug);
+
 export const LinkSlugSchema = z
   .string()
   .transform(normalizeLinkSlug)
@@ -20,7 +23,7 @@ export const LinkSlugSchema = z
       .min(LINK_SLUG_MIN)
       .max(LINK_SLUG_MAX)
       .regex(LINK_SLUG_REGEX)
-      .refine((slug) => !RESERVED_LINK_SLUGS.has(slug) && !slug.startsWith('_'))
+      .refine((slug) => !isReservedLinkSlug(slug))
   );
 
 export const LinkRedirectUrlSchema = z
