@@ -1,5 +1,4 @@
 import type { Link } from '#shared/types/link.type';
-import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { toast } from 'vue-sonner';
@@ -13,45 +12,18 @@ export const useLinkForm = (options: {
 }) => {
   const { $api } = useNuxtApp();
   const { t: $t } = useI18n();
-  const { requiredMessage, minMessage, maxMessage, alreadyUseMessage } =
-    useFormMessage();
+  const { alreadyUseMessage, formatMessage, errorMap } = useFormMessage();
 
   const isLoading: Ref<boolean> = ref(false);
 
-  const linkErrorMap: z.ZodErrorMap = (issue, ctx) => {
-    const input = issue.path[0] as FormInput;
+  const isSlug = (input: FormInput) => input === FormInput.SLUG;
 
-    switch (issue.code) {
-      case z.ZodIssueCode.invalid_type:
-        if (issue.received === z.ZodParsedType.undefined) {
-          return { message: requiredMessage(input) };
-        }
-        break;
-      case z.ZodIssueCode.too_small:
-        if (Number(issue.minimum) <= 1) {
-          return { message: requiredMessage(input) };
-        }
-        return { message: minMessage(input, Number(issue.minimum)) };
-      case z.ZodIssueCode.too_big:
-        return { message: maxMessage(input, Number(issue.maximum)) };
-      case z.ZodIssueCode.invalid_string:
-      case z.ZodIssueCode.custom:
-        return { message: formatMessage(input, issue.code) };
-    }
-
-    return { message: ctx.defaultError };
-  };
-
-  const formatMessage = (input: FormInput, code: z.ZodIssueCode) => {
-    if (input === FormInput.REDIRECT_URL) {
-      return `${$t('form.redirectUrl')} ${$t('form.urlFormat')}.`;
-    }
-
-    const reason =
-      code === z.ZodIssueCode.custom ? 'form.slugReserved' : 'form.slugFormat';
-
-    return `${$t('form.slug')} ${$t(reason)}.`;
-  };
+  const linkErrorMap = errorMap({
+    invalid_string: (_, input) =>
+      formatMessage(input, isSlug(input) ? 'slugFormat' : 'urlFormat'),
+    custom: (_, input) =>
+      formatMessage(input, isSlug(input) ? 'slugReserved' : 'urlFormat')
+  });
 
   const form = useForm({
     validationSchema: toTypedSchema(LinkCreationSchema, {
