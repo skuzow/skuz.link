@@ -22,7 +22,10 @@ export default defineEventHandler(async (event) => {
     const link = await repository.link.update(ownedLink.id, result.data);
 
     const requestURL = getRequestURL(event);
-    await purgeLinkRedirect(requestURL.origin, ownedLink.slug);
+    const slugs = new Set([ownedLink.slug, link.slug]);
+    await Promise.all(
+      [...slugs].map((slug) => purgeLinkRedirect(requestURL.origin, slug))
+    );
 
     return {
       statusCode: 200,

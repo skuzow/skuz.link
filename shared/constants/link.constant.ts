@@ -5,6 +5,7 @@ export const LINK_REDIRECT_URL_MAX: number = 2048;
 export const LINK_SLUG_REGEX: RegExp = /^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
 
 export const LINK_REDIRECT_CACHE_TTL_SECONDS: number = 60;
+export const LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS: number = 15;
 
 export const RESERVED_LINK_SLUGS: ReadonlySet<string> = new Set([
   // app

@@ -21,13 +21,18 @@ export default defineEventHandler(async (event) => {
   const repository = await useRepository(event);
 
   const cached = await readCachedLinkRedirect(requestURL.origin, slug);
-  if (cached) {
+  if (cached?.type === 'miss') return;
+
+  if (cached?.type === 'hit') {
     scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
-    return cached;
+    return clientLinkRedirect(cached.redirectUrl);
   }
 
   const redirectUrl = await repository.link.findRedirectUrlBySlug(slug);
-  if (!redirectUrl) return;
+  if (!redirectUrl) {
+    scheduleStoreLinkMiss(event, requestURL.origin, slug);
+    return;
+  }
 
   scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
   scheduleStoreLinkRedirect(event, requestURL.origin, slug, redirectUrl);

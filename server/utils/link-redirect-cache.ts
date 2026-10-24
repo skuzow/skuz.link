@@ -1,8 +1,15 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
-import { LINK_REDIRECT_CACHE_TTL_SECONDS } from '#shared/constants/link.constant';
+import {
+  LINK_REDIRECT_CACHE_TTL_SECONDS,
+  LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS
+} from '#shared/constants/link.constant';
 
-const STORED_CACHE_CONTROL = `public, max-age=${LINK_REDIRECT_CACHE_TTL_SECONDS}`;
 const CLIENT_CACHE_CONTROL = 'no-store';
+const MISS_HEADER = 'X-Link-Redirect';
+const MISS_HEADER_VALUE = 'miss';
+
+export type CachedLinkRedirect =
+  { type: 'hit'; redirectUrl: string } | { type: 'miss' };
 
 export function linkRedirectRequest(origin: string, slug: string): Request {
   return new Request(`${origin}/${slug}`, { method: 'GET' });
@@ -21,16 +28,22 @@ export function clientLinkRedirect(redirectUrl: string): Response {
 export async function readCachedLinkRedirect(
   origin: string,
   slug: string
-): Promise<Response | null> {
+): Promise<CachedLinkRedirect | null> {
   const cache = getDefaultCache();
   if (!cache) return null;
 
   try {
     const cached = await cache.match(linkRedirectRequest(origin, slug));
-    const location = cached?.headers.get('Location');
-    if (!location) return null;
+    if (!cached) return null;
 
-    return clientLinkRedirect(location);
+    if (cached.headers.get(MISS_HEADER) === MISS_HEADER_VALUE) {
+      return { type: 'miss' };
+    }
+
+    const redirectUrl = cached.headers.get('Location');
+    if (!redirectUrl) return null;
+
+    return { type: 'hit', redirectUrl };
   } catch (error) {
     console.error('Failed to read link redirect cache', error);
     return null;
@@ -43,25 +56,35 @@ export function scheduleStoreLinkRedirect(
   slug: string,
   redirectUrl: string
 ) {
-  const cache = getDefaultCache();
-  if (!cache) return;
+  scheduleStore(
+    event,
+    linkRedirectRequest(origin, slug),
+    new Response(null, {
+      status: 302,
+      headers: {
+        Location: redirectUrl,
+        'Cache-Control': `public, max-age=${LINK_REDIRECT_CACHE_TTL_SECONDS}`
+      }
+    })
+  );
+}
 
-  const task = cache
-    .put(
-      linkRedirectRequest(origin, slug),
-      new Response(null, {
-        status: 302,
-        headers: {
-          Location: redirectUrl,
-          'Cache-Control': STORED_CACHE_CONTROL
-        }
-      })
-    )
-    .catch((error: unknown) => {
-      console.error('Failed to store link redirect cache', error);
-    });
-
-  scheduleBackground(event, task);
+export function scheduleStoreLinkMiss(
+  event: H3Event<EventHandlerRequest>,
+  origin: string,
+  slug: string
+) {
+  scheduleStore(
+    event,
+    linkRedirectRequest(origin, slug),
+    new Response(null, {
+      status: 404,
+      headers: {
+        [MISS_HEADER]: MISS_HEADER_VALUE,
+        'Cache-Control': `public, max-age=${LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS}`
+      }
+    })
+  );
 }
 
 export function scheduleLinkClick(
@@ -84,6 +107,21 @@ export async function purgeLinkRedirect(origin: string, slug: string) {
   } catch (error) {
     console.error('Failed to purge link redirect cache', error);
   }
+}
+
+function scheduleStore(
+  event: H3Event<EventHandlerRequest>,
+  request: Request,
+  response: Response
+) {
+  const cache = getDefaultCache();
+  if (!cache) return;
+
+  const task = cache.put(request, response).catch((error: unknown) => {
+    console.error('Failed to store link redirect cache', error);
+  });
+
+  scheduleBackground(event, task);
 }
 
 type WorkersCacheStorage = CacheStorage & {
