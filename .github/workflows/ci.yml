@@ -37,3 +37,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: run format
         run: pnpm format
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: run tests
+        run: pnpm test
