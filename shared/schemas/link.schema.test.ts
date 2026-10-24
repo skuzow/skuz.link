@@ -85,7 +85,9 @@ describe('LinkRedirectUrlSchema', () => {
   it.each([
     ['https://example.com', 'https://example.com'],
     ['http://example.com/path?q=1#hash', 'http://example.com/path?q=1#hash'],
-    ['  https://example.com/repo  ', 'https://example.com/repo']
+    ['  https://example.com/repo  ', 'https://example.com/repo'],
+    ['HTTPS://example.com/Repo', 'HTTPS://example.com/Repo'],
+    ['Http://example.com', 'Http://example.com']
   ])('accepts %j as %j', (input, expected) => {
     expect(LinkRedirectUrlSchema.parse(input)).toBe(expected);
   });

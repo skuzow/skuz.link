@@ -1,6 +1,10 @@
 export const LINK_SLUG_MIN: number = 1;
 export const LINK_SLUG_MAX: number = 64;
 export const LINK_REDIRECT_URL_MAX: number = 2048;
+export const LINK_REDIRECT_URL_PROTOCOLS: ReadonlySet<string> = new Set([
+  'http:',
+  'https:'
+]);
 
 export const LINK_SLUG_REGEX: RegExp = /^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
 
