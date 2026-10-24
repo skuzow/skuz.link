@@ -1,6 +1,8 @@
 import type { Link } from '#shared/types/link.type';
 import { toast } from 'vue-sonner';
 
+import { normalizeLinkSlug } from '#shared/schemas/link.schema';
+
 export const useLinks = async () => {
   const { $api } = useNuxtApp();
   const { t: $t } = useI18n();
@@ -18,7 +20,7 @@ export const useLinks = async () => {
   const links = computed(() => data.value?.body.links ?? []);
 
   const filteredLinks = computed(() => {
-    const query = searchQuery.value.trim().toLowerCase();
+    const query = normalizeLinkSlug(searchQuery.value);
 
     if (!query) return links.value;
 

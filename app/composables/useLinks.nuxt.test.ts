@@ -64,6 +64,7 @@ describe('useLinks', () => {
   it.each([
     ['repo', ['repo', 'my-repo']],
     ['REPO', ['repo', 'my-repo']],
+    ['/Repo', ['repo', 'my-repo']],
     ['  blog ', ['blog-post']],
     ['', ['repo', 'blog-post', 'my-repo']]
   ])('filters by slug for the query %j', async (query, expected) => {
