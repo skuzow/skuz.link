@@ -6,7 +6,7 @@ import { admin } from 'better-auth/plugins';
 import * as schema from '../database/schema';
 import { getDB } from './db';
 import { runtimeConfig } from './runtimeConfig';
-import { purgeLinkRedirect } from './link-redirect-cache';
+import { purgeLinkRedirects } from './link-redirect-cache';
 import { useRepository } from './repository';
 
 const createAuth = (event?: H3Event<EventHandlerRequest>) => {
@@ -48,8 +48,9 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
             ? new URL(request.url)
             : getRequestURL(event);
 
-          await Promise.all(
-            userLinks.map((link) => purgeLinkRedirect(origin, link.slug))
+          await purgeLinkRedirects(
+            origin,
+            userLinks.map((link) => link.slug)
           );
         }
       }

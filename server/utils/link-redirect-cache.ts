@@ -3,8 +3,8 @@ import {
   LINK_REDIRECT_CACHE_TTL_SECONDS,
   LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS
 } from '#shared/constants/link.constant';
+import { scheduleBackground } from './background';
 
-const CLIENT_CACHE_CONTROL = 'no-store';
 const MISS_HEADER = 'X-Link-Redirect';
 const MISS_HEADER_VALUE = 'miss';
 
@@ -13,16 +13,6 @@ export type CachedLinkRedirect =
 
 export function linkRedirectRequest(origin: string, slug: string): Request {
   return new Request(`${origin}/${slug}`, { method: 'GET' });
-}
-
-export function clientLinkRedirect(redirectUrl: string): Response {
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: redirectUrl,
-      'Cache-Control': CLIENT_CACHE_CONTROL
-    }
-  });
 }
 
 export async function readCachedLinkRedirect(
@@ -87,26 +77,22 @@ export function scheduleStoreLinkMiss(
   );
 }
 
-export function scheduleLinkClick(
-  event: H3Event<EventHandlerRequest>,
-  increment: Promise<void>
+export async function purgeLinkRedirects(
+  origin: string,
+  slugs: Iterable<string>
 ) {
-  const task = increment.catch((error: unknown) => {
-    console.error('Failed to increment link clicks', error);
-  });
-
-  scheduleBackground(event, task);
-}
-
-export async function purgeLinkRedirect(origin: string, slug: string) {
   const cache = getDefaultCache();
   if (!cache) return;
 
-  try {
-    await cache.delete(linkRedirectRequest(origin, slug));
-  } catch (error) {
-    console.error('Failed to purge link redirect cache', error);
-  }
+  await Promise.all(
+    [...new Set(slugs)].map(async (slug) => {
+      try {
+        await cache.delete(linkRedirectRequest(origin, slug));
+      } catch (error) {
+        console.error('Failed to purge link redirect cache', error);
+      }
+    })
+  );
 }
 
 function scheduleStore(
@@ -138,22 +124,4 @@ function getDefaultCache(): Cache | null {
   if (typeof caches === 'undefined' || !hasDefaultCache(caches)) return null;
 
   return caches.default;
-}
-
-function scheduleBackground(
-  event: H3Event<EventHandlerRequest>,
-  task: Promise<void>
-) {
-  const executionContext = event.context.cloudflare?.context;
-  if (executionContext) {
-    executionContext.waitUntil(task);
-    return;
-  }
-
-  if (event.context.waitUntil) {
-    event.context.waitUntil(task);
-    return;
-  }
-
-  void task;
 }

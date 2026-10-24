@@ -5,10 +5,8 @@ import {
   LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS
 } from '#shared/constants/link.constant';
 import {
-  clientLinkRedirect,
-  purgeLinkRedirect,
+  purgeLinkRedirects,
   readCachedLinkRedirect,
-  scheduleLinkClick,
   scheduleStoreLinkMiss,
   scheduleStoreLinkRedirect
 } from './link-redirect-cache';
@@ -138,12 +136,12 @@ describe('scheduleStoreLinkMiss', () => {
   });
 });
 
-describe('purgeLinkRedirect', () => {
+describe('purgeLinkRedirects', () => {
   it('deletes a stored redirect', async () => {
     scheduleStoreLinkRedirect(event, ORIGIN, SLUG, REDIRECT_URL);
     await flush();
 
-    await purgeLinkRedirect(ORIGIN, SLUG);
+    await purgeLinkRedirects(ORIGIN, [SLUG]);
 
     expect(store.has(`${ORIGIN}/${SLUG}`)).toBe(false);
     expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
@@ -153,63 +151,20 @@ describe('purgeLinkRedirect', () => {
     scheduleStoreLinkMiss(event, ORIGIN, SLUG);
     await flush();
 
-    await purgeLinkRedirect(ORIGIN, SLUG);
+    await purgeLinkRedirects(ORIGIN, [SLUG]);
 
     expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+  });
+
+  it('deletes each distinct slug once', async () => {
+    await purgeLinkRedirects(ORIGIN, [SLUG, SLUG, 'other']);
+
+    expect(fakeCache.delete).toHaveBeenCalledTimes(2);
   });
 
   it('does nothing when the cache is unavailable', async () => {
     vi.stubGlobal('caches', undefined);
 
-    await expect(purgeLinkRedirect(ORIGIN, SLUG)).resolves.toBeUndefined();
-  });
-});
-
-describe('scheduleLinkClick', () => {
-  it('hands the increment to the Cloudflare execution context', () => {
-    const waitUntil = vi.fn();
-    const cloudflareEvent = {
-      context: { cloudflare: { context: { waitUntil } } }
-    } as unknown as H3Event<EventHandlerRequest>;
-
-    scheduleLinkClick(cloudflareEvent, Promise.resolve());
-
-    expect(waitUntil).toHaveBeenCalledTimes(1);
-  });
-
-  it('falls back to the event waitUntil', () => {
-    const waitUntil = vi.fn();
-    const nitroEvent = {
-      context: { waitUntil }
-    } as unknown as H3Event<EventHandlerRequest>;
-
-    scheduleLinkClick(nitroEvent, Promise.resolve());
-
-    expect(waitUntil).toHaveBeenCalledTimes(1);
-  });
-
-  it('logs and swallows increment failures', async () => {
-    const error = new Error('increment failed');
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
-    scheduleLinkClick(event, Promise.reject(error));
-    await flush();
-
-    expect(consoleError).toHaveBeenCalledWith(
-      'Failed to increment link clicks',
-      error
-    );
-  });
-});
-
-describe('clientLinkRedirect', () => {
-  it('returns a non-cacheable 302 to the target', () => {
-    const response = clientLinkRedirect(REDIRECT_URL);
-
-    expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe(REDIRECT_URL);
-    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    await expect(purgeLinkRedirects(ORIGIN, [SLUG])).resolves.toBeUndefined();
   });
 });

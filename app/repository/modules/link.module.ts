@@ -1,9 +1,9 @@
-import type { Link, LinkCreation } from '#shared/types/link.type';
+import type { Link, LinkInput } from '#shared/types/link.type';
 
-import HttpFactory from '@/repository/factory';
+import ApiModule from '@/repository/api.module';
 import Routes from '@/repository/routes.client';
 
-class LinkModule extends HttpFactory {
+class LinkModule extends ApiModule {
   private readonly ROUTE = Routes.Link;
 
   async getAll() {
@@ -13,7 +13,7 @@ class LinkModule extends HttpFactory {
     });
   }
 
-  async create(dto: LinkCreation) {
+  async create(dto: LinkInput) {
     return this.call<{ link: Link }>({
       method: 'POST',
       url: this.ROUTE.Links(),
@@ -21,7 +21,7 @@ class LinkModule extends HttpFactory {
     });
   }
 
-  async update(id: string, dto: LinkCreation) {
+  async update(id: string, dto: LinkInput) {
     return this.call<{ link: Link }>({
       method: 'PUT',
       url: this.ROUTE.LinkById(id),

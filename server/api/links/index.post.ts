@@ -1,25 +1,13 @@
-import { LinkCreationSchema } from '#shared/schemas/link.schema';
-
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
-  const body = await readBody(event);
-  const result = LinkCreationSchema.safeParse(body);
-
-  if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid fields',
-      data: result.error.issues
-    });
-  }
+  const input = await readLinkInput(event);
 
   const repository = await useRepository(event);
 
   try {
-    const link = await repository.link.create(user.id, result.data);
+    const link = await repository.link.create(user.id, input);
 
-    const requestURL = getRequestURL(event);
-    await purgeLinkRedirect(requestURL.origin, link.slug);
+    await purgeLinkRedirects(getRequestURL(event).origin, [link.slug]);
 
     return {
       statusCode: 201,

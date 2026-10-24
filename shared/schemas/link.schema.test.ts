@@ -7,7 +7,7 @@ import {
   RESERVED_LINK_SLUGS
 } from '../constants/link.constant';
 import {
-  LinkCreationSchema,
+  LinkInputSchema,
   LinkRedirectUrlSchema,
   LinkSlugSchema,
   isReservedLinkSlug,
@@ -136,9 +136,9 @@ describe('LinkRedirectUrlSchema', () => {
   });
 });
 
-describe('LinkCreationSchema', () => {
+describe('LinkInputSchema', () => {
   it('normalizes the slug and drops fields the client must not set', () => {
-    const result = LinkCreationSchema.parse({
+    const result = LinkInputSchema.parse({
       slug: ' /Repo ',
       redirectUrl: 'https://example.com',
       id: 'forged-id',
@@ -153,7 +153,7 @@ describe('LinkCreationSchema', () => {
   });
 
   it('requires both fields', () => {
-    const result = LinkCreationSchema.safeParse({});
+    const result = LinkInputSchema.safeParse({});
 
     expect(result.error?.issues.map((issue) => issue.path[0])).toEqual([
       'slug',

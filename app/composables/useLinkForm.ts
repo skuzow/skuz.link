@@ -4,7 +4,7 @@ import { useForm } from 'vee-validate';
 import { toast } from 'vue-sonner';
 
 import { FormInput } from '@/constants/form.constant';
-import { LinkCreationSchema } from '#shared/schemas/link.schema';
+import { LinkInputSchema } from '#shared/schemas/link.schema';
 
 export const useLinkForm = (options: {
   link: MaybeRefOrGetter<Link | null | undefined>;
@@ -26,7 +26,7 @@ export const useLinkForm = (options: {
   });
 
   const form = useForm({
-    validationSchema: toTypedSchema(LinkCreationSchema, {
+    validationSchema: toTypedSchema(LinkInputSchema, {
       errorMap: linkErrorMap
     })
   });

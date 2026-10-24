@@ -1,10 +1,17 @@
-import { LINK_SLUG_REGEX } from '#shared/constants/link.constant';
-import {
-  isReservedLinkSlug,
-  normalizeLinkSlug
-} from '#shared/schemas/link.schema';
+import { LinkSlugSchema } from '#shared/schemas/link.schema';
 
 const REDIRECT_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD']);
+const CLIENT_CACHE_CONTROL = 'no-store';
+
+function clientLinkRedirect(redirectUrl: string): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: redirectUrl,
+      'Cache-Control': CLIENT_CACHE_CONTROL
+    }
+  });
+}
 
 export default defineEventHandler(async (event) => {
   if (!REDIRECT_METHODS.has(event.method)) return;
@@ -17,8 +24,10 @@ export default defineEventHandler(async (event) => {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length !== 1) return;
 
-  const slug = normalizeLinkSlug(segments[0] ?? '');
-  if (!slug || !LINK_SLUG_REGEX.test(slug) || isReservedLinkSlug(slug)) return;
+  const result = LinkSlugSchema.safeParse(segments[0]);
+  if (!result.success) return;
+
+  const slug = result.data;
 
   const repository = await useRepository(event);
 
@@ -26,7 +35,13 @@ export default defineEventHandler(async (event) => {
   const countClick = () => {
     if (event.method !== 'GET') return;
 
-    scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+    const increment = repository.link
+      .incrementClicksBySlug(slug)
+      .catch((error: unknown) => {
+        console.error('Failed to increment link clicks', error);
+      });
+
+    scheduleBackground(event, increment);
   };
 
   const cached = await readCachedLinkRedirect(requestURL.origin, slug);

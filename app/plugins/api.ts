@@ -5,10 +5,8 @@ export interface ApiInstance {
 }
 
 export default defineNuxtPlugin(() => {
-  const apiFetcher = $fetch.create({});
-
   const modules: ApiInstance = {
-    link: new LinkModule(apiFetcher)
+    link: new LinkModule($fetch)
   };
 
   return {

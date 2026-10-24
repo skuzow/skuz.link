@@ -1,5 +1,6 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
-import type { Link } from '~~/shared/types/link.type';
+import { LinkInputSchema } from '~~/shared/schemas/link.schema';
+import type { Link, LinkInput } from '~~/shared/types/link.type';
 import { LinkAlreadyInUseError } from './errors';
 import { useRepository, type RepositoryInstance } from './repository';
 
@@ -27,6 +28,22 @@ export const requireOwnedLink = async (
   }
 
   return { repository, link };
+};
+
+export const readLinkInput = async (
+  event: H3Event<EventHandlerRequest>
+): Promise<LinkInput> => {
+  const result = LinkInputSchema.safeParse(await readBody(event));
+
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid fields',
+      data: result.error.issues
+    });
+  }
+
+  return result.data;
 };
 
 export const toLinkConflictError = (error: unknown) => {

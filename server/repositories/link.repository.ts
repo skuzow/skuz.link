@@ -1,4 +1,4 @@
-import type { Link, LinkCreation } from '#shared/types/link.type';
+import type { Link, LinkInput } from '#shared/types/link.type';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { links } from '~~/server/database/schema';
 import {
@@ -29,7 +29,7 @@ class LinkRepository {
     return link ?? null;
   }
 
-  async create(userId: string, data: LinkCreation): Promise<Link> {
+  async create(userId: string, data: LinkInput): Promise<Link> {
     const [link] = await this.withUniqueSlug(() =>
       this.db
         .insert(links)
@@ -48,7 +48,7 @@ class LinkRepository {
     return link;
   }
 
-  async update(id: string, data: LinkCreation): Promise<Link> {
+  async update(id: string, data: LinkInput): Promise<Link> {
     const [link] = await this.withUniqueSlug(() =>
       this.db.update(links).set(data).where(eq(links.id, id)).returning()
     );

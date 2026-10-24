@@ -1,19 +1,9 @@
-import type { $Fetch, NitroFetchOptions } from 'nitropack';
+import type { $Fetch } from 'nitropack';
 
 interface HttpRequest {
   url: string;
-  method:
-    | 'GET'
-    | 'HEAD'
-    | 'PATCH'
-    | 'POST'
-    | 'PUT'
-    | 'DELETE'
-    | 'CONNECT'
-    | 'OPTIONS'
-    | 'TRACE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: object;
-  fetchOptions?: NitroFetchOptions<'json'>;
 }
 
 interface ApiResponse<T> {
@@ -22,14 +12,14 @@ interface ApiResponse<T> {
   body: T;
 }
 
-abstract class HttpFactory {
+abstract class ApiModule {
   private readonly $fetch: $Fetch;
 
   constructor(fetcher: $Fetch) {
     this.$fetch = fetcher;
   }
 
-  async call<T>({ method, url, body, fetchOptions }: HttpRequest) {
+  async call<T>({ method, url, body }: HttpRequest) {
     const cookie = useRequestHeaders(['cookie']);
 
     return this.$fetch<ApiResponse<T>>(url, {
@@ -37,10 +27,9 @@ abstract class HttpFactory {
       body,
       headers: {
         ...cookie
-      },
-      ...fetchOptions
+      }
     });
   }
 }
 
-export default HttpFactory;
+export default ApiModule;

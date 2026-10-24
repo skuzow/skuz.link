@@ -1,11 +1,14 @@
 import { eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { LINK_SLUG_MAX } from '#shared/constants/link.constant';
 import { links } from '../database/schema';
+import LinkRepository from '../repositories/link.repository';
 import { setupTestServer } from '../testing/server';
 
 const server = await setupTestServer();
 
 const REDIRECT_URL = 'https://example.com/target';
+const TOO_LONG_SLUG = 'a'.repeat(LINK_SLUG_MAX + 1);
 
 let userId: string;
 
@@ -15,6 +18,8 @@ beforeEach(async () => {
   const { user } = await server.login();
   userId = user.id;
 });
+
+afterEach(() => vi.restoreAllMocks());
 
 const insertLink = async (slug: string, redirectUrl = REDIRECT_URL) => {
   await server.db
@@ -97,6 +102,28 @@ describe('link redirect middleware', () => {
     expect(await findClicks('cached')).toBe(2);
   });
 
+  it('still redirects when counting the click fails', async () => {
+    await insertLink('click-fails');
+
+    const error = new Error('increment failed');
+    vi.spyOn(
+      LinkRepository.prototype,
+      'incrementClicksBySlug'
+    ).mockRejectedValueOnce(error);
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const response = await server.fetch('/click-fails');
+    await server.flush();
+
+    expect(response.status).toBe(302);
+    expect(consoleError).toHaveBeenCalledWith(
+      'Failed to increment link clicks',
+      error
+    );
+  });
+
   it('falls through for an unknown slug and caches the miss', async () => {
     const response = await server.fetch('/unknown');
 
@@ -113,7 +140,8 @@ describe('link redirect middleware', () => {
     ['GET', '/pass-nested/extra', 'pass-nested'],
     ['GET', '/_pass-internal', 'pass-internal'],
     ['GET', '/pass.svg', 'pass'],
-    ['GET', '/login', 'login']
+    ['GET', '/login', 'login'],
+    ['GET', `/${TOO_LONG_SLUG}`, TOO_LONG_SLUG]
   ])('ignores %s %s', async (method, path, slug) => {
     await insertLink(slug);
 

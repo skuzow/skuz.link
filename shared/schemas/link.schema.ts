@@ -44,7 +44,7 @@ export const LinkRedirectUrlSchema = z
   .url()
   .refine(isHttpUrl);
 
-export const LinkCreationSchema = z.object({
+export const LinkInputSchema = z.object({
   slug: LinkSlugSchema,
   redirectUrl: LinkRedirectUrlSchema
 });
