@@ -1,24 +1,19 @@
-import { drizzle } from 'drizzle-orm/d1';
 import { eq } from 'drizzle-orm';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import * as schema from '../database/schema';
-import { createTestPlatform } from '../testing/platform';
+import { setupTestServer } from '../testing/server';
 import { LinkAlreadyInUseError } from '../utils/errors';
 import LinkRepository from './link.repository';
 
-const platform = await createTestPlatform();
-const db = drizzle(platform.env.db, { schema });
-const repository = new LinkRepository(db);
-
-afterAll(() => platform.dispose());
+const server = await setupTestServer();
+const repository = new LinkRepository(server.db);
 
 const ALICE = 'alice';
 const BOB = 'bob';
 
 beforeEach(async () => {
-  await db.delete(schema.links);
-  await db.delete(schema.user);
-  await db.insert(schema.user).values([
+  await server.reset();
+  await server.db.insert(schema.user).values([
     { id: ALICE, name: 'Alice', email: 'alice@example.com' },
     { id: BOB, name: 'Bob', email: 'bob@example.com' }
   ]);
@@ -78,7 +73,7 @@ describe('LinkRepository', () => {
   });
 
   it('updates fields and bumps updatedAt', async () => {
-    await db.insert(schema.links).values({
+    await server.db.insert(schema.links).values({
       id: 'stale',
       ...linkData('stale'),
       userId: ALICE,
@@ -108,7 +103,7 @@ describe('LinkRepository', () => {
     await repository.incrementClicksBySlug('clicked');
     await repository.incrementClicksBySlug('clicked');
 
-    const rows = await db
+    const rows = await server.db
       .select({ slug: schema.links.slug, clicks: schema.links.clicks })
       .from(schema.links)
       .where(eq(schema.links.userId, ALICE));
