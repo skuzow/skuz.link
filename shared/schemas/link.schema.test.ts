@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   LINK_REDIRECT_URL_MAX,
@@ -34,6 +35,34 @@ describe('isReservedLinkSlug', () => {
     expect(isReservedLinkSlug('login')).toBe(true);
     expect(isReservedLinkSlug('links')).toBe(true);
     expect(isReservedLinkSlug('my-docs')).toBe(false);
+  });
+
+  it('flags every top-level page route, so links cannot shadow pages', () => {
+    const pages = readdirSync(new URL('../../app/pages', import.meta.url))
+      .map((entry) => entry.replace(/\.vue$/, ''))
+      .filter((name) => name !== 'index' && !name.startsWith('['));
+
+    expect(pages.length).toBeGreaterThan(0);
+
+    for (const page of pages) {
+      expect(isReservedLinkSlug(page), page).toBe(true);
+    }
+  });
+
+  it('flags every locale prefix, so links cannot shadow localized routes', () => {
+    const nuxtConfig = readFileSync(
+      new URL('../../nuxt.config.ts', import.meta.url),
+      'utf8'
+    );
+    const localeCodes = [...nuxtConfig.matchAll(/code:\s*'([^']+)'/g)].map(
+      ([, code]) => code
+    );
+
+    expect(localeCodes.length).toBeGreaterThan(0);
+
+    for (const code of localeCodes) {
+      expect(isReservedLinkSlug(code!), code).toBe(true);
+    }
   });
 
   it('only stores slugs that the slug format accepts', () => {

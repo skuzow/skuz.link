@@ -1,7 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { RESERVED_LINK_SLUGS } from '#shared/constants/link.constant';
 import { links } from '../database/schema';
 import { setupTestServer } from '../testing/server';
 
@@ -123,35 +121,5 @@ describe('link redirect middleware', () => {
 
     expect(response.status).not.toBe(302);
     expect(response.headers.get('location')).toBeNull();
-  });
-});
-
-describe('reserved slugs', () => {
-  it('cover every top-level page route, so links cannot shadow pages', () => {
-    const pages = readdirSync(new URL('../../app/pages', import.meta.url))
-      .map((entry) => entry.replace(/\.vue$/, ''))
-      .filter((name) => name !== 'index' && !name.startsWith('['));
-
-    expect(pages.length).toBeGreaterThan(0);
-
-    for (const page of pages) {
-      expect(RESERVED_LINK_SLUGS.has(page), page).toBe(true);
-    }
-  });
-
-  it('cover every locale prefix, so links cannot shadow localized routes', () => {
-    const nuxtConfig = readFileSync(
-      new URL('../../nuxt.config.ts', import.meta.url),
-      'utf8'
-    );
-    const localeCodes = [...nuxtConfig.matchAll(/code:\s*'([^']+)'/g)].map(
-      ([, code]) => code
-    );
-
-    expect(localeCodes.length).toBeGreaterThan(0);
-
-    for (const code of localeCodes) {
-      expect(RESERVED_LINK_SLUGS.has(code!), code).toBe(true);
-    }
   });
 });
