@@ -64,6 +64,7 @@
     "happy-dom": "^21.0.4",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
+    "miniflare": "5.20261019.2-beta",
     "nitro-cloudflare-dev": "^0.2.2",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.7.4",
