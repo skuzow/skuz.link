@@ -1,3 +1,5 @@
+export const LINKS_ROUTE: string = '/links';
+
 export const LINKS_GRID_LIST_CLASS: string =
   'grid grid-cols-1 gap-4 @min-[33rem]:grid-cols-2 @min-[50rem]:grid-cols-3';
 

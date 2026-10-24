@@ -1,3 +1,5 @@
+import { LINKS_ROUTE } from '@/constants/links.constant';
+
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
   const { isAuthenticated } = useAuth();
 
@@ -5,5 +7,5 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
 
   const localePath = useLocalePath();
 
-  return await navigateTo(localePath('/links'));
+  return await navigateTo(localePath(LINKS_ROUTE));
 });
