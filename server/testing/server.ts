@@ -177,5 +177,3 @@ export const setupTestServer = async () => {
 
   return { db, fetch, flush, login, createLink, redirectTarget, reset };
 };
-
-export type TestServer = Awaited<ReturnType<typeof setupTestServer>>;
