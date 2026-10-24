@@ -8,6 +8,7 @@ import {
   clientLinkRedirect,
   purgeLinkRedirect,
   readCachedLinkRedirect,
+  scheduleLinkClick,
   scheduleStoreLinkMiss,
   scheduleStoreLinkRedirect
 } from './link-redirect-cache';
@@ -161,6 +162,45 @@ describe('purgeLinkRedirect', () => {
     vi.stubGlobal('caches', undefined);
 
     await expect(purgeLinkRedirect(ORIGIN, SLUG)).resolves.toBeUndefined();
+  });
+});
+
+describe('scheduleLinkClick', () => {
+  it('hands the increment to the Cloudflare execution context', () => {
+    const waitUntil = vi.fn();
+    const cloudflareEvent = {
+      context: { cloudflare: { context: { waitUntil } } }
+    } as unknown as H3Event<EventHandlerRequest>;
+
+    scheduleLinkClick(cloudflareEvent, Promise.resolve());
+
+    expect(waitUntil).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to the event waitUntil', () => {
+    const waitUntil = vi.fn();
+    const nitroEvent = {
+      context: { waitUntil }
+    } as unknown as H3Event<EventHandlerRequest>;
+
+    scheduleLinkClick(nitroEvent, Promise.resolve());
+
+    expect(waitUntil).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs and swallows increment failures', async () => {
+    const error = new Error('increment failed');
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    scheduleLinkClick(event, Promise.reject(error));
+    await flush();
+
+    expect(consoleError).toHaveBeenCalledWith(
+      'Failed to increment link clicks',
+      error
+    );
   });
 });
 
