@@ -12,7 +12,8 @@ import {
   type EventHandler,
   type RouterMethod
 } from 'h3';
-import { afterAll, vi } from 'vitest';
+import { afterAll, expect, vi } from 'vitest';
+import type { Link } from '#shared/types/link.type';
 import * as schema from '../database/schema';
 import { runtimeConfig } from '../utils/runtimeConfig';
 import { createTestPlatform } from './platform';
@@ -142,6 +143,31 @@ export const setupTestServer = async () => {
     return { user, headers };
   };
 
+  const createLink = async (
+    headers: Headers,
+    slug: string,
+    redirectUrl = `https://example.com/${slug}`
+  ) => {
+    const response = await fetch('/api/links', {
+      method: 'POST',
+      headers,
+      json: { slug, redirectUrl }
+    });
+
+    expect(response.status).toBe(200);
+
+    const { body } = await response.json();
+
+    return body.link as Link;
+  };
+
+  const redirectTarget = async (slug: string) => {
+    const response = await fetch(`/${slug}`);
+    await flush();
+
+    return response.status === 302 ? response.headers.get('location') : null;
+  };
+
   const reset = async () => {
     await db.delete(schema.links);
     await db.delete(schema.session);
@@ -149,7 +175,7 @@ export const setupTestServer = async () => {
     await db.delete(schema.user);
   };
 
-  return { db, fetch, flush, login, reset };
+  return { db, fetch, flush, login, createLink, redirectTarget, reset };
 };
 
 export type TestServer = Awaited<ReturnType<typeof setupTestServer>>;

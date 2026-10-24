@@ -18,35 +18,10 @@ beforeEach(async () => {
   bob = await server.login();
 });
 
-const createLink = async (
-  session: Session,
-  slug: string,
-  redirectUrl = `https://example.com/${slug}`
-) => {
-  const response = await server.fetch('/api/links', {
-    method: 'POST',
-    headers: session.headers,
-    json: { slug, redirectUrl }
-  });
-
-  expect(response.status).toBe(200);
-
-  const { body } = await response.json();
-
-  return body.link as Link;
-};
-
 const findLink = async (id: string) => {
   const [link] = await server.db.select().from(links).where(eq(links.id, id));
 
   return link;
-};
-
-const redirectTarget = async (slug: string) => {
-  const response = await server.fetch(`/${slug}`);
-  await server.flush();
-
-  return response.status === 302 ? response.headers.get('location') : null;
 };
 
 describe('authentication', () => {
@@ -171,7 +146,7 @@ describe('POST /api/links', () => {
   });
 
   it('returns 409 when another user owns the slug', async () => {
-    await createLink(bob, 'taken');
+    await server.createLink(bob.headers, 'taken');
 
     const response = await server.fetch('/api/links', {
       method: 'POST',
@@ -183,17 +158,19 @@ describe('POST /api/links', () => {
   });
 
   it('purges a cached miss so the new link redirects at once', async () => {
-    expect(await redirectTarget('fresh')).toBeNull();
+    expect(await server.redirectTarget('fresh')).toBeNull();
 
-    await createLink(alice, 'fresh');
+    await server.createLink(alice.headers, 'fresh');
 
-    expect(await redirectTarget('fresh')).toBe('https://example.com/fresh');
+    expect(await server.redirectTarget('fresh')).toBe(
+      'https://example.com/fresh'
+    );
   });
 });
 
 describe('PUT /api/links/:id', () => {
   it("updates the caller's link", async () => {
-    const link = await createLink(alice, 'edit-me');
+    const link = await server.createLink(alice.headers, 'edit-me');
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -212,7 +189,7 @@ describe('PUT /api/links/:id', () => {
   });
 
   it("returns 404 for another user's link and leaves it untouched", async () => {
-    const link = await createLink(bob, 'bobs-link');
+    const link = await server.createLink(bob.headers, 'bobs-link');
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -235,7 +212,7 @@ describe('PUT /api/links/:id', () => {
   });
 
   it('returns 400 for invalid fields', async () => {
-    const link = await createLink(alice, 'valid');
+    const link = await server.createLink(alice.headers, 'valid');
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -247,8 +224,8 @@ describe('PUT /api/links/:id', () => {
   });
 
   it('returns 409 when renaming onto a taken slug', async () => {
-    await createLink(bob, 'occupied');
-    const link = await createLink(alice, 'rename-me');
+    await server.createLink(bob.headers, 'occupied');
+    const link = await server.createLink(alice.headers, 'rename-me');
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -260,10 +237,10 @@ describe('PUT /api/links/:id', () => {
   });
 
   it('purges the old and new slug when renaming', async () => {
-    const link = await createLink(alice, 'old-slug');
+    const link = await server.createLink(alice.headers, 'old-slug');
 
-    expect(await redirectTarget('old-slug')).toBe(link.redirectUrl);
-    expect(await redirectTarget('new-slug')).toBeNull();
+    expect(await server.redirectTarget('old-slug')).toBe(link.redirectUrl);
+    expect(await server.redirectTarget('new-slug')).toBeNull();
 
     await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -271,14 +248,16 @@ describe('PUT /api/links/:id', () => {
       json: { slug: 'new-slug', redirectUrl: 'https://example.com/moved' }
     });
 
-    expect(await redirectTarget('old-slug')).toBeNull();
-    expect(await redirectTarget('new-slug')).toBe('https://example.com/moved');
+    expect(await server.redirectTarget('old-slug')).toBeNull();
+    expect(await server.redirectTarget('new-slug')).toBe(
+      'https://example.com/moved'
+    );
   });
 
   it('purges the cached target when only the url changes', async () => {
-    const link = await createLink(alice, 'same-slug');
+    const link = await server.createLink(alice.headers, 'same-slug');
 
-    expect(await redirectTarget('same-slug')).toBe(link.redirectUrl);
+    expect(await server.redirectTarget('same-slug')).toBe(link.redirectUrl);
 
     await server.fetch(`/api/links/${link.id}`, {
       method: 'PUT',
@@ -286,7 +265,7 @@ describe('PUT /api/links/:id', () => {
       json: { slug: 'same-slug', redirectUrl: 'https://example.com/updated' }
     });
 
-    expect(await redirectTarget('same-slug')).toBe(
+    expect(await server.redirectTarget('same-slug')).toBe(
       'https://example.com/updated'
     );
   });
@@ -294,9 +273,9 @@ describe('PUT /api/links/:id', () => {
 
 describe('DELETE /api/links/:id', () => {
   it("deletes the caller's link and purges its redirect", async () => {
-    const link = await createLink(alice, 'gone');
+    const link = await server.createLink(alice.headers, 'gone');
 
-    expect(await redirectTarget('gone')).toBe(link.redirectUrl);
+    expect(await server.redirectTarget('gone')).toBe(link.redirectUrl);
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'DELETE',
@@ -305,11 +284,11 @@ describe('DELETE /api/links/:id', () => {
 
     expect(response.status).toBe(200);
     expect(await findLink(link.id)).toBeUndefined();
-    expect(await redirectTarget('gone')).toBeNull();
+    expect(await server.redirectTarget('gone')).toBeNull();
   });
 
   it("returns 404 for another user's link and keeps it", async () => {
-    const link = await createLink(bob, 'keep-me');
+    const link = await server.createLink(bob.headers, 'keep-me');
 
     const response = await server.fetch(`/api/links/${link.id}`, {
       method: 'DELETE',
