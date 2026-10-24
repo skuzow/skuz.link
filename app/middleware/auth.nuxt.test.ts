@@ -1,19 +1,7 @@
-import { registerEndpoint } from '@nuxt/test-utils/runtime';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { setupTestRouter } from '@/testing/router';
 
-registerEndpoint('/api/links', () => ({ body: { links: [] } }));
-
-const navigate = async (path: string) => {
-  const router = useRouter();
-  await router.push(path);
-
-  return router.currentRoute.value.path;
-};
-
-afterEach(async () => {
-  useState('auth:session').value = null;
-  await navigate('/');
-});
+const { navigate, login } = setupTestRouter();
 
 describe('auth middleware', () => {
   it('sends guests to the login page', async () => {
@@ -25,7 +13,7 @@ describe('auth middleware', () => {
   });
 
   it('lets signed-in users through', async () => {
-    useState('auth:session').value = { token: 'session-token' };
+    login();
 
     expect(await navigate('/links')).toBe('/links');
   });
