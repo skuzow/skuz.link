@@ -4,8 +4,10 @@ import {
   normalizeLinkSlug
 } from '#shared/schemas/link.schema';
 
+const REDIRECT_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD']);
+
 export default defineEventHandler(async (event) => {
-  if (event.method !== 'GET') return;
+  if (!REDIRECT_METHODS.has(event.method)) return;
 
   const requestURL = getRequestURL(event);
 
@@ -20,11 +22,18 @@ export default defineEventHandler(async (event) => {
 
   const repository = await useRepository(event);
 
+  // HEAD comes from bots and link previews, so only GET counts as a click
+  const countClick = () => {
+    if (event.method !== 'GET') return;
+
+    scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+  };
+
   const cached = await readCachedLinkRedirect(requestURL.origin, slug);
   if (cached?.type === 'miss') return;
 
   if (cached?.type === 'hit') {
-    scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+    countClick();
     return clientLinkRedirect(cached.redirectUrl);
   }
 
@@ -34,7 +43,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  scheduleLinkClick(event, repository.link.incrementClicksBySlug(slug));
+  countClick();
   scheduleStoreLinkRedirect(event, requestURL.origin, slug, redirectUrl);
 
   return clientLinkRedirect(redirectUrl);

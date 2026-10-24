@@ -47,6 +47,31 @@ describe('link redirect middleware', () => {
     expect(await findClicks('repo')).toBe(1);
   });
 
+  it('redirects HEAD requests without counting a click', async () => {
+    await insertLink('head-check');
+
+    const response = await server.fetch('/head-check', { method: 'HEAD' });
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe(REDIRECT_URL);
+
+    await server.flush();
+    expect(await findClicks('head-check')).toBe(0);
+  });
+
+  it('serves cached redirects to HEAD requests without counting a click', async () => {
+    await insertLink('head-cached');
+    await server.fetch('/head-cached');
+    await server.flush();
+
+    const response = await server.fetch('/head-cached', { method: 'HEAD' });
+
+    expect(response.status).toBe(302);
+
+    await server.flush();
+    expect(await findClicks('head-cached')).toBe(1);
+  });
+
   it('matches slugs case-insensitively and with a trailing slash', async () => {
     await insertLink('blog-post');
 
