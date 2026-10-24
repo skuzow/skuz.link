@@ -1,9 +1,13 @@
 import { eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { links } from '../../database/schema';
 import { setupTestServer } from '../../testing/server';
 
 const server = await setupTestServer();
+
+// getAuth caches the auth instance built for the first request, so make that
+// request from another origin than the account deletion below
+beforeAll(() => server.fetch('/', { origin: 'http://127.0.0.1:3000' }));
 
 beforeEach(() => server.reset());
 

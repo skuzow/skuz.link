@@ -37,18 +37,19 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
     user: {
       deleteUser: {
         enabled: true,
-        beforeDelete: async (user) => {
+        beforeDelete: async (user, request) => {
           if (!event) return;
 
           const repository = await useRepository(event);
 
           const userLinks = await repository.link.findAllByUserId(user.id);
-          const requestURL = getRequestURL(event);
+          // event belongs to the request that first built the cached auth
+          const { origin } = request
+            ? new URL(request.url)
+            : getRequestURL(event);
 
           await Promise.all(
-            userLinks.map((link) =>
-              purgeLinkRedirect(requestURL.origin, link.slug)
-            )
+            userLinks.map((link) => purgeLinkRedirect(origin, link.slug))
           );
         }
       }
