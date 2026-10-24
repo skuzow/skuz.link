@@ -12,4 +12,4 @@ Start the file with `const server = await setupTestServer()` from `server/testin
 
 ## Helpers
 
-Test helpers live in `server/testing/` and `app/testing/`. Files in `server/utils/` are auto-imported into the worker bundle, so they hold production code only.
+Test helpers live in `server/testing/` and `app/testing/`. Nitro auto-imports every export in `server/utils/` into the worker bundle, so that folder holds production code and its tests, which export nothing.
