@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1769884723493,
-      "tag": "0000_open_shinko_yamashiro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1792279770970,
-      "tag": "0001_premium_professor_monster",
+      "when": 1792869011994,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]
