@@ -38,9 +38,6 @@ export const useFormMessage = () => {
   const alreadyUseMessage = (input: FormInput) =>
     `${$t(`form.${input}`)} ${$t('form.use')}.`;
 
-  const exampleMessage = (input: FormInput, number?: number) =>
-    `${number || ''} ${$t('form.example')} ${$t(`form.${input}`)}`;
-
   const formatMessage = (input: FormInput, reason: string) =>
     `${$t(`form.${input}`)} ${$t(`form.${reason}`)}.`;
 
@@ -77,11 +74,7 @@ export const useFormMessage = () => {
     };
 
   return {
-    requiredMessage,
-    minMessage,
-    maxMessage,
     alreadyUseMessage,
-    exampleMessage,
     formatMessage,
     errorMap
   };
