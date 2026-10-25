@@ -19,7 +19,8 @@
     "db:migrate-pro": "wrangler d1 migrations apply db --remote",
     "db:studio": "pnpm dlx d1s",
     "build": "nuxt build",
-    "preview": "wrangler dev",
+    "dev:worker": "wrangler dev",
+    "preview": "wrangler preview --name dev",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "prepare": "husky"
