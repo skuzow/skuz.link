@@ -10,7 +10,7 @@ export const useLinkForm = (options: {
   link: MaybeRefOrGetter<Link | null | undefined>;
   onSuccess: () => void | Promise<void>;
 }) => {
-  const { $api } = useNuxtApp();
+  const linkApi = useLinkApi();
   const { t: $t } = useI18n();
   const { alreadyUseMessage, formatMessage, errorMap } = useFormMessage();
 
@@ -50,11 +50,11 @@ export const useLinkForm = (options: {
 
     try {
       if (currentLink.value) {
-        await $api.link.update(currentLink.value.id, values);
+        await linkApi.update(currentLink.value.id, values);
 
         toast.success($t('toast.links.edit.title'));
       } else {
-        await $api.link.create(values);
+        await linkApi.create(values);
 
         toast.success($t('toast.links.create.title'));
       }

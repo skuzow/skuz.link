@@ -186,11 +186,9 @@ export const setupTestServer = async () => {
       json: { slug, redirectUrl }
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
 
-    const { body } = await response.json();
-
-    return body.link as Link;
+    return (await response.json()) as Link;
   };
 
   const redirectTarget = async (slug: string) => {

@@ -1,14 +1,8 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
+import LinkRedirectCache, {
   LINK_REDIRECT_CACHE_TTL_SECONDS,
   LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS
-} from '#layers/links/shared/domain/link.constant';
-import {
-  purgeLinkRedirects,
-  readCachedLinkRedirect,
-  scheduleStoreLinkMiss,
-  scheduleStoreLinkRedirect
 } from './link-redirect-cache';
 
 const ORIGIN = 'https://skuz.link';
@@ -32,6 +26,8 @@ const event = {
   context: {}
 } as unknown as H3Event<EventHandlerRequest>;
 
+const redirectCache = new LinkRedirectCache(event, ORIGIN);
+
 beforeEach(() => {
   store.clear();
   vi.clearAllMocks();
@@ -45,26 +41,26 @@ afterEach(() => {
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-describe('readCachedLinkRedirect', () => {
+describe('read', () => {
   it('returns null when nothing is cached', async () => {
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+    expect(await redirectCache.read(SLUG)).toBeNull();
   });
 
   it('returns a hit with the stored Location after a redirect is stored', async () => {
-    scheduleStoreLinkRedirect(event, ORIGIN, SLUG, REDIRECT_URL);
+    redirectCache.scheduleStoreRedirect(SLUG, REDIRECT_URL);
     await flush();
 
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toEqual({
+    expect(await redirectCache.read(SLUG)).toEqual({
       type: 'hit',
       redirectUrl: REDIRECT_URL
     });
   });
 
   it('returns a miss after a miss is stored', async () => {
-    scheduleStoreLinkMiss(event, ORIGIN, SLUG);
+    redirectCache.scheduleStoreMiss(SLUG);
     await flush();
 
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toEqual({
+    expect(await redirectCache.read(SLUG)).toEqual({
       type: 'miss'
     });
   });
@@ -72,7 +68,7 @@ describe('readCachedLinkRedirect', () => {
   it('returns null when the cache is unavailable', async () => {
     vi.stubGlobal('caches', undefined);
 
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+    expect(await redirectCache.read(SLUG)).toBeNull();
   });
 
   it('returns null and logs when the cache read throws', async () => {
@@ -82,7 +78,7 @@ describe('readCachedLinkRedirect', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+    expect(await redirectCache.read(SLUG)).toBeNull();
     expect(consoleError).toHaveBeenCalledWith(
       'Failed to read link redirect cache',
       error
@@ -90,9 +86,9 @@ describe('readCachedLinkRedirect', () => {
   });
 });
 
-describe('scheduleStoreLinkRedirect', () => {
+describe('scheduleStoreRedirect', () => {
   it('stores a 302 with the redirect TTL', async () => {
-    scheduleStoreLinkRedirect(event, ORIGIN, SLUG, REDIRECT_URL);
+    redirectCache.scheduleStoreRedirect(SLUG, REDIRECT_URL);
     await flush();
 
     const stored = store.get(`${ORIGIN}/${SLUG}`);
@@ -111,7 +107,7 @@ describe('scheduleStoreLinkRedirect', () => {
       .mockImplementation(() => {});
 
     expect(() =>
-      scheduleStoreLinkRedirect(event, ORIGIN, SLUG, REDIRECT_URL)
+      redirectCache.scheduleStoreRedirect(SLUG, REDIRECT_URL)
     ).not.toThrow();
     await flush();
 
@@ -122,9 +118,9 @@ describe('scheduleStoreLinkRedirect', () => {
   });
 });
 
-describe('scheduleStoreLinkMiss', () => {
+describe('scheduleStoreMiss', () => {
   it('stores a 404 marker with the not-found TTL', async () => {
-    scheduleStoreLinkMiss(event, ORIGIN, SLUG);
+    redirectCache.scheduleStoreMiss(SLUG);
     await flush();
 
     const stored = store.get(`${ORIGIN}/${SLUG}`);
@@ -136,28 +132,28 @@ describe('scheduleStoreLinkMiss', () => {
   });
 });
 
-describe('purgeLinkRedirects', () => {
+describe('purge', () => {
   it('deletes a stored redirect', async () => {
-    scheduleStoreLinkRedirect(event, ORIGIN, SLUG, REDIRECT_URL);
+    redirectCache.scheduleStoreRedirect(SLUG, REDIRECT_URL);
     await flush();
 
-    await purgeLinkRedirects(ORIGIN, [SLUG]);
+    await redirectCache.purge([SLUG]);
 
     expect(store.has(`${ORIGIN}/${SLUG}`)).toBe(false);
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+    expect(await redirectCache.read(SLUG)).toBeNull();
   });
 
   it('deletes a stored miss so a new link is found', async () => {
-    scheduleStoreLinkMiss(event, ORIGIN, SLUG);
+    redirectCache.scheduleStoreMiss(SLUG);
     await flush();
 
-    await purgeLinkRedirects(ORIGIN, [SLUG]);
+    await redirectCache.purge([SLUG]);
 
-    expect(await readCachedLinkRedirect(ORIGIN, SLUG)).toBeNull();
+    expect(await redirectCache.read(SLUG)).toBeNull();
   });
 
   it('deletes each distinct slug once', async () => {
-    await purgeLinkRedirects(ORIGIN, [SLUG, SLUG, 'other']);
+    await redirectCache.purge([SLUG, SLUG, 'other']);
 
     expect(fakeCache.delete).toHaveBeenCalledTimes(2);
   });
@@ -165,6 +161,6 @@ describe('purgeLinkRedirects', () => {
   it('does nothing when the cache is unavailable', async () => {
     vi.stubGlobal('caches', undefined);
 
-    await expect(purgeLinkRedirects(ORIGIN, [SLUG])).resolves.toBeUndefined();
+    await expect(redirectCache.purge([SLUG])).resolves.toBeUndefined();
   });
 });

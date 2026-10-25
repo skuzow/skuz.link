@@ -37,6 +37,10 @@ describe('authentication', () => {
     });
 
     expect(response.status).toBe(401);
+    expect(await response.json()).toMatchObject({
+      statusCode: 401,
+      statusMessage: 'Unauthorized'
+    });
   });
 
   it('returns 401 for a tampered session cookie', async () => {
@@ -81,31 +85,30 @@ describe('GET /api/links', () => {
 
     expect(response.status).toBe(200);
 
-    const { body } = await response.json();
-    expect(body.links.map((link: Link) => link.slug)).toEqual([
-      'newer',
-      'older'
-    ]);
+    const body: Link[] = await response.json();
+    expect(body.map((link) => link.slug)).toEqual(['newer', 'older']);
   });
 });
 
 describe('POST /api/links', () => {
-  it('creates a link owned by the caller with a normalized slug', async () => {
+  it('returns 201 with a link owned by the caller and a normalized slug', async () => {
     const response = await server.fetch('/api/links', {
       method: 'POST',
       headers: alice.headers,
       json: { slug: ' /Repo ', redirectUrl: 'https://example.com/repo' }
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
 
-    const { body } = await response.json();
-    expect(body.link).toMatchObject({
+    const link: Link = await response.json();
+    expect(link).toMatchObject({
+      id: expect.any(String),
       slug: 'repo',
       redirectUrl: 'https://example.com/repo',
       userId: alice.user.id,
       clicks: 0
     });
+    expect(await findLink(link.id)).toMatchObject({ slug: 'repo' });
   });
 
   it('ignores fields the client must not set', async () => {
@@ -121,8 +124,8 @@ describe('POST /api/links', () => {
       }
     });
 
-    const { body } = await response.json();
-    const link = await findLink(body.link.id);
+    const { id }: Link = await response.json();
+    const link = await findLink(id);
 
     expect(link?.id).not.toBe('forged-id');
     expect(link?.userId).toBe(alice.user.id);
@@ -155,6 +158,7 @@ describe('POST /api/links', () => {
     });
 
     expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ statusCode: 409 });
   });
 
   it('purges a cached miss so the new link redirects at once', async () => {
@@ -179,13 +183,32 @@ describe('PUT /api/links/:id', () => {
     });
 
     expect(response.status).toBe(200);
-
-    const { body } = await response.json();
-    expect(body.link).toMatchObject({
+    expect(await response.json()).toMatchObject({
       id: link.id,
       slug: 'edited',
       redirectUrl: 'https://example.com/edited'
     });
+  });
+
+  it('keeps the creation date and bumps updatedAt', async () => {
+    await server.db.insert(links).values({
+      id: 'stale',
+      slug: 'stale',
+      redirectUrl: 'https://example.com/stale',
+      userId: alice.user.id,
+      createdAt: new Date(1_000),
+      updatedAt: new Date(1_000)
+    });
+
+    const response = await server.fetch('/api/links/stale', {
+      method: 'PUT',
+      headers: alice.headers,
+      json: { slug: 'fresh', redirectUrl: 'https://example.com/fresh' }
+    });
+
+    const link: Link = await response.json();
+    expect(new Date(link.createdAt).getTime()).toBe(1_000);
+    expect(new Date(link.updatedAt).getTime()).toBeGreaterThan(1_000);
   });
 
   it("returns 404 for another user's link and leaves it untouched", async () => {
@@ -209,6 +232,10 @@ describe('PUT /api/links/:id', () => {
     });
 
     expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({
+      statusCode: 404,
+      statusMessage: 'Link not found'
+    });
   });
 
   it('returns 400 for invalid fields', async () => {
@@ -234,6 +261,7 @@ describe('PUT /api/links/:id', () => {
     });
 
     expect(response.status).toBe(409);
+    expect((await findLink(link.id))?.slug).toBe('rename-me');
   });
 
   it('purges the old and new slug when renaming', async () => {
@@ -272,7 +300,7 @@ describe('PUT /api/links/:id', () => {
 });
 
 describe('DELETE /api/links/:id', () => {
-  it("deletes the caller's link and purges its redirect", async () => {
+  it("returns 204 after deleting the caller's link and purging its redirect", async () => {
     const link = await server.createLink(alice.headers, 'gone');
 
     expect(await server.redirectTarget('gone')).toBe(link.redirectUrl);
@@ -282,7 +310,8 @@ describe('DELETE /api/links/:id', () => {
       headers: alice.headers
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(204);
+    expect(await response.text()).toBe('');
     expect(await findLink(link.id)).toBeUndefined();
     expect(await server.redirectTarget('gone')).toBeNull();
   });
@@ -297,5 +326,14 @@ describe('DELETE /api/links/:id', () => {
 
     expect(response.status).toBe(404);
     expect(await findLink(link.id)).toBeDefined();
+  });
+
+  it('returns 404 for an unknown id', async () => {
+    const response = await server.fetch('/api/links/missing', {
+      method: 'DELETE',
+      headers: alice.headers
+    });
+
+    expect(response.status).toBe(404);
   });
 });

@@ -16,8 +16,8 @@ const LINKS = [
   makeLink({ id: 'link-3', slug: 'my-repo' })
 ];
 
-const getLinks = vi.fn(() => ({ body: { links: LINKS } }));
-const deleteLink = vi.fn(() => ({}));
+const getLinks = vi.fn(() => LINKS);
+const deleteLink = vi.fn(() => null);
 
 registerEndpoint('/api/links', { method: 'GET', handler: getLinks });
 registerEndpoint('/api/links/link-1', {

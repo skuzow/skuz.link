@@ -1,17 +1,11 @@
 import { requireUser } from '#layers/auth/server/current-user';
-import { useRepository } from '#layers/links/server/infrastructure/repository';
+import { useLinkService } from '#layers/links/server/container';
+import { defineLinkEventHandler } from '#layers/links/server/http';
 
-export default defineEventHandler(async (event) => {
+export default defineLinkEventHandler(async (event) => {
   const user = await requireUser(event);
 
-  const repository = await useRepository(event);
-  const userLinks = await repository.link.findAllByUserId(user.id);
+  const linkService = await useLinkService(event);
 
-  return {
-    statusCode: 200,
-    statusMessage: 'Links found',
-    body: {
-      links: userLinks
-    }
-  };
+  return linkService.list(user.id);
 });

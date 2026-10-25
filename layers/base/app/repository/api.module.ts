@@ -6,12 +6,6 @@ interface HttpRequest {
   body?: object;
 }
 
-interface ApiResponse<T> {
-  statusCode: number;
-  statusMessage: string;
-  body: T;
-}
-
 abstract class ApiModule {
   private readonly $fetch: Fetcher;
 
@@ -20,7 +14,7 @@ abstract class ApiModule {
   }
 
   async call<T>({ method, url, body }: HttpRequest) {
-    return this.$fetch<ApiResponse<T>>(url, { method, body });
+    return this.$fetch<T>(url, { method, body });
   }
 }
 

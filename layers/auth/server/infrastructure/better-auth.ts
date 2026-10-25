@@ -1,12 +1,11 @@
-import { getRequestURL, type EventHandlerRequest, type H3Event } from 'h3';
+import type { EventHandlerRequest, H3Event } from 'h3';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins';
 import * as schema from './schema';
 import { getDB } from '#layers/base/server/platform/db';
 import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
-import { purgeLinkRedirects } from '#layers/links/server/infrastructure/link-redirect-cache';
-import { useRepository } from '#layers/links/server/infrastructure/repository';
+import { useLinkService } from '#layers/links/server/container';
 
 const createAuth = (event?: H3Event<EventHandlerRequest>) => {
   return betterAuth({
@@ -39,15 +38,9 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
         beforeDelete: async (user) => {
           if (!event) return;
 
-          const repository = await useRepository(event);
+          const linkService = await useLinkService(event);
 
-          const userLinks = await repository.link.findAllByUserId(user.id);
-          const { origin } = getRequestURL(event);
-
-          await purgeLinkRedirects(
-            origin,
-            userLinks.map((link) => link.slug)
-          );
+          await linkService.purgeOwnerRedirects(user.id);
         }
       }
     },

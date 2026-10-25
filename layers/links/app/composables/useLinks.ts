@@ -4,12 +4,12 @@ import { toast } from 'vue-sonner';
 import { normalizeLinkSlug } from '#layers/links/shared/domain/link.schema';
 
 export const useLinks = async () => {
-  const { $api } = useNuxtApp();
+  const linkApi = useLinkApi();
   const { t: $t } = useI18n();
   const { alert } = useAlert();
 
   const { data, pending, refresh } = await useAsyncData('links', () =>
-    $api.link.getAll()
+    linkApi.getAll()
   );
 
   const searchQuery = shallowRef('');
@@ -17,7 +17,7 @@ export const useLinks = async () => {
   const editingLink = shallowRef<Link | null>(null);
   const isDeleting = shallowRef(false);
 
-  const links = computed(() => data.value?.body.links ?? []);
+  const links = computed(() => data.value ?? []);
 
   const filteredLinks = computed(() => {
     const query = normalizeLinkSlug(searchQuery.value);
@@ -64,7 +64,7 @@ export const useLinks = async () => {
     isDeleting.value = true;
 
     try {
-      await $api.link.delete(link.id);
+      await linkApi.delete(link.id);
 
       toast.success($t('toast.links.delete.title'));
 

@@ -1,27 +1,18 @@
 import { requireUser } from '#layers/auth/server/current-user';
-import { readLinkInput, toLinkConflictError } from '#layers/links/server/http';
-import { purgeLinkRedirects } from '#layers/links/server/infrastructure/link-redirect-cache';
-import { useRepository } from '#layers/links/server/infrastructure/repository';
+import { useLinkService } from '#layers/links/server/container';
+import {
+  defineLinkEventHandler,
+  readLinkInput
+} from '#layers/links/server/http';
 
-export default defineEventHandler(async (event) => {
+export default defineLinkEventHandler(async (event) => {
   const user = await requireUser(event);
   const input = await readLinkInput(event);
 
-  const repository = await useRepository(event);
+  const linkService = await useLinkService(event);
+  const link = await linkService.create(user.id, input);
 
-  try {
-    const link = await repository.link.create(user.id, input);
+  setResponseStatus(event, 201);
 
-    await purgeLinkRedirects(getRequestURL(event).origin, [link.slug]);
-
-    return {
-      statusCode: 201,
-      statusMessage: 'Link created successfully',
-      body: {
-        link
-      }
-    };
-  } catch (error) {
-    throw toLinkConflictError(error);
-  }
+  return link;
 });

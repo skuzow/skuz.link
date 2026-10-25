@@ -7,14 +7,14 @@ class LinkModule extends ApiModule {
   private readonly ROUTE = Routes.Link;
 
   async getAll() {
-    return this.call<{ links: Link[] }>({
+    return this.call<Link[]>({
       method: 'GET',
       url: this.ROUTE.Links()
     });
   }
 
   async create(dto: LinkInput) {
-    return this.call<{ link: Link }>({
+    return this.call<Link>({
       method: 'POST',
       url: this.ROUTE.Links(),
       body: dto
@@ -22,7 +22,7 @@ class LinkModule extends ApiModule {
   }
 
   async update(id: string, dto: LinkInput) {
-    return this.call<{ link: Link }>({
+    return this.call<Link>({
       method: 'PUT',
       url: this.ROUTE.LinkById(id),
       body: dto

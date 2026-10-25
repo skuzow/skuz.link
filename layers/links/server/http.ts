@@ -1,36 +1,24 @@
-import type { EventHandlerRequest, H3Event } from 'h3';
+import type { EventHandler, EventHandlerRequest, H3Event } from 'h3';
 import { LinkInputSchema } from '#layers/links/shared/domain/link.schema';
-import type { Link, LinkInput } from '#layers/links/shared/domain/link.type';
-import { LinkAlreadyInUseError } from '#layers/links/shared/domain/link.error';
+import type { LinkInput } from '#layers/links/shared/domain/link.type';
 import {
-  useRepository,
-  type RepositoryInstance
-} from '#layers/links/server/infrastructure/repository';
+  LinkAlreadyInUseError,
+  LinkNotFoundError
+} from '#layers/links/shared/domain/link.error';
 
-export const requireOwnedLink = async (
-  event: H3Event<EventHandlerRequest>,
-  userId: string
-): Promise<{ repository: RepositoryInstance; link: Link }> => {
+const invalidFields = (data?: unknown) =>
+  createError({
+    statusCode: 400,
+    statusMessage: 'Invalid fields',
+    data
+  });
+
+export const readLinkId = (event: H3Event<EventHandlerRequest>): string => {
   const id = getRouterParam(event, 'id');
 
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid fields'
-    });
-  }
+  if (!id) throw invalidFields();
 
-  const repository = await useRepository(event);
-  const link = await repository.link.findOwnedById(id, userId);
-
-  if (!link) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Link not found'
-    });
-  }
-
-  return { repository, link };
+  return id;
 };
 
 export const readLinkInput = async (
@@ -38,18 +26,19 @@ export const readLinkInput = async (
 ): Promise<LinkInput> => {
   const result = LinkInputSchema.safeParse(await readBody(event));
 
-  if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid fields',
-      data: result.error.issues
-    });
-  }
+  if (!result.success) throw invalidFields(result.error.issues);
 
   return result.data;
 };
 
-export const toLinkConflictError = (error: unknown) => {
+const toLinkHttpError = (error: unknown) => {
+  if (error instanceof LinkNotFoundError) {
+    return createError({
+      statusCode: 404,
+      statusMessage: 'Link not found'
+    });
+  }
+
   if (error instanceof LinkAlreadyInUseError) {
     return createError({
       statusCode: 409,
@@ -59,3 +48,15 @@ export const toLinkConflictError = (error: unknown) => {
 
   return error;
 };
+
+// so each Links route can throw domain errors without mapping them
+export const defineLinkEventHandler = <T>(
+  handler: EventHandler<EventHandlerRequest, Promise<T>>
+) =>
+  defineEventHandler(async (event) => {
+    try {
+      return await handler(event);
+    } catch (error) {
+      throw toLinkHttpError(error);
+    }
+  });

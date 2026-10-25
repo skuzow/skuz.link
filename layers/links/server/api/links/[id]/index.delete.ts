@@ -1,17 +1,15 @@
 import { requireUser } from '#layers/auth/server/current-user';
-import { requireOwnedLink } from '#layers/links/server/http';
-import { purgeLinkRedirects } from '#layers/links/server/infrastructure/link-redirect-cache';
+import { useLinkService } from '#layers/links/server/container';
+import { defineLinkEventHandler, readLinkId } from '#layers/links/server/http';
 
-export default defineEventHandler(async (event) => {
+export default defineLinkEventHandler(async (event) => {
   const user = await requireUser(event);
-  const { repository, link } = await requireOwnedLink(event, user.id);
+  const id = readLinkId(event);
 
-  await repository.link.delete(link.id);
+  const linkService = await useLinkService(event);
+  await linkService.delete(user.id, id);
 
-  await purgeLinkRedirects(getRequestURL(event).origin, [link.slug]);
+  setResponseStatus(event, 204);
 
-  return {
-    statusCode: 200,
-    statusMessage: 'Link deleted successfully'
-  };
+  return null;
 });

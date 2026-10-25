@@ -1,36 +1,17 @@
 import { requireUser } from '#layers/auth/server/current-user';
+import { useLinkService } from '#layers/links/server/container';
 import {
-  readLinkInput,
-  requireOwnedLink,
-  toLinkConflictError
+  defineLinkEventHandler,
+  readLinkId,
+  readLinkInput
 } from '#layers/links/server/http';
-import { purgeLinkRedirects } from '#layers/links/server/infrastructure/link-redirect-cache';
 
-export default defineEventHandler(async (event) => {
+export default defineLinkEventHandler(async (event) => {
   const user = await requireUser(event);
-  const { repository, link: ownedLink } = await requireOwnedLink(
-    event,
-    user.id
-  );
-
+  const id = readLinkId(event);
   const input = await readLinkInput(event);
 
-  try {
-    const link = await repository.link.update(ownedLink.id, input);
+  const linkService = await useLinkService(event);
 
-    await purgeLinkRedirects(getRequestURL(event).origin, [
-      ownedLink.slug,
-      link.slug
-    ]);
-
-    return {
-      statusCode: 200,
-      statusMessage: 'Link edited successfully',
-      body: {
-        link
-      }
-    };
-  } catch (error) {
-    throw toLinkConflictError(error);
-  }
+  return linkService.update(user.id, id, input);
 });

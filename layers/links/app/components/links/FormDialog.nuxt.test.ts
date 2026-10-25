@@ -11,12 +11,8 @@ vi.mock('vue-sonner', async (importOriginal) => ({
   toast: { success: vi.fn(), error: vi.fn() }
 }));
 
-const createLink = vi.fn(async (event) => ({
-  body: { link: makeLink(await readBody(event)) }
-}));
-const updateLink = vi.fn(async (event) => ({
-  body: { link: makeLink(await readBody(event)) }
-}));
+const createLink = vi.fn(async (event) => makeLink(await readBody(event)));
+const updateLink = vi.fn(async (event) => makeLink(await readBody(event)));
 
 registerEndpoint('/api/links', { method: 'POST', handler: createLink });
 registerEndpoint('/api/links/link-1', { method: 'PUT', handler: updateLink });
@@ -78,9 +74,8 @@ describe('LinksFormDialog', () => {
     await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
     expect(createLink).toHaveBeenCalledTimes(1);
     expect(await createLink.mock.results[0]!.value).toMatchObject({
-      body: {
-        link: { slug: 'repo', redirectUrl: 'https://example.com/repo' }
-      }
+      slug: 'repo',
+      redirectUrl: 'https://example.com/repo'
     });
     expect(toast.success).toHaveBeenCalledWith('Link created successfully');
   });
@@ -97,7 +92,8 @@ describe('LinksFormDialog', () => {
 
     await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
     expect(await updateLink.mock.results[0]!.value).toMatchObject({
-      body: { link: { slug: 'new-slug', redirectUrl: link.redirectUrl } }
+      slug: 'new-slug',
+      redirectUrl: link.redirectUrl
     });
     expect(createLink).not.toHaveBeenCalled();
     expect(toast.success).toHaveBeenCalledWith('Link updated successfully');
