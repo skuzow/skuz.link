@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { LinkIcon, Settings2Icon, LogOutIcon } from 'lucide-vue-next';
 
+import { LINKS_ROUTE } from '@/constants/links.constant';
+
 const { authUser, signOut } = useAuth();
 
 const { openAuthSettings } = useAuthSettings();
@@ -20,7 +22,10 @@ const { openAuthSettings } = useAuthSettings();
 
       <UiDropdownMenuGroup>
         <UiDropdownMenuItem as-child>
-          <NuxtLinkLocale to="/links" :title="$t('nav.header.user.links')">
+          <NuxtLinkLocale
+            :to="LINKS_ROUTE"
+            :title="$t('nav.header.user.links')"
+          >
             <LinkIcon :size="16" />
             <span>{{ $t('nav.header.user.links') }}</span>
           </NuxtLinkLocale>

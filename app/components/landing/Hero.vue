@@ -1,5 +1,9 @@
 <script lang="ts" setup>
 import { RocketIcon } from 'lucide-vue-next';
+
+import { LINKS_ROUTE } from '@/constants/links.constant';
+
+const { isAuthenticated } = useAuth();
 </script>
 
 <template>
@@ -24,7 +28,7 @@ import { RocketIcon } from 'lucide-vue-next';
       </div>
 
       <UiButton as-child>
-        <NuxtLinkLocale to="/login">
+        <NuxtLinkLocale :to="isAuthenticated ? LINKS_ROUTE : '/login'">
           {{ $t('landing.cta') }}
           <RocketIcon :size="16" />
         </NuxtLinkLocale>

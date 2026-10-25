@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+definePageMeta({ middleware: 'guest' });
+
 const { t: $t } = useI18n();
 
 seoMeta({

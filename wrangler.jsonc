@@ -2,11 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "skuz-link",
   "compatibility_date": "2025-12-02",
-  "main": "./.output/server/index.mjs",
-  "assets": {
-    "binding": "assets",
-    "directory": "./.output/public/"
-  },
   "routes": [
     {
       "pattern": "skuz.link",
@@ -20,16 +15,25 @@
       "enabled": true
     },
     "logs": {
-      "enabled": true,
-      "invocation_logs": true
+      "enabled": true
     }
   },
   "d1_databases": [
     {
       "binding": "db",
-      "database_name": "skuz-link-dev",
-      "database_id": "5a373b32-0ca5-416e-9eb7-934746b6eff7",
+      "database_name": "skuz-link-pro",
+      "database_id": "8b3e03f7-ae5c-4176-8335-dad917dae398",
+      "preview_database_id": "5a373b32-0ca5-416e-9eb7-934746b6eff7",
       "migrations_dir": "server/database/migrations"
     }
-  ]
+  ],
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "db",
+        "database_name": "skuz-link-dev",
+        "database_id": "5a373b32-0ca5-416e-9eb7-934746b6eff7"
+      }
+    ]
+  }
 }

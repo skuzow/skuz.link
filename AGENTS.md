@@ -13,3 +13,7 @@ Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-
 ### Domain docs
 
 Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+## Testing
+
+Read `docs/agents/testing.md` before writing a test or test helper, and when a server test fails on an undefined auto-import.
