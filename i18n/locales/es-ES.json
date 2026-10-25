@@ -1,12 +1,9 @@
 {
-  "save": "Guardar cambios",
   "nav": {
     "home": "Inicio",
     "header": {
-      "login": "Iniciar sesión",
       "user": {
         "links": "Links",
-        "settings": "Ajustes",
         "logout": "Cerrar sesión"
       },
       "lang": {
@@ -24,7 +21,6 @@
     }
   },
   "form": {
-    "name": "Nombre",
     "slug": "Link",
     "redirectUrl": "URL de redirección",
     "slugPlaceholder": "github",
@@ -33,36 +29,6 @@
     "slugReserved": "está reservado",
     "urlFormat": "debe ser una URL http(s) válida",
     "example": "Ejemplo de"
-  },
-  "auth": {
-    "google": "Continuar con Google",
-    "github": "Continuar con Github",
-    "settings": {
-      "profile": {
-        "title": "Perfil",
-        "button": "Actualizar perfil"
-      },
-      "sessions": {
-        "title": "Sesiones",
-        "button": "Revocar",
-        "current": "Actual"
-      },
-      "account": {
-        "linked": {
-          "title": "Cuentas conectadas",
-          "credential": "Credenciales",
-          "button": "Desconectar",
-          "link": "Conectar cuenta"
-        },
-        "delete": {
-          "title": "Eliminar cuenta",
-          "description": "Esta acción es irreversible"
-        }
-      }
-    }
-  },
-  "login": {
-    "description": "Inicia sesión para gestionar tus links."
   },
   "links": {
     "empty": {
@@ -103,16 +69,6 @@
     "cta": "Empezar"
   },
   "alert": {
-    "auth": {
-      "settings": {
-        "account": {
-          "delete": {
-            "title": "¿Estás seguro de que quieres eliminar tu cuenta?",
-            "description": "Esta acción es irreversible."
-          }
-        }
-      }
-    },
     "links": {
       "delete": {
         "title": "¿Estás seguro de que quieres eliminar este link?",
@@ -121,33 +77,6 @@
     }
   },
   "toast": {
-    "auth": {
-      "error": "Error al iniciar sesión con",
-      "settings": {
-        "profile": {
-          "title": "Perfil actualizado con éxito"
-        },
-        "sessions": {
-          "error": "Error al revocar la sesión",
-          "title": "Sesión revocada con éxito"
-        },
-        "account": {
-          "linked": {
-            "unlink": {
-              "error": "Error al desvincular la cuenta",
-              "title": "Cuenta desvinculada con éxito"
-            },
-            "link": {
-              "error": "Error al vincular la cuenta"
-            }
-          },
-          "delete": {
-            "error": "Error al eliminar la cuenta",
-            "title": "Cuenta eliminada con éxito"
-          }
-        }
-      }
-    },
     "links": {
       "create": {
         "title": "Link creado con éxito"

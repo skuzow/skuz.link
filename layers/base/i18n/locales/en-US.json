@@ -2,6 +2,7 @@
   "description": "Url shortener",
   "cancel": "Cancel",
   "confirm": "Confirm",
+  "save": "Save changes",
   "form": {
     "required": "is required",
     "least": "must be at least",

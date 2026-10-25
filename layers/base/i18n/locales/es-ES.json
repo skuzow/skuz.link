@@ -2,6 +2,7 @@
   "description": "Acortador de urls",
   "cancel": "Cancelar",
   "confirm": "Confirmar",
+  "save": "Guardar cambios",
   "form": {
     "required": "es obligatorio",
     "least": "debe ser como mínimo",

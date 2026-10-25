@@ -1,5 +1,7 @@
+import { requireUser } from '#layers/auth/server/current-user';
+
 export default defineEventHandler(async (event) => {
-  const user = await requireAuth(event);
+  const user = await requireUser(event);
   const { repository, link: ownedLink } = await requireOwnedLink(
     event,
     user.id

@@ -45,8 +45,8 @@ const { isAuthenticated } = useAuth();
 
         <li v-else>
           <UiButton as-child variant="secondary">
-            <NuxtLinkLocale to="/login" :title="$t('nav.header.login')">
-              {{ $t('nav.header.login') }}
+            <NuxtLinkLocale to="/login" :title="$t('login.title')">
+              {{ $t('login.title') }}
             </NuxtLinkLocale>
           </UiButton>
         </li>

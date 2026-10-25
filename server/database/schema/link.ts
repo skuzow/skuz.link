@@ -1,6 +1,7 @@
 import { relations, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
-import { user } from './auth';
+// relative import: drizzle-kit loads the schema without Nuxt's #layers aliases
+import { user } from '../../../layers/auth/server/infrastructure/schema';
 
 export const links = sqliteTable(
   'links',
