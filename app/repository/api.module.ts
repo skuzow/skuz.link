@@ -1,4 +1,4 @@
-import type { $Fetch } from 'nitropack';
+type Fetcher = ReturnType<typeof useRequestFetch>;
 
 interface HttpRequest {
   url: string;
@@ -13,22 +13,14 @@ interface ApiResponse<T> {
 }
 
 abstract class ApiModule {
-  private readonly $fetch: $Fetch;
+  private readonly $fetch: Fetcher;
 
-  constructor(fetcher: $Fetch) {
+  constructor(fetcher: Fetcher) {
     this.$fetch = fetcher;
   }
 
   async call<T>({ method, url, body }: HttpRequest) {
-    const cookie = useRequestHeaders(['cookie']);
-
-    return this.$fetch<ApiResponse<T>>(url, {
-      method,
-      body,
-      headers: {
-        ...cookie
-      }
-    });
+    return this.$fetch<ApiResponse<T>>(url, { method, body });
   }
 }
 

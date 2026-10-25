@@ -5,8 +5,11 @@ export interface ApiInstance {
 }
 
 export default defineNuxtPlugin(() => {
+  // global $fetch drops cookies and Cloudflare bindings during SSR
+  const fetcher = useRequestFetch();
+
   const modules: ApiInstance = {
-    link: new LinkModule($fetch)
+    link: new LinkModule(fetcher)
   };
 
   return {
