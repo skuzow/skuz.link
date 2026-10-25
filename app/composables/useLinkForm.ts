@@ -16,7 +16,7 @@ export const useLinkForm = (options: {
 
   const isLoading: Ref<boolean> = ref(false);
 
-  const isSlug = (input: FormInput) => input === FormInput.SLUG;
+  const isSlug = (input: string) => input === FormInput.SLUG;
 
   const linkErrorMap = errorMap({
     invalid_string: (_, input) =>

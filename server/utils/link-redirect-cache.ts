@@ -3,7 +3,7 @@ import {
   LINK_REDIRECT_CACHE_TTL_SECONDS,
   LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS
 } from '#shared/constants/link.constant';
-import { scheduleBackground } from './background';
+import { scheduleBackground } from '#layers/base/server/platform/background';
 
 const MISS_HEADER = 'X-Link-Redirect';
 const MISS_HEADER_VALUE = 'miss';

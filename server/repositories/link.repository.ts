@@ -1,12 +1,9 @@
 import type { Link, LinkInput } from '#shared/types/link.type';
 import { and, desc, eq, sql } from 'drizzle-orm';
+import type { Database } from '#layers/base/server/platform/db';
+import { isUniqueConstraintError } from '#layers/base/server/platform/errors';
 import { links } from '~~/server/database/schema';
-import {
-  isUniqueConstraintError,
-  LinkAlreadyInUseError
-} from '~~/server/utils/errors';
-
-type Database = Awaited<ReturnType<typeof useDB>>;
+import { LinkAlreadyInUseError } from '~~/server/utils/errors';
 
 class LinkRepository {
   constructor(private db: Database) {}

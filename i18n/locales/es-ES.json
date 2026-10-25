@@ -1,7 +1,4 @@
 {
-  "description": "Acortador de urls",
-  "cancel": "Cancelar",
-  "confirm": "Confirmar",
   "save": "Guardar cambios",
   "nav": {
     "home": "Inicio",
@@ -35,11 +32,6 @@
     "slugFormat": "solo puede contener minúsculas, números, guiones y guiones bajos",
     "slugReserved": "está reservado",
     "urlFormat": "debe ser una URL http(s) válida",
-    "required": "es obligatorio",
-    "least": "debe ser como mínimo",
-    "most": "debe ser como máximo",
-    "characters": "caracteres",
-    "use": "está en uso",
     "example": "Ejemplo de"
   },
   "auth": {

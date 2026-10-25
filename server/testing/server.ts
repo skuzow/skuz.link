@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { User } from 'better-auth';
 import { betterAuth } from 'better-auth';
@@ -15,12 +15,13 @@ import {
 import { afterAll, expect, vi } from 'vitest';
 import type { Link } from '#shared/types/link.type';
 import * as schema from '../database/schema';
-import { runtimeConfig } from '../utils/runtimeConfig';
+import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
 import { createTestPlatform } from './platform';
 
 export const TEST_ORIGIN: string = runtimeConfig.betterAuth.url;
 
-const SERVER_DIR = new URL('../', import.meta.url);
+const ROOT_DIR = new URL('../../', import.meta.url);
+const LAYERS_DIR = new URL('layers/', ROOT_DIR);
 const METHOD_SUFFIX_REGEX: RegExp =
   /\.(get|post|put|patch|delete|head|options)$/;
 
@@ -29,13 +30,26 @@ interface TestRequestInit extends Omit<RequestInit, 'body'> {
   origin?: string;
 }
 
-const listHandlerFiles = (dir: string) =>
-  readdirSync(new URL(dir, SERVER_DIR), { recursive: true, encoding: 'utf8' })
+// Nitro's scan order: root first, then layers in reverse alphabetical order
+const listServerDirs = () => [
+  new URL('server/', ROOT_DIR),
+  ...readdirSync(LAYERS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => b.localeCompare(a))
+    .map((layer) => new URL(`${layer}/server/`, LAYERS_DIR))
+];
+
+const listHandlerFiles = (dir: URL) => {
+  if (!existsSync(dir)) return [];
+
+  return readdirSync(dir, { recursive: true, encoding: 'utf8' })
     .filter((file) => file.endsWith('.ts') && !file.endsWith('.test.ts'))
     .sort();
+};
 
-const loadHandler = async (file: string): Promise<EventHandler> => {
-  const module = await import(fileURLToPath(new URL(file, SERVER_DIR)));
+const loadHandler = async (file: URL): Promise<EventHandler> => {
+  const module = await import(fileURLToPath(file));
 
   return module.default;
 };
@@ -57,16 +71,31 @@ const toApiRoute = (file: string) => {
 
 const createTestApp = async () => {
   const app = createApp();
+  const serverDirs = listServerDirs();
 
-  for (const file of listHandlerFiles('middleware')) {
-    app.use(await loadHandler(`middleware/${file}`));
+  for (const serverDir of serverDirs) {
+    const middlewareDir = new URL('middleware/', serverDir);
+
+    for (const file of listHandlerFiles(middlewareDir)) {
+      app.use(await loadHandler(new URL(file, middlewareDir)));
+    }
   }
 
   const router = createRouter();
+  // Nitro keeps the first handler per route and method, so root wins
+  const registeredRoutes = new Set<string>();
 
-  for (const file of listHandlerFiles('api')) {
-    const { route, method } = toApiRoute(file);
-    router.add(route, await loadHandler(`api/${file}`), method);
+  for (const serverDir of serverDirs) {
+    const apiDir = new URL('api/', serverDir);
+
+    for (const file of listHandlerFiles(apiDir)) {
+      const { route, method } = toApiRoute(file);
+      const routeKey = `${method ?? '*'} ${route}`;
+      if (registeredRoutes.has(routeKey)) continue;
+
+      registeredRoutes.add(routeKey);
+      router.add(route, await loadHandler(new URL(file, apiDir)), method);
+    }
   }
 
   app.use(router);

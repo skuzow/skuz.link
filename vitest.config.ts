@@ -7,30 +7,35 @@ import { configDefaults, defineConfig } from 'vitest/config';
 const resolvePath = (path: string) =>
   fileURLToPath(new URL(path, import.meta.url));
 
-const sharedAlias = {
-  '#shared': resolvePath('./shared')
-};
+const projectAliases = [
+  { find: '#shared', replacement: resolvePath('./shared') },
+  // mirrors the #layers/<name> aliases Nuxt creates for every layer
+  { find: /^#layers\/([\w-]+)/, replacement: `${resolvePath('./layers')}/$1` }
+];
 
 export default defineConfig({
   test: {
     projects: [
       {
         resolve: {
-          alias: sharedAlias
+          alias: projectAliases
         },
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['{app,shared}/**/*.test.ts'],
+          include: [
+            '{app,shared}/**/*.test.ts',
+            'layers/*/{app,shared}/**/*.test.ts'
+          ],
           exclude: [...configDefaults.exclude, '**/*.nuxt.test.ts']
         }
       },
       {
         resolve: {
-          alias: {
-            ...sharedAlias,
-            '~~': resolvePath('.')
-          }
+          alias: [
+            ...projectAliases,
+            { find: '~~', replacement: resolvePath('.') }
+          ]
         },
         plugins: [
           // replays Nitro auto-imports so server files load unchanged
@@ -44,7 +49,7 @@ export default defineConfig({
         test: {
           name: 'server',
           environment: 'node',
-          include: ['server/**/*.test.ts'],
+          include: ['server/**/*.test.ts', 'layers/*/server/**/*.test.ts'],
           env: {
             NUXT_BETTER_AUTH_URL: 'http://localhost:3000',
             NUXT_BETTER_AUTH_SECRET: 'skuz-link-test-secret-0123456789abcdef',
@@ -63,7 +68,7 @@ export default defineConfig({
         test: {
           name: 'nuxt',
           environment: 'nuxt',
-          include: ['app/**/*.nuxt.test.ts']
+          include: ['app/**/*.nuxt.test.ts', 'layers/*/app/**/*.nuxt.test.ts']
         }
       })
     ]

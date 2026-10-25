@@ -1,7 +1,4 @@
 {
-  "description": "Url shortener",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
   "save": "Save changes",
   "nav": {
     "home": "Home",
@@ -35,11 +32,6 @@
     "slugFormat": "can only contain lowercase letters, numbers, hyphens and underscores",
     "slugReserved": "is reserved",
     "urlFormat": "must be a valid http(s) URL",
-    "required": "is required",
-    "least": "must be at least",
-    "most": "must be at most",
-    "characters": "characters",
-    "use": "is already in use",
     "example": "Example"
   },
   "auth": {

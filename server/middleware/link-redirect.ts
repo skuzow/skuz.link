@@ -1,3 +1,4 @@
+import { scheduleBackground } from '#layers/base/server/platform/background';
 import { LinkSlugSchema } from '#shared/schemas/link.schema';
 
 const REDIRECT_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD']);

@@ -1,6 +1,6 @@
 import type { Link, LinkInput } from '#shared/types/link.type';
 
-import ApiModule from '@/repository/api.module';
+import ApiModule from '#layers/base/app/repository/api.module';
 import Routes from '@/repository/routes.client';
 
 class LinkModule extends ApiModule {

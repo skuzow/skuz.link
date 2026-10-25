@@ -1,0 +1,12 @@
+{
+  "description": "Acortador de urls",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "form": {
+    "required": "es obligatorio",
+    "least": "debe ser como mínimo",
+    "most": "debe ser como máximo",
+    "characters": "caracteres",
+    "use": "está en uso"
+  }
+}

@@ -4,8 +4,8 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins';
 import * as schema from '../database/schema';
-import { getDB } from './db';
-import { runtimeConfig } from './runtimeConfig';
+import { getDB } from '#layers/base/server/platform/db';
+import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
 import { purgeLinkRedirects } from './link-redirect-cache';
 import { useRepository } from './repository';
 

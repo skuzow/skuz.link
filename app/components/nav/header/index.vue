@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { cn } from '@/lib/utils';
+import { cn } from '#layers/base/app/lib/utils';
 
 interface Props {
   isLanding?: boolean;

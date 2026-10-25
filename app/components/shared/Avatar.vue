@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/require-default-prop -->
 <script lang="ts" setup>
-import type { AvatarVariants } from '@/components/ui/avatar';
+import type { AvatarVariants } from '#layers/base/app/components/ui/avatar';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { authUser } = useAuth();

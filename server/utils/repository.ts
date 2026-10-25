@@ -1,4 +1,5 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
+import { useDB } from '#layers/base/server/platform/db';
 import LinkRepository from '~~/server/repositories/link.repository';
 
 export interface RepositoryInstance {
