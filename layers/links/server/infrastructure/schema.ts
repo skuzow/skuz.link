@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 // relative import: drizzle-kit loads the schema without Nuxt's #layers aliases
 import { user } from '../../../auth/server/infrastructure/schema';
@@ -23,10 +23,3 @@ export const links = sqliteTable(
   },
   (table) => [index('links_userId_idx').on(table.userId)]
 );
-
-export const linksRelations = relations(links, ({ one }) => ({
-  user: one(user, {
-    fields: [links.userId],
-    references: [user.id]
-  })
-}));

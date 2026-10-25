@@ -40,7 +40,13 @@ export default defineConfig({
         plugins: [
           // replays Nitro auto-imports so server files load unchanged
           Unimport.vite({
-            imports: Object.keys(h3).map((name) => ({ name, from: 'h3' })),
+            imports: [
+              ...Object.keys(h3).map((name) => ({ name, from: 'h3' })),
+              ...['useNitroApp', 'defineNitroPlugin'].map((name) => ({
+                name,
+                from: resolvePath('./server/testing/nitro.ts')
+              }))
+            ],
             dirs: ['./server/utils'],
             include: [/[\\/]server[\\/].+\.ts$/],
             dts: false

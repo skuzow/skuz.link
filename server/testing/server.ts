@@ -12,11 +12,13 @@ import {
   type EventHandler,
   type RouterMethod
 } from 'h3';
+import type { NitroAppPlugin } from 'nitropack/types';
 import { afterAll, afterEach, expect, vi } from 'vitest';
 import * as authSchema from '#layers/auth/server/infrastructure/schema';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import * as linksSchema from '#layers/links/server/infrastructure/schema';
 import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
+import { useNitroApp } from './nitro';
 import { createTestPlatform } from './platform';
 
 export const TEST_ORIGIN: string = runtimeConfig.betterAuth.url;
@@ -43,7 +45,7 @@ const listServerDirs = () => [
     .map((layer) => new URL(`${layer}/server/`, LAYERS_DIR))
 ];
 
-const listHandlerFiles = (dir: URL) => {
+const listServerFiles = (dir: URL) => {
   if (!existsSync(dir)) return [];
 
   return readdirSync(dir, { recursive: true, encoding: 'utf8' })
@@ -51,10 +53,30 @@ const listHandlerFiles = (dir: URL) => {
     .sort();
 };
 
-const loadHandler = async (file: URL): Promise<EventHandler> => {
+const loadDefaultExport = async <T>(file: URL): Promise<T> => {
   const module = await import(fileURLToPath(file));
 
   return module.default;
+};
+
+const loadHandler = (file: URL) => loadDefaultExport<EventHandler>(file);
+
+// runs every layer's Nitro plugins against the test Nitro app, so the hooks
+// they register fire when server code calls them through useNitroApp()
+const runPlugins = async (serverDirs: URL[]) => {
+  const nitroApp = useNitroApp();
+  nitroApp.hooks.removeAllHooks();
+
+  for (const serverDir of serverDirs) {
+    const pluginsDir = new URL('plugins/', serverDir);
+
+    for (const file of listServerFiles(pluginsDir)) {
+      const plugin = await loadDefaultExport<NitroAppPlugin>(
+        new URL(file, pluginsDir)
+      );
+      plugin(nitroApp);
+    }
+  }
 };
 
 // mirrors Nitro file routing: index.get.ts, [id], [...all]
@@ -76,10 +98,12 @@ const createTestApp = async () => {
   const app = createApp();
   const serverDirs = listServerDirs();
 
+  await runPlugins(serverDirs);
+
   for (const serverDir of serverDirs) {
     const middlewareDir = new URL('middleware/', serverDir);
 
-    for (const file of listHandlerFiles(middlewareDir)) {
+    for (const file of listServerFiles(middlewareDir)) {
       app.use(await loadHandler(new URL(file, middlewareDir)));
     }
   }
@@ -91,7 +115,7 @@ const createTestApp = async () => {
   for (const serverDir of serverDirs) {
     const apiDir = new URL('api/', serverDir);
 
-    for (const file of listHandlerFiles(apiDir)) {
+    for (const file of listServerFiles(apiDir)) {
       const { route, method } = toApiRoute(file);
       const routeKey = `${method ?? '*'} ${route}`;
       if (registeredRoutes.has(routeKey)) continue;
@@ -107,7 +131,7 @@ const createTestApp = async () => {
 };
 
 /**
- * Runs the real server middleware and API routes on a fresh local D1 and
+ * Runs the real server plugins, middleware and API routes on a fresh local D1 and
  * Workers cache. The cache is not cleared between tests, so give each test
  * its own slugs.
  */

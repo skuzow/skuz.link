@@ -3,9 +3,10 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins';
 import * as schema from './schema';
+// declares auth:user:deleting, also for the app types that import this file
+import type {} from '../types/hooks';
 import { getDB } from '#layers/base/server/platform/db';
 import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
-import { useLinkService } from '#layers/links/server/container';
 
 const createAuth = (event?: H3Event<EventHandlerRequest>) => {
   return betterAuth({
@@ -38,9 +39,11 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
         beforeDelete: async (user) => {
           if (!event) return;
 
-          const linkService = await useLinkService(event);
-
-          await linkService.purgeOwnerRedirects(user.id);
+          await useNitroApp().hooks.callHook(
+            'auth:user:deleting',
+            event,
+            user.id
+          );
         }
       }
     },
