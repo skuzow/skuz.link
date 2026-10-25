@@ -1,0 +1,31 @@
+<script lang="ts" setup>
+import type { Link } from '#layers/links/shared/domain/link.type';
+import { vAutoAnimate } from '@formkit/auto-animate/vue';
+import {
+  LINKS_GRID_ITEM_CLASS,
+  LINKS_GRID_LIST_CLASS
+} from '#layers/links/app/constants/links.constant';
+
+defineProps<{
+  links: Link[];
+}>();
+
+const emit = defineEmits<{
+  edit: [link: Link];
+  delete: [link: Link];
+}>();
+</script>
+
+<template>
+  <div class="@container">
+    <ul v-auto-animate :class="LINKS_GRID_LIST_CLASS">
+      <li v-for="link in links" :key="link.id" :class="LINKS_GRID_ITEM_CLASS">
+        <LinksCard
+          :link="link"
+          @edit="emit('edit', $event)"
+          @delete="emit('delete', $event)"
+        />
+      </li>
+    </ul>
+  </div>
+</template>

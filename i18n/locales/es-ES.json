@@ -20,46 +20,6 @@
       "contact": "Contactar"
     }
   },
-  "form": {
-    "slug": "Link",
-    "redirectUrl": "URL de redirección",
-    "slugPlaceholder": "github",
-    "redirectUrlPlaceholder": "https://ejemplo.com",
-    "slugFormat": "solo puede contener minúsculas, números, guiones y guiones bajos",
-    "slugReserved": "está reservado",
-    "urlFormat": "debe ser una URL http(s) válida",
-    "example": "Ejemplo de"
-  },
-  "links": {
-    "empty": {
-      "title": "Aún no tienes links",
-      "description": "Crea tu primer link corto para empezar a compartir.",
-      "button": "Crear link"
-    },
-    "search": {
-      "placeholder": "Buscar por nombre",
-      "empty": {
-        "title": "No se encontraron links",
-        "description": "Prueba con otro nombre."
-      }
-    },
-    "create": {
-      "title": "Crear link",
-      "description": "Indica la ruta corta y la URL a la que redirigir.",
-      "button": "Crear link"
-    },
-    "edit": {
-      "title": "Editar link",
-      "description": "Actualiza la ruta corta o la URL de redirección.",
-      "button": "Editar"
-    },
-    "delete": {
-      "button": "Eliminar"
-    },
-    "copy": "Copiar",
-    "actions": "Acciones del link",
-    "clicks": "{n} clics"
-  },
   "landing": {
     "headline": {
       "first": "Acorta tus enlaces,",
@@ -67,30 +27,5 @@
     },
     "subline": "Acortador de URLs simple, rápido y fiable. Toma el control de cada enlace que compartes.",
     "cta": "Empezar"
-  },
-  "alert": {
-    "links": {
-      "delete": {
-        "title": "¿Estás seguro de que quieres eliminar este link?",
-        "description": "Esta acción es irreversible."
-      }
-    }
-  },
-  "toast": {
-    "links": {
-      "create": {
-        "title": "Link creado con éxito"
-      },
-      "edit": {
-        "title": "Link actualizado con éxito"
-      },
-      "delete": {
-        "title": "Link eliminado con éxito"
-      },
-      "copy": {
-        "title": "Link copiado"
-      },
-      "error": "Ha ocurrido un error con tus links"
-    }
   }
 }

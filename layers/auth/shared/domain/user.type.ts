@@ -1,3 +1,13 @@
-import type { user } from '#layers/auth/server/infrastructure/schema';
-
-export type User = typeof user.$inferSelect;
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  role: string | null;
+  banned: boolean | null;
+  banReason: string | null;
+  banExpires: Date | null;
+}

@@ -13,12 +13,15 @@ import {
   type RouterMethod
 } from 'h3';
 import { afterAll, expect, vi } from 'vitest';
-import type { Link } from '#shared/types/link.type';
-import * as schema from '../database/schema';
+import * as authSchema from '#layers/auth/server/infrastructure/schema';
+import type { Link } from '#layers/links/shared/domain/link.type';
+import * as linksSchema from '#layers/links/server/infrastructure/schema';
 import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
 import { createTestPlatform } from './platform';
 
 export const TEST_ORIGIN: string = runtimeConfig.betterAuth.url;
+
+const schema = { ...authSchema, ...linksSchema };
 
 const ROOT_DIR = new URL('../../', import.meta.url);
 const LAYERS_DIR = new URL('layers/', ROOT_DIR);

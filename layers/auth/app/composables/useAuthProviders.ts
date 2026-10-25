@@ -1,6 +1,6 @@
 import { toast } from 'vue-sonner';
 
-import { LINKS_ROUTE } from '@/constants/links.constant';
+import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
 export const useAuthProviders = () => {
   const localePath = useLocalePath();

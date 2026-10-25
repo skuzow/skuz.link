@@ -1,4 +1,4 @@
-import { LINKS_ROUTE } from '@/constants/links.constant';
+import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
   const { isAuthenticated } = useAuth();

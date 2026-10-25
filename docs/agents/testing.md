@@ -14,4 +14,4 @@ Start the file with `const server = await setupTestServer()` from root `server/t
 
 ## Helpers
 
-Test helpers live in `server/testing/` and `app/testing/`. Nitro auto-imports every export in `server/utils/` into the worker bundle, so that folder holds production code and its tests, which export nothing. Layers have no `server/utils/` folder, because Nitro would auto-import it too (ADR-0004): base platform code lives in `layers/base/server/platform/` and is imported explicitly.
+Test helpers live in root `server/testing/` and in the `app/testing/` folder of root or a layer, like the Link fixture in `layers/links/app/testing/`. Nitro auto-imports every export in `server/utils/` into the worker bundle, so that folder holds production code and its tests, which export nothing. Layers have no `server/utils/` folder, because Nitro would auto-import it too (ADR-0004): base platform code lives in `layers/base/server/platform/` and is imported explicitly.

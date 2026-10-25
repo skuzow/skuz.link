@@ -5,8 +5,8 @@ import { admin } from 'better-auth/plugins';
 import * as schema from './schema';
 import { getDB } from '#layers/base/server/platform/db';
 import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
-import { purgeLinkRedirects } from '~~/server/utils/link-redirect-cache';
-import { useRepository } from '~~/server/utils/repository';
+import { purgeLinkRedirects } from '#layers/links/server/infrastructure/link-redirect-cache';
+import { useRepository } from '#layers/links/server/infrastructure/repository';
 
 const createAuth = (event?: H3Event<EventHandlerRequest>) => {
   return betterAuth({

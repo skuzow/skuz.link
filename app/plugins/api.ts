@@ -1,4 +1,4 @@
-import LinkModule from '@/repository/modules/link.module';
+import LinkModule from '#layers/links/app/repository/modules/link.module';
 
 export interface ApiInstance {
   link: LinkModule;

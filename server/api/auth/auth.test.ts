@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { links } from '../../database/schema';
+import { links } from '#layers/links/server/infrastructure/schema';
 import { setupTestServer } from '../../testing/server';
 
 const server = await setupTestServer();

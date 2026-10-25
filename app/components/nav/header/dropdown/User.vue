@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { LinkIcon, Settings2Icon, LogOutIcon } from 'lucide-vue-next';
 
-import { LINKS_ROUTE } from '@/constants/links.constant';
+import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
 const { authUser, signOut } = useAuth();
 
