@@ -6,9 +6,15 @@
     {
       "pattern": "skuz.link",
       "custom_domain": true
+    },
+    {
+      "pattern": "skuz-link.skuzow.net",
+      "custom_domain": true,
+      "enabled": false,
+      "previews_enabled": true
     }
   ],
-  "preview_urls": true,
+  "preview_urls": false,
   "observability": {
     "enabled": true,
     "traces": {
