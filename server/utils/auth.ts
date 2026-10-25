@@ -37,16 +37,13 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
     user: {
       deleteUser: {
         enabled: true,
-        beforeDelete: async (user, request) => {
+        beforeDelete: async (user) => {
           if (!event) return;
 
           const repository = await useRepository(event);
 
           const userLinks = await repository.link.findAllByUserId(user.id);
-          // event belongs to the request that first built the cached auth
-          const { origin } = request
-            ? new URL(request.url)
-            : getRequestURL(event);
+          const { origin } = getRequestURL(event);
 
           await purgeLinkRedirects(
             origin,
@@ -71,16 +68,16 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
 
 type AuthInstance = ReturnType<typeof createAuth>;
 
-let authInstance: AuthInstance | undefined;
+// cached per request: a module-level instance would keep the first request's
+// D1 binding, which goes stale when the runtime restarts (Miniflare in dev)
+export const getAuth = (event?: H3Event<EventHandlerRequest>): AuthInstance => {
+  if (!event) return createAuth();
+  if (event.context.auth) return event.context.auth;
 
-export const getAuth = (event?: H3Event<EventHandlerRequest>) => {
-  if (authInstance) return authInstance;
+  const authInstance = createAuth(event);
+  event.context.auth = authInstance;
 
-  const generatedAuth = createAuth(event);
-
-  if (event) authInstance = generatedAuth;
-
-  return generatedAuth;
+  return authInstance;
 };
 
 let _auth: AuthInstance | undefined;
