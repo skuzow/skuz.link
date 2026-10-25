@@ -1,6 +1,6 @@
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { links } from '#layers/links/server/infrastructure/schema';
 import { setupTestServer } from '~~/server/testing/server';
 
@@ -17,6 +17,8 @@ beforeEach(async () => {
   alice = await server.login();
   bob = await server.login();
 });
+
+afterEach(() => vi.restoreAllMocks());
 
 const findLink = async (id: string) => {
   const [link] = await server.db.select().from(links).where(eq(links.id, id));
@@ -335,5 +337,62 @@ describe('DELETE /api/links/:id', () => {
     });
 
     expect(response.status).toBe(404);
+  });
+});
+
+describe('redirect cache faults', () => {
+  it('still creates, updates and deletes links without a cache', async () => {
+    server.stubCache(null);
+
+    const link = await server.createLink(alice.headers, 'uncached');
+    expect(await server.redirectTarget('uncached')).toBe(link.redirectUrl);
+
+    const updated = await server.fetch(`/api/links/${link.id}`, {
+      method: 'PUT',
+      headers: alice.headers,
+      json: { slug: 'uncached', redirectUrl: 'https://example.com/updated' }
+    });
+    expect(updated.status).toBe(200);
+    expect(await server.redirectTarget('uncached')).toBe(
+      'https://example.com/updated'
+    );
+
+    const deleted = await server.fetch(`/api/links/${link.id}`, {
+      method: 'DELETE',
+      headers: alice.headers
+    });
+    expect(deleted.status).toBe(204);
+    expect(await server.redirectTarget('uncached')).toBeNull();
+  });
+
+  it('still creates, updates and deletes links when purging fails', async () => {
+    const error = new Error('delete failed');
+    server.stubCache({
+      match: () => Promise.resolve(undefined),
+      put: () => Promise.resolve(),
+      delete: () => Promise.reject(error)
+    });
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const link = await server.createLink(alice.headers, 'purge-fails');
+
+    const updated = await server.fetch(`/api/links/${link.id}`, {
+      method: 'PUT',
+      headers: alice.headers,
+      json: { slug: 'purge-fails', redirectUrl: 'https://example.com/updated' }
+    });
+    expect(updated.status).toBe(200);
+
+    const deleted = await server.fetch(`/api/links/${link.id}`, {
+      method: 'DELETE',
+      headers: alice.headers
+    });
+    expect(deleted.status).toBe(204);
+    expect(consoleError).toHaveBeenCalledWith(
+      'Failed to purge link redirect cache',
+      error
+    );
   });
 });

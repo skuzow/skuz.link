@@ -12,7 +12,7 @@ import {
   type EventHandler,
   type RouterMethod
 } from 'h3';
-import { afterAll, expect, vi } from 'vitest';
+import { afterAll, afterEach, expect, vi } from 'vitest';
 import * as authSchema from '#layers/auth/server/infrastructure/schema';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import * as linksSchema from '#layers/links/server/infrastructure/schema';
@@ -133,10 +133,18 @@ export const setupTestServer = async () => {
     plugins: [testUtils()]
   });
 
+  afterEach(() => vi.stubGlobal('caches', platform.caches));
+
   afterAll(async () => {
     vi.unstubAllGlobals();
     await platform.dispose();
   });
+
+  // swaps the Workers cache for the current test, so a test can take it
+  // away (null) or inject faults; the real one is back after each test
+  const stubCache = (cache: Partial<Cache> | null) => {
+    vi.stubGlobal('caches', cache ? { default: cache } : undefined);
+  };
 
   const fetch = (
     path: string,
@@ -205,5 +213,14 @@ export const setupTestServer = async () => {
     await db.delete(schema.user);
   };
 
-  return { db, fetch, flush, login, createLink, redirectTarget, reset };
+  return {
+    db,
+    fetch,
+    flush,
+    login,
+    createLink,
+    redirectTarget,
+    reset,
+    stubCache
+  };
 };

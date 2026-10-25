@@ -1,8 +1,8 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
 import { scheduleBackground } from '#layers/base/server/platform/background';
 
-export const LINK_REDIRECT_CACHE_TTL_SECONDS: number = 60;
-export const LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS: number = 15;
+const LINK_REDIRECT_CACHE_TTL_SECONDS: number = 60;
+const LINK_REDIRECT_NOT_FOUND_CACHE_TTL_SECONDS: number = 15;
 
 const MISS_HEADER = 'X-Link-Redirect';
 const MISS_HEADER_VALUE = 'miss';

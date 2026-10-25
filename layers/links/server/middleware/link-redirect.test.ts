@@ -39,6 +39,7 @@ const findClicks = async (slug: string) => {
 describe('link redirect middleware', () => {
   it('redirects a known slug without client caching and counts the click', async () => {
     await insertLink('repo');
+    await insertLink('not-visited');
 
     const response = await server.fetch('/repo');
 
@@ -48,6 +49,7 @@ describe('link redirect middleware', () => {
 
     await server.flush();
     expect(await findClicks('repo')).toBe(1);
+    expect(await findClicks('not-visited')).toBe(0);
   });
 
   it('redirects HEAD requests without counting a click', async () => {
@@ -149,5 +151,65 @@ describe('link redirect middleware', () => {
 
     expect(response.status).not.toBe(302);
     expect(response.headers.get('location')).toBeNull();
+  });
+});
+
+describe('redirect cache faults', () => {
+  const silenceErrors = () =>
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+  it('redirects and counts the click without a cache', async () => {
+    await insertLink('no-cache');
+    server.stubCache(null);
+
+    const response = await server.fetch('/no-cache');
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe(REDIRECT_URL);
+
+    await server.flush();
+    expect(await findClicks('no-cache')).toBe(1);
+  });
+
+  it('still redirects when reading the cache fails', async () => {
+    await insertLink('read-fails');
+    const error = new Error('match failed');
+    server.stubCache({
+      match: () => Promise.reject(error),
+      put: () => Promise.resolve()
+    });
+    const consoleError = silenceErrors();
+
+    const response = await server.fetch('/read-fails');
+    await server.flush();
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe(REDIRECT_URL);
+    expect(await findClicks('read-fails')).toBe(1);
+    expect(consoleError).toHaveBeenCalledWith(
+      'Failed to read link redirect cache',
+      error
+    );
+  });
+
+  it('still redirects when writing the cache fails', async () => {
+    await insertLink('write-fails');
+    const error = new Error('put failed');
+    server.stubCache({
+      match: () => Promise.resolve(undefined),
+      put: () => Promise.reject(error)
+    });
+    const consoleError = silenceErrors();
+
+    const response = await server.fetch('/write-fails');
+    await server.flush();
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe(REDIRECT_URL);
+    expect(await findClicks('write-fails')).toBe(1);
+    expect(consoleError).toHaveBeenCalledWith(
+      'Failed to store link redirect cache',
+      error
+    );
   });
 });
