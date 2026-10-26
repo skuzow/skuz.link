@@ -17,11 +17,11 @@
         "current": "Actual"
       },
       "account": {
-        "linked": {
+        "connected": {
           "title": "Cuentas conectadas",
           "credential": "Credenciales",
-          "button": "Desconectar",
-          "link": "Conectar cuenta"
+          "disconnect": "Desconectar",
+          "connect": "Conectar cuenta"
         },
         "delete": {
           "title": "Eliminar cuenta",
@@ -58,13 +58,13 @@
           "title": "Sesión revocada con éxito"
         },
         "account": {
-          "linked": {
-            "unlink": {
-              "error": "Error al desvincular la cuenta",
-              "title": "Cuenta desvinculada con éxito"
+          "connected": {
+            "disconnect": {
+              "error": "Error al desconectar la cuenta",
+              "title": "Cuenta desconectada con éxito"
             },
-            "link": {
-              "error": "Error al vincular la cuenta"
+            "connect": {
+              "error": "Error al conectar la cuenta"
             }
           },
           "delete": {

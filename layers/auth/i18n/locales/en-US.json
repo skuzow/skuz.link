@@ -17,11 +17,11 @@
         "current": "Current"
       },
       "account": {
-        "linked": {
-          "title": "Linked accounts",
+        "connected": {
+          "title": "Connected accounts",
           "credential": "Credentials",
-          "button": "Unlink",
-          "link": "Link account"
+          "disconnect": "Disconnect",
+          "connect": "Connect account"
         },
         "delete": {
           "title": "Delete account",
@@ -58,13 +58,13 @@
           "title": "Session revoked successfully"
         },
         "account": {
-          "linked": {
-            "unlink": {
-              "error": "Error unlinking account",
-              "title": "Account unlinked successfully"
+          "connected": {
+            "disconnect": {
+              "error": "Error disconnecting account",
+              "title": "Account disconnected successfully"
             },
-            "link": {
-              "error": "Error linking account"
+            "connect": {
+              "error": "Error connecting account"
             }
           },
           "delete": {

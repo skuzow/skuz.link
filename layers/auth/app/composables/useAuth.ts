@@ -101,8 +101,8 @@ export function useAuth() {
     listAuthSessions: authClient.listSessions,
     revokeSession,
     listAccounts: authClient.listAccounts,
-    unlinkAccount: authClient.unlinkAccount,
-    linkAccount: authClient.linkSocial,
+    disconnectAccount: authClient.unlinkAccount,
+    connectAccount: authClient.linkSocial,
     deleteAuthUser: authClient.deleteUser
   };
 }

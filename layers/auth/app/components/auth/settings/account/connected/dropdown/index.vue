@@ -12,7 +12,7 @@ interface Props {
 
 const { accountProviders = [] } = defineProps<Props>();
 
-const unlinkedProviders: ComputedRef<AuthProvider[]> = computed(() =>
+const availableProviders: ComputedRef<AuthProvider[]> = computed(() =>
   AuthProviderValues.filter((provider) => !accountProviders?.includes(provider))
 );
 </script>
@@ -22,15 +22,17 @@ const unlinkedProviders: ComputedRef<AuthProvider[]> = computed(() =>
     <UiDropdownMenuTrigger as-child>
       <UiButton variant="ghost">
         <LinkIcon :size="16" />
-        {{ $t('auth.settings.account.linked.link') }}
+        {{ $t('auth.settings.account.connected.connect') }}
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="w-44 font-medium">
       <template
-        v-for="unlinkedProvider in unlinkedProviders"
-        :key="unlinkedProvider"
+        v-for="availableProvider in availableProviders"
+        :key="availableProvider"
       >
-        <AuthSettingsAccountLinkedDropdownItem :provider="unlinkedProvider" />
+        <AuthSettingsAccountConnectedDropdownItem
+          :provider="availableProvider"
+        />
       </template>
     </UiDropdownMenuContent>
   </UiDropdownMenu>

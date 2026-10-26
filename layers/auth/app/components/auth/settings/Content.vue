@@ -17,7 +17,7 @@ import { Settings2Icon } from 'lucide-vue-next';
       <UiAccordion type="multiple" class="space-y-4">
         <AuthSettingsSessions />
 
-        <AuthSettingsAccountLinked />
+        <AuthSettingsAccountConnected />
 
         <AuthSettingsAccountDelete />
       </UiAccordion>

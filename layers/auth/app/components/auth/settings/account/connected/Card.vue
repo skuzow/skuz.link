@@ -16,34 +16,37 @@ const emit = defineEmits(['refresh-accounts']);
 
 const { t: $t } = useI18n();
 
-const { unlinkAccount } = useAuth();
+const { disconnectAccount } = useAuth();
 
-const isLoadingUnlinkAccount: Ref<boolean> = ref(false);
+const isLoadingDisconnectAccount: Ref<boolean> = ref(false);
 
 const accountProvider: string =
   account.providerId === 'credential'
-    ? $t('auth.settings.account.linked.credential')
+    ? $t('auth.settings.account.connected.credential')
     : titleCase(account.providerId);
 
-const clickUnlinkAccount = async () => {
-  if (isLoadingUnlinkAccount.value) return;
+const clickDisconnectAccount = async () => {
+  if (isLoadingDisconnectAccount.value) return;
 
-  isLoadingUnlinkAccount.value = true;
+  isLoadingDisconnectAccount.value = true;
 
-  const { error } = await unlinkAccount({
+  const { error } = await disconnectAccount({
     accountId: account.id
   });
 
-  isLoadingUnlinkAccount.value = false;
+  isLoadingDisconnectAccount.value = false;
 
   if (error) {
-    toast.error($t('toast.auth.settings.account.linked.unlink.error'), {
+    toast.error($t('toast.auth.settings.account.connected.disconnect.error'), {
       description: error.message
     });
   } else {
-    toast.success($t('toast.auth.settings.account.linked.unlink.title'), {
-      description: accountProvider
-    });
+    toast.success(
+      $t('toast.auth.settings.account.connected.disconnect.title'),
+      {
+        description: accountProvider
+      }
+    );
 
     emit('refresh-accounts');
   }
@@ -72,11 +75,11 @@ const clickUnlinkAccount = async () => {
       class="text-destructive hover:text-destructive"
       variant="ghost"
       :disabled="length === 1"
-      @click="clickUnlinkAccount"
+      @click="clickDisconnectAccount"
     >
-      <IconLoader v-if="isLoadingUnlinkAccount" class="fill-destructive" />
+      <IconLoader v-if="isLoadingDisconnectAccount" class="fill-destructive" />
       <UnlinkIcon v-else :size="16" />
-      {{ $t('auth.settings.account.linked.button') }}
+      {{ $t('auth.settings.account.connected.disconnect') }}
     </UiButton>
   </UiCard>
 </template>

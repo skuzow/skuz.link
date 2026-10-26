@@ -7,7 +7,7 @@ const {
   status,
   refresh,
   data: accounts
-} = await useLazyAsyncData('linked-accounts', () => listAccounts());
+} = await useLazyAsyncData('connected-accounts', () => listAccounts());
 
 const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
   accounts.value?.data
@@ -24,7 +24,7 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
     class="flex flex-col gap-y-2 pt-1"
   >
     <li v-for="account in accounts.data" :key="account.id">
-      <AuthSettingsAccountLinkedCard
+      <AuthSettingsAccountConnectedCard
         :account="account"
         :length="accounts.data.length"
         @refresh-accounts="refresh"
@@ -35,7 +35,7 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
       v-if="accountProviders?.length !== AuthProviderValues.length"
       class="text-end"
     >
-      <AuthSettingsAccountLinkedDropdown
+      <AuthSettingsAccountConnectedDropdown
         :account-providers="accountProviders"
       />
     </li>
