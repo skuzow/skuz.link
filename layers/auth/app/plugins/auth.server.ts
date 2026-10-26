@@ -1,3 +1,6 @@
+// declares event.context.getAuthSession
+import type {} from '#layers/auth/server/types/context';
+
 export default defineNuxtPlugin({
   name: 'better-auth-fetch-plugin',
   enforce: 'pre',
@@ -9,7 +12,7 @@ export default defineNuxtPlugin({
       !nuxtApp.payload.isCached
     ) {
       const event = useRequestEvent()!;
-      const session = event.context.authSession;
+      const session = await event.context.getAuthSession();
 
       useState('auth:session', () => session?.session || null);
       useState('auth:user', () => session?.user || null);

@@ -61,7 +61,7 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
   });
 };
 
-type AuthInstance = ReturnType<typeof createAuth>;
+export type AuthInstance = ReturnType<typeof createAuth>;
 
 // cached per request: a module-level instance would keep the first request's
 // D1 binding, which goes stale when the runtime restarts (Miniflare in dev)

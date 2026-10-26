@@ -1,15 +1,26 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
 import type { User } from '#layers/auth/shared/domain/user.type';
-import { getAuth } from '#layers/auth/server/infrastructure/better-auth';
+import {
+  getAuth,
+  type AuthInstance
+} from '#layers/auth/server/infrastructure/better-auth';
+// declares the Session getter and its memo on event.context
+import type {} from './types/context';
 
-export const getAuthSession = async (event: H3Event<EventHandlerRequest>) => {
-  const auth = getAuth(event);
+export type AuthSession = Awaited<
+  ReturnType<AuthInstance['api']['getSession']>
+>;
 
-  const session = await auth.api.getSession({
+// memoized per request, so the session middleware's getter, the SSR auth
+// plugin and requireUser share one lookup
+export const getAuthSession = (
+  event: H3Event<EventHandlerRequest>
+): Promise<AuthSession> => {
+  event.context.authSessionLookup ??= getAuth(event).api.getSession({
     headers: event.headers
   });
 
-  return session;
+  return event.context.authSessionLookup;
 };
 
 export const requireUser = async (event: H3Event<EventHandlerRequest>) => {
