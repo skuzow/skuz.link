@@ -24,7 +24,9 @@ export default defineConfig({
           environment: 'node',
           include: [
             '{app,shared}/**/*.test.ts',
-            'layers/*/{app,shared}/**/*.test.ts'
+            'layers/*/{app,shared}/**/*.test.ts',
+            // lint fixtures for the layer boundary rules
+            'eslint.config.test.ts'
           ],
           exclude: [...configDefaults.exclude, '**/*.nuxt.test.ts']
         }
