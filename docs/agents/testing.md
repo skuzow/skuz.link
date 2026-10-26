@@ -4,6 +4,7 @@ Tests sit next to their source, in root or inside a layer (`layers/<name>/`). Th
 
 - `*.test.ts` in `shared/` or `app/` runs in `unit`: plain node.
 - `*.test.ts` in `server/` runs in `server`. An unimport plugin replays Nitro's auto-imports (h3, and `useNitroApp` and `defineNitroPlugin` from the test Nitro app in `server/testing/nitro.ts`) so handlers and plugins load unchanged; when server code starts using another auto-import source (e.g. `useRuntimeConfig`), add it to that plugin.
+- `eslint.config.test.ts` in root runs in `unit`: it lints fixture imports against the layer boundary rules.
 - `*.nuxt.test.ts` in `app/` runs in `nuxt` (`@nuxt/test-utils`, happy-dom). Mock API calls with `registerEndpoint`.
 
 For example, the background-task test lives in `layers/base/server/platform/` and runs in `server`. A test of the composed app lives in root: one that needs several layers, or the values root sets in `app.config`. Examples are the route middleware tests in root `app/middleware/` and the account deletion test in root `server/api/auth/`. Both node projects alias `#layers/<name>` the way Nuxt does, so layer code and its tests import other layers through that alias.
