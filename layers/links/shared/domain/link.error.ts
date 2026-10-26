@@ -1,7 +1,7 @@
-export class LinkAlreadyInUseError extends Error {
+export class SlugTakenError extends Error {
   constructor() {
-    super('Link already in use');
-    this.name = 'LinkAlreadyInUseError';
+    super('Slug already in use');
+    this.name = 'SlugTakenError';
   }
 }
 

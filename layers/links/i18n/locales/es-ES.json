@@ -1,6 +1,6 @@
 {
   "form": {
-    "slug": "Link",
+    "slug": "Slug",
     "redirectUrl": "URL de redirección",
     "slugPlaceholder": "github",
     "redirectUrlPlaceholder": "https://ejemplo.com",
@@ -16,20 +16,20 @@
       "button": "Crear link"
     },
     "search": {
-      "placeholder": "Buscar por nombre",
+      "placeholder": "Buscar por slug",
       "empty": {
         "title": "No se encontraron links",
-        "description": "Prueba con otro nombre."
+        "description": "Prueba con otro slug."
       }
     },
     "create": {
       "title": "Crear link",
-      "description": "Indica la ruta corta y la URL a la que redirigir.",
+      "description": "Indica el slug y la URL a la que redirigir.",
       "button": "Crear link"
     },
     "edit": {
       "title": "Editar link",
-      "description": "Actualiza la ruta corta o la URL de redirección.",
+      "description": "Actualiza el slug o la URL de redirección.",
       "button": "Editar"
     },
     "delete": {

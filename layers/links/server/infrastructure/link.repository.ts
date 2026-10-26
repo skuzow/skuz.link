@@ -3,7 +3,7 @@ import { and, desc, eq, sql } from 'drizzle-orm';
 import type { Database } from '#layers/base/server/platform/db';
 import { isUniqueConstraintError } from '#layers/base/server/platform/errors';
 import { links } from './schema';
-import { LinkAlreadyInUseError } from '#layers/links/shared/domain/link.error';
+import { SlugTakenError } from '#layers/links/shared/domain/link.error';
 
 class LinkRepository {
   constructor(private db: Database) {}
@@ -86,7 +86,7 @@ class LinkRepository {
     try {
       return await operation();
     } catch (error) {
-      if (isUniqueConstraintError(error)) throw new LinkAlreadyInUseError();
+      if (isUniqueConstraintError(error)) throw new SlugTakenError();
 
       throw error;
     }

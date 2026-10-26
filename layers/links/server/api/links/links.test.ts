@@ -160,7 +160,10 @@ describe('POST /api/links', () => {
     });
 
     expect(response.status).toBe(409);
-    expect(await response.json()).toMatchObject({ statusCode: 409 });
+    expect(await response.json()).toMatchObject({
+      statusCode: 409,
+      statusMessage: 'Slug already in use'
+    });
   });
 
   it('purges a cached miss so the new link redirects at once', async () => {
@@ -263,6 +266,10 @@ describe('PUT /api/links/:id', () => {
     });
 
     expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      statusCode: 409,
+      statusMessage: 'Slug already in use'
+    });
     expect((await findLink(link.id))?.slug).toBe('rename-me');
   });
 

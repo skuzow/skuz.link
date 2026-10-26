@@ -68,6 +68,8 @@ describe('LinksFormDialog', () => {
   it('creates a link with the normalized slug', async () => {
     const { fill, submit, onSuccess } = await mountDialog();
 
+    expect(dialogText()).toContain('Choose a slug and the URL to redirect to.');
+
     await fill({ slug: ' /Repo ', redirectUrl: 'https://example.com/repo' });
     await submit();
 
@@ -83,6 +85,8 @@ describe('LinksFormDialog', () => {
   it('prefills and updates an existing link', async () => {
     const link = makeLink({ id: 'link-1', slug: 'old-slug' });
     const { fill, submit, input, onSuccess } = await mountDialog(link);
+
+    expect(dialogText()).toContain('Update the slug or the redirect URL.');
 
     expect(input('slug').value).toBe('old-slug');
     expect(input('redirectUrl').value).toBe(link.redirectUrl);
@@ -109,7 +113,7 @@ describe('LinksFormDialog', () => {
     await submit();
 
     await vi.waitFor(() =>
-      expect(dialogText()).toContain('Link is already in use.')
+      expect(dialogText()).toContain('Slug is already in use.')
     );
     expect(toast.error).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
@@ -135,17 +139,17 @@ describe('LinksFormDialog', () => {
   it.each([
     [
       { slug: '', redirectUrl: '' },
-      ['Link is required.', 'Redirect URL is required.']
+      ['Slug is required.', 'Redirect URL is required.']
     ],
     [
       { slug: 'Bad Slug!', redirectUrl: 'https://example.com' },
       [
-        'Link can only contain lowercase letters, numbers, hyphens and underscores.'
+        'Slug can only contain lowercase letters, numbers, hyphens and underscores.'
       ]
     ],
     [
       { slug: 'login', redirectUrl: 'https://example.com' },
-      ['Link is reserved.']
+      ['Slug is reserved.']
     ],
     [
       { slug: 'repo', redirectUrl: 'ftp://example.com' },

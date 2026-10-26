@@ -2,8 +2,8 @@ import type { EventHandler, EventHandlerRequest, H3Event } from 'h3';
 import { LinkInputSchema } from '#layers/links/shared/domain/link.schema';
 import type { LinkInput } from '#layers/links/shared/domain/link.type';
 import {
-  LinkAlreadyInUseError,
-  LinkNotFoundError
+  LinkNotFoundError,
+  SlugTakenError
 } from '#layers/links/shared/domain/link.error';
 
 const invalidFields = (data?: unknown) =>
@@ -39,10 +39,10 @@ const toLinkHttpError = (error: unknown) => {
     });
   }
 
-  if (error instanceof LinkAlreadyInUseError) {
+  if (error instanceof SlugTakenError) {
     return createError({
       statusCode: 409,
-      statusMessage: 'Link already in use'
+      statusMessage: 'Slug already in use'
     });
   }
 

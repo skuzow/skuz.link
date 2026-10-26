@@ -53,7 +53,7 @@ afterEach(() => {
 });
 
 describe('LinksCard', () => {
-  it('shows the short path, destination and clicks', async () => {
+  it('shows the slug, redirect URL and clicks', async () => {
     const { wrapper } = await mountCard();
 
     expect(wrapper.text()).toContain('/repo');
