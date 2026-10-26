@@ -1,10 +1,9 @@
 import { toast } from 'vue-sonner';
 
-import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
-
 export const useAuthProviders = () => {
   const localePath = useLocalePath();
   const { t: $t } = useI18n();
+  const { auth } = useAppConfig();
 
   const { signIn } = useAuth();
 
@@ -18,7 +17,7 @@ export const useAuthProviders = () => {
 
     const { error } = await signIn.social({
       provider: 'google',
-      callbackURL: localePath(LINKS_ROUTE)
+      callbackURL: localePath(auth.signedInRoute)
     });
 
     isLoadingWithGoogle.value = false;
@@ -33,7 +32,7 @@ export const useAuthProviders = () => {
 
     const { error } = await signIn.social({
       provider: 'github',
-      callbackURL: localePath(LINKS_ROUTE)
+      callbackURL: localePath(auth.signedInRoute)
     });
 
     isLoadingWithGithub.value = false;
