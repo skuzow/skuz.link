@@ -8,7 +8,6 @@ const resolvePath = (path: string) =>
   fileURLToPath(new URL(path, import.meta.url));
 
 const projectAliases = [
-  { find: '#shared', replacement: resolvePath('./shared') },
   // mirrors the #layers/<name> aliases Nuxt creates for every layer
   { find: /^#layers\/([\w-]+)/, replacement: `${resolvePath('./layers')}/$1` }
 ];
@@ -47,7 +46,6 @@ export default defineConfig({
                 from: resolvePath('./server/testing/nitro.ts')
               }))
             ],
-            dirs: ['./server/utils'],
             include: [/[\\/]server[\\/].+\.ts$/],
             dts: false
           })

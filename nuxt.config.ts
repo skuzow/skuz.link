@@ -46,9 +46,6 @@ export default defineNuxtConfig({
     cloudflare: {
       deployConfig: true,
       nodeCompat: true
-    },
-    imports: {
-      dirs: ['./server/utils']
     }
   }
 });
