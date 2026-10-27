@@ -1,15 +1,9 @@
-import tailwindcss from '@tailwindcss/vite';
-import { generateRuntimeConfig } from './server/utils/runtimeConfig';
+import { generateRuntimeConfig } from './layers/base/server/platform/runtimeConfig';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-
-  css: ['~/assets/css/tailwind.css'],
-  vite: {
-    plugins: [tailwindcss()]
-  },
 
   modules: [
     '@nuxtjs/color-mode',
@@ -17,7 +11,6 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
-    'shadcn-nuxt',
     'nitro-cloudflare-dev'
   ],
 
@@ -48,18 +41,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: generateRuntimeConfig(),
 
-  imports: {
-    dirs: ['lib']
-  },
-
   nitro: {
     preset: 'cloudflare_module',
     cloudflare: {
       deployConfig: true,
       nodeCompat: true
-    },
-    imports: {
-      dirs: ['./server/utils']
     }
   }
 });

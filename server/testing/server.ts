@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { User } from 'better-auth';
 import { betterAuth } from 'better-auth';
@@ -12,15 +12,21 @@ import {
   type EventHandler,
   type RouterMethod
 } from 'h3';
-import { afterAll, expect, vi } from 'vitest';
-import type { Link } from '#shared/types/link.type';
-import * as schema from '../database/schema';
-import { runtimeConfig } from '../utils/runtimeConfig';
+import type { NitroAppPlugin } from 'nitropack/types';
+import { afterAll, afterEach, expect, vi } from 'vitest';
+import * as authSchema from '#layers/auth/server/infrastructure/schema';
+import type { Link } from '#layers/links/shared/domain/link.type';
+import * as linksSchema from '#layers/links/server/infrastructure/schema';
+import { runtimeConfig } from '#layers/base/server/platform/runtimeConfig';
+import { useNitroApp } from './nitro';
 import { createTestPlatform } from './platform';
 
 export const TEST_ORIGIN: string = runtimeConfig.betterAuth.url;
 
-const SERVER_DIR = new URL('../', import.meta.url);
+const schema = { ...authSchema, ...linksSchema };
+
+const ROOT_DIR = new URL('../../', import.meta.url);
+const LAYERS_DIR = new URL('layers/', ROOT_DIR);
 const METHOD_SUFFIX_REGEX: RegExp =
   /\.(get|post|put|patch|delete|head|options)$/;
 
@@ -29,15 +35,48 @@ interface TestRequestInit extends Omit<RequestInit, 'body'> {
   origin?: string;
 }
 
-const listHandlerFiles = (dir: string) =>
-  readdirSync(new URL(dir, SERVER_DIR), { recursive: true, encoding: 'utf8' })
+// Nitro's scan order: root first, then layers in reverse alphabetical order
+const listServerDirs = () => [
+  new URL('server/', ROOT_DIR),
+  ...readdirSync(LAYERS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => b.localeCompare(a))
+    .map((layer) => new URL(`${layer}/server/`, LAYERS_DIR))
+];
+
+const listServerFiles = (dir: URL) => {
+  if (!existsSync(dir)) return [];
+
+  return readdirSync(dir, { recursive: true, encoding: 'utf8' })
     .filter((file) => file.endsWith('.ts') && !file.endsWith('.test.ts'))
     .sort();
+};
 
-const loadHandler = async (file: string): Promise<EventHandler> => {
-  const module = await import(fileURLToPath(new URL(file, SERVER_DIR)));
+const loadDefaultExport = async <T>(file: URL): Promise<T> => {
+  const module = await import(fileURLToPath(file));
 
   return module.default;
+};
+
+const loadHandler = (file: URL) => loadDefaultExport<EventHandler>(file);
+
+// runs every layer's Nitro plugins against the test Nitro app, so the hooks
+// they register fire when server code calls them through useNitroApp()
+const runPlugins = async (serverDirs: URL[]) => {
+  const nitroApp = useNitroApp();
+  nitroApp.hooks.removeAllHooks();
+
+  for (const serverDir of serverDirs) {
+    const pluginsDir = new URL('plugins/', serverDir);
+
+    for (const file of listServerFiles(pluginsDir)) {
+      const plugin = await loadDefaultExport<NitroAppPlugin>(
+        new URL(file, pluginsDir)
+      );
+      plugin(nitroApp);
+    }
+  }
 };
 
 // mirrors Nitro file routing: index.get.ts, [id], [...all]
@@ -57,16 +96,33 @@ const toApiRoute = (file: string) => {
 
 const createTestApp = async () => {
   const app = createApp();
+  const serverDirs = listServerDirs();
 
-  for (const file of listHandlerFiles('middleware')) {
-    app.use(await loadHandler(`middleware/${file}`));
+  await runPlugins(serverDirs);
+
+  for (const serverDir of serverDirs) {
+    const middlewareDir = new URL('middleware/', serverDir);
+
+    for (const file of listServerFiles(middlewareDir)) {
+      app.use(await loadHandler(new URL(file, middlewareDir)));
+    }
   }
 
   const router = createRouter();
+  // Nitro keeps the first handler per route and method, so root wins
+  const registeredRoutes = new Set<string>();
 
-  for (const file of listHandlerFiles('api')) {
-    const { route, method } = toApiRoute(file);
-    router.add(route, await loadHandler(`api/${file}`), method);
+  for (const serverDir of serverDirs) {
+    const apiDir = new URL('api/', serverDir);
+
+    for (const file of listServerFiles(apiDir)) {
+      const { route, method } = toApiRoute(file);
+      const routeKey = `${method ?? '*'} ${route}`;
+      if (registeredRoutes.has(routeKey)) continue;
+
+      registeredRoutes.add(routeKey);
+      router.add(route, await loadHandler(new URL(file, apiDir)), method);
+    }
   }
 
   app.use(router);
@@ -75,7 +131,7 @@ const createTestApp = async () => {
 };
 
 /**
- * Runs the real server middleware and API routes on a fresh local D1 and
+ * Runs the real server plugins, middleware and API routes on a fresh local D1 and
  * Workers cache. The cache is not cleared between tests, so give each test
  * its own slugs.
  */
@@ -101,10 +157,18 @@ export const setupTestServer = async () => {
     plugins: [testUtils()]
   });
 
+  afterEach(() => vi.stubGlobal('caches', platform.caches));
+
   afterAll(async () => {
     vi.unstubAllGlobals();
     await platform.dispose();
   });
+
+  // swaps the Workers cache for the current test, so a test can take it
+  // away (null) or inject faults; the real one is back after each test
+  const stubCache = (cache: Partial<Cache> | null) => {
+    vi.stubGlobal('caches', cache ? { default: cache } : undefined);
+  };
 
   const fetch = (
     path: string,
@@ -154,11 +218,9 @@ export const setupTestServer = async () => {
       json: { slug, redirectUrl }
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
 
-    const { body } = await response.json();
-
-    return body.link as Link;
+    return (await response.json()) as Link;
   };
 
   const redirectTarget = async (slug: string) => {
@@ -175,5 +237,14 @@ export const setupTestServer = async () => {
     await db.delete(schema.user);
   };
 
-  return { db, fetch, flush, login, createLink, redirectTarget, reset };
+  return {
+    db,
+    fetch,
+    flush,
+    login,
+    createLink,
+    redirectTarget,
+    reset,
+    stubCache
+  };
 };

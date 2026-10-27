@@ -1,0 +1,13 @@
+{
+  "description": "Url shortener",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save changes",
+  "form": {
+    "required": "is required",
+    "least": "must be at least",
+    "most": "must be at most",
+    "characters": "characters",
+    "use": "is already in use"
+  }
+}

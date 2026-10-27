@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { LinkIcon, Settings2Icon, LogOutIcon } from 'lucide-vue-next';
 
-import { LINKS_ROUTE } from '@/constants/links.constant';
+import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
 const { authUser, signOut } = useAuth();
 
@@ -11,7 +11,7 @@ const { openAuthSettings } = useAuthSettings();
 <template>
   <UiDropdownMenu>
     <UiDropdownMenuTrigger as-child>
-      <SharedAvatar loading="eager" :user="authUser" />
+      <UserAvatar loading="eager" :user="authUser" />
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="w-56 font-medium">
       <UiDropdownMenuLabel>
@@ -33,7 +33,7 @@ const { openAuthSettings } = useAuthSettings();
 
         <UiDropdownMenuItem @click="openAuthSettings">
           <Settings2Icon :size="16" />
-          <span>{{ $t('nav.header.user.settings') }}</span>
+          <span>{{ $t('auth.settings.title') }}</span>
         </UiDropdownMenuItem>
       </UiDropdownMenuGroup>
 

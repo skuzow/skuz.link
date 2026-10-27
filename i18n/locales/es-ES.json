@@ -1,15 +1,9 @@
 {
-  "description": "Acortador de urls",
-  "cancel": "Cancelar",
-  "confirm": "Confirmar",
-  "save": "Guardar cambios",
   "nav": {
     "home": "Inicio",
     "header": {
-      "login": "Iniciar sesión",
       "user": {
         "links": "Links",
-        "settings": "Ajustes",
         "logout": "Cerrar sesión"
       },
       "lang": {
@@ -26,82 +20,6 @@
       "contact": "Contactar"
     }
   },
-  "form": {
-    "name": "Nombre",
-    "slug": "Link",
-    "redirectUrl": "URL de redirección",
-    "slugPlaceholder": "github",
-    "redirectUrlPlaceholder": "https://ejemplo.com",
-    "slugFormat": "solo puede contener minúsculas, números, guiones y guiones bajos",
-    "slugReserved": "está reservado",
-    "urlFormat": "debe ser una URL http(s) válida",
-    "required": "es obligatorio",
-    "least": "debe ser como mínimo",
-    "most": "debe ser como máximo",
-    "characters": "caracteres",
-    "use": "está en uso",
-    "example": "Ejemplo de"
-  },
-  "auth": {
-    "google": "Continuar con Google",
-    "github": "Continuar con Github",
-    "settings": {
-      "profile": {
-        "title": "Perfil",
-        "button": "Actualizar perfil"
-      },
-      "sessions": {
-        "title": "Sesiones",
-        "button": "Revocar",
-        "current": "Actual"
-      },
-      "account": {
-        "linked": {
-          "title": "Cuentas conectadas",
-          "credential": "Credenciales",
-          "button": "Desconectar",
-          "link": "Conectar cuenta"
-        },
-        "delete": {
-          "title": "Eliminar cuenta",
-          "description": "Esta acción es irreversible"
-        }
-      }
-    }
-  },
-  "login": {
-    "description": "Inicia sesión para gestionar tus links."
-  },
-  "links": {
-    "empty": {
-      "title": "Aún no tienes links",
-      "description": "Crea tu primer link corto para empezar a compartir.",
-      "button": "Crear link"
-    },
-    "search": {
-      "placeholder": "Buscar por nombre",
-      "empty": {
-        "title": "No se encontraron links",
-        "description": "Prueba con otro nombre."
-      }
-    },
-    "create": {
-      "title": "Crear link",
-      "description": "Indica la ruta corta y la URL a la que redirigir.",
-      "button": "Crear link"
-    },
-    "edit": {
-      "title": "Editar link",
-      "description": "Actualiza la ruta corta o la URL de redirección.",
-      "button": "Editar"
-    },
-    "delete": {
-      "button": "Eliminar"
-    },
-    "copy": "Copiar",
-    "actions": "Acciones del link",
-    "clicks": "{n} clics"
-  },
   "landing": {
     "headline": {
       "first": "Acorta tus enlaces,",
@@ -109,67 +27,5 @@
     },
     "subline": "Acortador de URLs simple, rápido y fiable. Toma el control de cada enlace que compartes.",
     "cta": "Empezar"
-  },
-  "alert": {
-    "auth": {
-      "settings": {
-        "account": {
-          "delete": {
-            "title": "¿Estás seguro de que quieres eliminar tu cuenta?",
-            "description": "Esta acción es irreversible."
-          }
-        }
-      }
-    },
-    "links": {
-      "delete": {
-        "title": "¿Estás seguro de que quieres eliminar este link?",
-        "description": "Esta acción es irreversible."
-      }
-    }
-  },
-  "toast": {
-    "auth": {
-      "error": "Error al iniciar sesión con",
-      "settings": {
-        "profile": {
-          "title": "Perfil actualizado con éxito"
-        },
-        "sessions": {
-          "error": "Error al revocar la sesión",
-          "title": "Sesión revocada con éxito"
-        },
-        "account": {
-          "linked": {
-            "unlink": {
-              "error": "Error al desvincular la cuenta",
-              "title": "Cuenta desvinculada con éxito"
-            },
-            "link": {
-              "error": "Error al vincular la cuenta"
-            }
-          },
-          "delete": {
-            "error": "Error al eliminar la cuenta",
-            "title": "Cuenta eliminada con éxito"
-          }
-        }
-      }
-    },
-    "links": {
-      "create": {
-        "title": "Link creado con éxito"
-      },
-      "edit": {
-        "title": "Link actualizado con éxito"
-      },
-      "delete": {
-        "title": "Link eliminado con éxito"
-      },
-      "copy": {
-        "title": "Link copiado"
-      },
-      "error": "Ha ocurrido un error con tus links"
-    }
   }
 }

@@ -1,15 +1,9 @@
 {
-  "description": "Url shortener",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
-  "save": "Save changes",
   "nav": {
     "home": "Home",
     "header": {
-      "login": "Login",
       "user": {
         "links": "Links",
-        "settings": "Settings",
         "logout": "Logout"
       },
       "lang": {
@@ -26,82 +20,6 @@
       "contact": "Contact"
     }
   },
-  "form": {
-    "name": "Name",
-    "slug": "Link",
-    "redirectUrl": "Redirect URL",
-    "slugPlaceholder": "github",
-    "redirectUrlPlaceholder": "https://example.com",
-    "slugFormat": "can only contain lowercase letters, numbers, hyphens and underscores",
-    "slugReserved": "is reserved",
-    "urlFormat": "must be a valid http(s) URL",
-    "required": "is required",
-    "least": "must be at least",
-    "most": "must be at most",
-    "characters": "characters",
-    "use": "is already in use",
-    "example": "Example"
-  },
-  "auth": {
-    "google": "Continue with Google",
-    "github": "Continue with Github",
-    "settings": {
-      "profile": {
-        "title": "Profile",
-        "button": "Update profile"
-      },
-      "sessions": {
-        "title": "Sessions",
-        "button": "Revoke",
-        "current": "Current"
-      },
-      "account": {
-        "linked": {
-          "title": "Linked accounts",
-          "credential": "Credentials",
-          "button": "Unlink",
-          "link": "Link account"
-        },
-        "delete": {
-          "title": "Delete account",
-          "description": "This action is irreversible"
-        }
-      }
-    }
-  },
-  "login": {
-    "description": "Login to manage your links."
-  },
-  "links": {
-    "empty": {
-      "title": "No links yet",
-      "description": "Create your first short link to start sharing.",
-      "button": "Create link"
-    },
-    "search": {
-      "placeholder": "Search by name",
-      "empty": {
-        "title": "No links found",
-        "description": "Try a different name."
-      }
-    },
-    "create": {
-      "title": "Create link",
-      "description": "Choose a short path and the URL to redirect to.",
-      "button": "Create link"
-    },
-    "edit": {
-      "title": "Edit link",
-      "description": "Update the short path or the redirect URL.",
-      "button": "Edit"
-    },
-    "delete": {
-      "button": "Delete"
-    },
-    "copy": "Copy",
-    "actions": "Link actions",
-    "clicks": "{n} clicks"
-  },
   "landing": {
     "headline": {
       "first": "Shorten your links,",
@@ -109,67 +27,5 @@
     },
     "subline": "Simple, fast, and reliable URL shortener. Take control of every link you share.",
     "cta": "Get started"
-  },
-  "alert": {
-    "auth": {
-      "settings": {
-        "account": {
-          "delete": {
-            "title": "Are you sure you want to delete your account?",
-            "description": "This action is irreversible."
-          }
-        }
-      }
-    },
-    "links": {
-      "delete": {
-        "title": "Are you sure you want to delete this link?",
-        "description": "This action is irreversible."
-      }
-    }
-  },
-  "toast": {
-    "auth": {
-      "error": "Error signing in with",
-      "settings": {
-        "profile": {
-          "title": "Profile updated successfully"
-        },
-        "sessions": {
-          "error": "Error revoking session",
-          "title": "Session revoked successfully"
-        },
-        "account": {
-          "linked": {
-            "unlink": {
-              "error": "Error unlinking account",
-              "title": "Account unlinked successfully"
-            },
-            "link": {
-              "error": "Error linking account"
-            }
-          },
-          "delete": {
-            "error": "Error deleting account",
-            "title": "Account deleted successfully"
-          }
-        }
-      }
-    },
-    "links": {
-      "create": {
-        "title": "Link created successfully"
-      },
-      "edit": {
-        "title": "Link updated successfully"
-      },
-      "delete": {
-        "title": "Link deleted successfully"
-      },
-      "copy": {
-        "title": "Link copied"
-      },
-      "error": "Something went wrong with your links"
-    }
   }
 }

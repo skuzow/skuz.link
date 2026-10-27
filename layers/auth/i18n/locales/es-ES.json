@@ -1,0 +1,78 @@
+{
+  "form": {
+    "name": "Nombre"
+  },
+  "auth": {
+    "google": "Continuar con Google",
+    "github": "Continuar con Github",
+    "settings": {
+      "title": "Ajustes",
+      "profile": {
+        "title": "Perfil",
+        "button": "Actualizar perfil"
+      },
+      "sessions": {
+        "title": "Sesiones",
+        "button": "Revocar",
+        "current": "Actual"
+      },
+      "account": {
+        "connected": {
+          "title": "Cuentas conectadas",
+          "credential": "Credenciales",
+          "disconnect": "Desconectar",
+          "connect": "Conectar cuenta"
+        },
+        "delete": {
+          "title": "Eliminar cuenta",
+          "description": "Esta acción es irreversible"
+        }
+      }
+    }
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "description": "Inicia sesión para gestionar tus links."
+  },
+  "alert": {
+    "auth": {
+      "settings": {
+        "account": {
+          "delete": {
+            "title": "¿Estás seguro de que quieres eliminar tu cuenta?",
+            "description": "Esta acción es irreversible."
+          }
+        }
+      }
+    }
+  },
+  "toast": {
+    "auth": {
+      "error": "Error al iniciar sesión con",
+      "settings": {
+        "profile": {
+          "title": "Perfil actualizado con éxito"
+        },
+        "sessions": {
+          "error": "Error al revocar la sesión",
+          "title": "Sesión revocada con éxito"
+        },
+        "account": {
+          "connected": {
+            "disconnect": {
+              "error": "Error al desconectar la cuenta",
+              "title": "Cuenta desconectada con éxito"
+            },
+            "connect": {
+              "error": "Error al conectar la cuenta"
+            }
+          },
+          "delete": {
+            "error": "Error al eliminar la cuenta",
+            "title": "Cuenta eliminada con éxito"
+          }
+        }
+      }
+    }
+  }
+}

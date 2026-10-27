@@ -1,0 +1,36 @@
+<script lang="ts" setup>
+definePageMeta({ middleware: 'guest' });
+
+const { t: $t } = useI18n();
+
+seoMeta({
+  title: $t('login.title'),
+  description: $t('login.description')
+});
+</script>
+
+<template>
+  <section
+    class="mx-auto flex h-11/12 max-w-xs flex-col justify-center gap-y-10"
+  >
+    <div class="flex flex-col items-center gap-y-6 text-center">
+      <NavLogo :size="28" />
+
+      <div class="space-y-1">
+        <h1 class="text-lg font-semibold">
+          {{ $t('login.title') }}
+        </h1>
+
+        <p class="text-muted-foreground text-sm">
+          {{ $t('login.description') }}
+        </p>
+      </div>
+    </div>
+
+    <UiSeparator />
+
+    <div class="flex w-full flex-col gap-y-2.5">
+      <AuthProviderButtons />
+    </div>
+  </section>
+</template>

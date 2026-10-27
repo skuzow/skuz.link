@@ -2,7 +2,8 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   dialect: 'sqlite',
-  schema: './server/database/schema/index.ts',
+  // every layer defines its own tables; D1 has one migrations folder
+  schema: './layers/*/server/infrastructure/schema.ts',
   out: './server/database/migrations',
   driver: 'd1-http',
 
