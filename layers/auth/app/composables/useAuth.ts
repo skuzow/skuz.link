@@ -62,14 +62,18 @@ export function useAuth() {
     });
   }
 
-  const signOut = async () => {
-    const res = await authClient.signOut();
-
+  const leaveSession = async () => {
     const localePath = useLocalePath();
     await navigateTo(localePath('/'));
 
     authSession.value = null;
     authUser.value = null;
+  };
+
+  const signOut = async () => {
+    const res = await authClient.signOut();
+
+    await leaveSession();
 
     return res;
   };
@@ -77,13 +81,15 @@ export function useAuth() {
   const revokeSession = async (token: string) => {
     const res = await authClient.revokeSession({ token });
 
-    if (!res.error && token === authSession.value?.token) {
-      const localePath = useLocalePath();
-      await navigateTo(localePath('/'));
+    if (!res.error && token === authSession.value?.token) await leaveSession();
 
-      authSession.value = null;
-      authUser.value = null;
-    }
+    return res;
+  };
+
+  const deleteAuthUser = async () => {
+    const res = await authClient.deleteUser();
+
+    if (!res.error) await leaveSession();
 
     return res;
   };
@@ -103,6 +109,6 @@ export function useAuth() {
     listAccounts: authClient.listAccounts,
     disconnectAccount: authClient.unlinkAccount,
     connectAccount: authClient.linkSocial,
-    deleteAuthUser: authClient.deleteUser
+    deleteAuthUser
   };
 }

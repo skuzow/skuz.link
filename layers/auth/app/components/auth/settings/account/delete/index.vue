@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { toast } from 'vue-sonner';
 
-const localePath = useLocalePath();
 const { t: $t } = useI18n();
 
 const { deleteAuthUser } = useAuth();
+
+const { closeAuthSettings } = useAuthSettings();
 
 const { alert } = useAlert();
 
@@ -23,9 +24,7 @@ const deleteAccount = async () => {
 
   isLoadingDeleteAccount.value = true;
 
-  const { error } = await deleteAuthUser({
-    callbackURL: localePath('/')
-  });
+  const { error } = await deleteAuthUser();
 
   isLoadingDeleteAccount.value = false;
 
@@ -34,6 +33,7 @@ const deleteAccount = async () => {
       description: error.message
     });
   } else {
+    closeAuthSettings();
     toast.success($t('toast.auth.settings.account.delete.title'));
   }
 };
