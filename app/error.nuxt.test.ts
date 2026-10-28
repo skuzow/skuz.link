@@ -24,12 +24,15 @@ const login = () => {
   useState('auth:user').value = { name: 'Ada Lovelace', image: null };
 };
 
-const clickUserMenuItem = async (label: string) => {
-  const avatar = document.body.querySelector('[data-slot="avatar-fallback"]');
-  const trigger = avatar?.closest('[aria-haspopup="menu"]');
-  if (!trigger) throw new Error('Missing user menu');
+const openMenu = async (trigger: Element | null | undefined, name: string) => {
+  if (!trigger) throw new Error(`Missing ${name} menu`);
 
   await new DOMWrapper(trigger).trigger('keydown', { key: 'Enter' });
+};
+
+const clickUserMenuItem = async (label: string) => {
+  const avatar = document.body.querySelector('[data-slot="avatar-fallback"]');
+  await openMenu(avatar?.closest('[aria-haspopup="menu"]'), 'user');
 
   const item = [...document.body.querySelectorAll('[role="menuitem"]')].find(
     (element) => element.textContent?.trim() === label
@@ -38,6 +41,18 @@ const clickUserMenuItem = async (label: string) => {
 
   await new DOMWrapper(item).trigger('click');
 };
+
+const openLangMenu = async (label: string) => {
+  const trigger = [
+    ...document.body.querySelectorAll('[aria-haspopup="menu"]')
+  ].find((element) => element.textContent?.includes(label));
+  await openMenu(trigger, 'language');
+};
+
+const langMenuLink = (title: string) =>
+  document.body
+    .querySelector(`[role="menuitem"][title="${title}"]`)
+    ?.getAttribute('href');
 
 beforeEach(() => {
   // better-auth calls fetch on an absolute URL, which registerEndpoint misses
@@ -92,6 +107,22 @@ describe('error page', () => {
       'An unexpected error occurred. Please try again later.'
     );
     expect(wrapper.text()).not.toContain('Cannot read db of undefined');
+  });
+
+  it('offers the Spanish path from the language menu at an unprefixed path', async () => {
+    await mountErrorPage(404, '/typo');
+
+    await openLangMenu('Toggle language');
+
+    expect(langMenuLink('ES')).toBe('/es/typo');
+  });
+
+  it('offers the unprefixed path from the language menu at a Spanish path', async () => {
+    await mountErrorPage(404, '/es/typo');
+
+    await openLangMenu('Alternar idioma');
+
+    expect(langMenuLink('EN')).toBe('/typo');
   });
 
   it('opens Settings from the user menu for a signed-in user', async () => {
