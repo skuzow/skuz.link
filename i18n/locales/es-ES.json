@@ -27,5 +27,16 @@
     },
     "subline": "Acortador de URLs simple, rápido y fiable. Toma el control de cada enlace que compartes.",
     "cta": "Empezar"
+  },
+  "error": {
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "El enlace o la página que buscas no existe."
+    },
+    "generic": {
+      "title": "Algo salió mal",
+      "description": "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde."
+    },
+    "home": "Volver al inicio"
   }
 }
