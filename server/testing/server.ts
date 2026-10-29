@@ -33,6 +33,9 @@ const METHOD_SUFFIX_REGEX: RegExp =
 interface TestRequestInit extends Omit<RequestInit, 'body'> {
   json?: unknown;
   origin?: string;
+  // false leaves out the Cloudflare context, like the internal fetch that
+  // renders Nuxt's error page on the Worker
+  cloudflare?: boolean;
 }
 
 // Nitro's scan order: root first, then layers in reverse alphabetical order
@@ -138,6 +141,8 @@ const createTestApp = async () => {
 export const setupTestServer = async () => {
   const platform = await createTestPlatform();
   vi.stubGlobal('caches', platform.caches);
+  // Nitro's Cloudflare entry also keeps the bindings on globalThis
+  vi.stubGlobal('__env__', platform.env);
 
   const db = drizzle(platform.env.db, { schema });
   const handle = toWebHandler(await createTestApp());
@@ -172,7 +177,13 @@ export const setupTestServer = async () => {
 
   const fetch = (
     path: string,
-    { json, origin = TEST_ORIGIN, headers, ...init }: TestRequestInit = {}
+    {
+      json,
+      origin = TEST_ORIGIN,
+      cloudflare = true,
+      headers,
+      ...init
+    }: TestRequestInit = {}
   ) => {
     const url = new URL(path, origin);
     const requestHeaders = new Headers(headers);
@@ -189,9 +200,12 @@ export const setupTestServer = async () => {
       body: json === undefined ? undefined : JSON.stringify(json)
     });
 
-    return handle(request, {
-      cloudflare: { env: platform.env, context: executionContext }
-    });
+    return handle(
+      request,
+      cloudflare
+        ? { cloudflare: { env: platform.env, context: executionContext } }
+        : undefined
+    );
   };
 
   const flush = async () => {
