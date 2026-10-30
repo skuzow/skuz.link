@@ -32,7 +32,7 @@ _Avoid_: destination, target, long URL
 Sending a Visitor from a Short URL on to its Link's Redirect URL.
 
 **Owner**:
-The User who created a Link. Only the Owner can list, edit or delete it.
+The User who created a Link. Only the Owner can list or edit it, and only the Owner can delete it unless it breaks the Terms of use.
 _Avoid_: creator, author
 
 **Visitor**:
@@ -44,7 +44,7 @@ _Avoid_: visit, hit, view
 
 ### Auth
 
-Users, how they sign in, and their Sessions.
+Users, how they sign in, their Sessions, and Bans.
 
 **User**:
 A person who signs in to skuz.link and can own Links.
@@ -60,3 +60,23 @@ _Avoid_: linked account
 **Session**:
 One signed-in browser of a User, which the User can revoke.
 _Avoid_: device, login
+
+**Ban**:
+Shutting out a User who broke the Terms of use seriously or repeatedly. A banned User can't sign in again, and all their Links are deleted.
+_Avoid_: block, suspension
+
+### Legal
+
+The texts that say who runs skuz.link, how it handles personal data, and what Users agree to.
+
+**Legal notice**:
+The page that says who runs skuz.link and how to contact them.
+_Avoid_: imprint, impressum
+
+**Privacy policy**:
+The page that explains which personal data skuz.link processes, why, for how long, and people's rights over it, cookies included.
+_Avoid_: privacy notice, cookie policy
+
+**Terms of use**:
+The rules a User accepts by signing in: what Links may point to, and what happens to Links and Users that break them.
+_Avoid_: terms of service, ToS, terms and conditions
