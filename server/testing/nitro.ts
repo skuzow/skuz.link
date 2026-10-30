@@ -1,7 +1,8 @@
 import type {
   NitroApp,
   NitroAppPlugin,
-  NitroRuntimeHooks
+  NitroRuntimeHooks,
+  Task
 } from 'nitropack/types';
 
 type HookName = keyof NitroRuntimeHooks;
@@ -31,3 +32,5 @@ export const useNitroApp = (): NitroApp => testNitroApp;
 
 export const defineNitroPlugin = (plugin: NitroAppPlugin): NitroAppPlugin =>
   plugin;
+
+export const defineTask = <RT = unknown>(task: Task<RT>): Task<RT> => task;
