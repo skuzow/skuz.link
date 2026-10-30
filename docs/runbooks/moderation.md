@@ -118,4 +118,4 @@ Either way, the banned User's browser keeps a cached Session cookie for up to 5 
 
 ## Never delete a banned User's record
 
-The `user` row and its `account` rows are what stop the same Google or GitHub account from signing up again. Don't delete them, through SQL or through better-auth's user deletion, even when the User asks for erasure: the Privacy policy keeps the ban record (name, email, ban reason) for as long as skuz.link runs, under legitimate interest.
+The `user` row and its `account` rows are what stop the same Google or GitHub account from signing up again. Don't delete them, through SQL or through better-auth's user deletion, even when the User asks for erasure: the Privacy policy keeps the ban record (name, email, ban reason and the Connected accounts' Provider ids) for as long as skuz.link runs, under legitimate interest.

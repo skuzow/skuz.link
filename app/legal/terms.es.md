@@ -10,6 +10,8 @@ Al iniciar sesión en skuz.link aceptas estos Términos de uso. Para usar skuz.l
 
 Solo puedes iniciar sesión con Google o con GitHub. Puedes eliminar tu cuenta cuando quieras desde los Ajustes.
 
+En la [Política de privacidad](/es/privacidad) explico qué datos guardo de tu cuenta y cuáles son tus derechos.
+
 ## 4. Tus enlaces
 
 - Eres responsable de los enlaces que creas.

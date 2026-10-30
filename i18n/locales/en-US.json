@@ -18,6 +18,7 @@
     },
     "footer": {
       "legalNotice": "Legal notice",
+      "privacy": "Privacy",
       "terms": "Terms",
       "contact": "Contact"
     }
@@ -47,6 +48,10 @@
     "legalNotice": {
       "title": "Legal notice",
       "description": "Who runs skuz.link and how to contact me."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "What personal data skuz.link processes, why, and your rights."
     },
     "terms": {
       "title": "Terms of use",

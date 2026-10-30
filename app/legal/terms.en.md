@@ -10,6 +10,8 @@ By signing in to skuz.link, you accept these Terms of use. To use skuz.link, you
 
 You can only sign in with Google or GitHub. You can delete your account at any time in Settings.
 
+The [Privacy policy](/privacy) explains what data I keep about your account and what your rights are.
+
 ## 4. Your links
 
 - You are responsible for the links you create.

@@ -18,6 +18,7 @@
     },
     "footer": {
       "legalNotice": "Aviso legal",
+      "privacy": "Privacidad",
       "terms": "Términos",
       "contact": "Contactar"
     }
@@ -46,6 +47,10 @@
     "legalNotice": {
       "title": "Aviso legal",
       "description": "Quién gestiona skuz.link y cómo contactarme."
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "description": "Qué datos personales trata skuz.link, para qué y cuáles son tus derechos."
     },
     "terms": {
       "title": "Términos de uso",

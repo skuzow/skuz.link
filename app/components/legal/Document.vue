@@ -36,7 +36,8 @@ const { locale } = useI18n();
       </p>
     </header>
 
-    <div class="prose prose-neutral dark:prose-invert">
+    <!-- long cookie names in table cells would push a phone screen sideways -->
+    <div class="prose prose-neutral dark:prose-invert [&_td]:wrap-anywhere">
       <component :is="bodies[locale]" />
     </div>
   </article>

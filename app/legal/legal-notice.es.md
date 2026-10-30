@@ -21,3 +21,5 @@ Retiro cualquier enlace que incumpla los [Términos de uso](/es/terminos) en cua
 ## 5. Ley aplicable
 
 Este Aviso legal se rige por la ley española.
+
+Las normas para usar skuz.link están en los [Términos de uso](/es/terminos), y cómo trato tus datos personales, en la [Política de privacidad](/es/privacidad).

@@ -24,6 +24,13 @@ const currentYear: number = new Date().getFullYear();
         </li>
         <li>
           <UiButton as-child variant="link">
+            <NuxtLinkLocale to="/privacy">
+              {{ $t('nav.footer.privacy') }}
+            </NuxtLinkLocale>
+          </UiButton>
+        </li>
+        <li>
+          <UiButton as-child variant="link">
             <NuxtLinkLocale to="/terms">
               {{ $t('nav.footer.terms') }}
             </NuxtLinkLocale>

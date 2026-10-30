@@ -21,3 +21,5 @@ I remove any link that breaks the [Terms of use](/terms) as soon as I learn abou
 ## 5. Applicable law
 
 This Legal notice is governed by Spanish law.
+
+The rules for using skuz.link are in the [Terms of use](/terms), and how I handle your personal data is in the [Privacy policy](/privacy).
