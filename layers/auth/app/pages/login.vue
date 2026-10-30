@@ -2,6 +2,7 @@
 definePageMeta({ middleware: 'guest' });
 
 const { t: $t } = useI18n();
+const { auth } = useAppConfig();
 
 seoMeta({
   title: $t('login.title'),
@@ -32,5 +33,29 @@ seoMeta({
     <div class="flex w-full flex-col gap-y-2.5">
       <AuthProviderButtons />
     </div>
+
+    <!-- signing in accepts the Terms of use; nothing stores the acceptance -->
+    <i18n-t
+      keypath="login.acceptance"
+      tag="p"
+      class="text-muted-foreground -mt-6 text-center text-xs text-balance"
+    >
+      <template #terms>
+        <NuxtLinkLocale
+          :to="auth.termsRoute"
+          class="hover:text-foreground underline underline-offset-4"
+        >
+          {{ $t('login.termsLink') }}
+        </NuxtLinkLocale>
+      </template>
+      <template #privacy>
+        <NuxtLinkLocale
+          :to="auth.privacyRoute"
+          class="hover:text-foreground underline underline-offset-4"
+        >
+          {{ $t('login.privacyLink') }}
+        </NuxtLinkLocale>
+      </template>
+    </i18n-t>
   </section>
 </template>

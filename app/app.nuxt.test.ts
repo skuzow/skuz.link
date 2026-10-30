@@ -237,3 +237,25 @@ describe('privacy policy', () => {
     expect(mainLink('Términos de uso')).toBe('/es/terminos');
   });
 });
+
+describe('login page', () => {
+  it('links the Terms of use and the Privacy policy under the Provider buttons at an unprefixed path', async () => {
+    await mountApp('/login');
+
+    expect(mainText()).toContain(
+      "By continuing, you accept the Terms of use and confirm you've read the Privacy policy."
+    );
+    expect(mainLink('Terms of use')).toBe('/terms');
+    expect(mainLink('Privacy policy')).toBe('/privacy');
+  });
+
+  it('links the Spanish Terms of use and Privacy policy under the Provider buttons at a Spanish path', async () => {
+    await mountApp('/es/login');
+
+    expect(mainText()).toContain(
+      'Al continuar, aceptas los Términos de uso y confirmas que has leído la Política de privacidad.'
+    );
+    expect(mainLink('Términos de uso')).toBe('/es/terminos');
+    expect(mainLink('Política de privacidad')).toBe('/es/privacidad');
+  });
+});
