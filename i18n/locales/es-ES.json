@@ -17,6 +17,7 @@
       }
     },
     "footer": {
+      "legalNotice": "Aviso legal",
       "contact": "Contactar"
     }
   },
@@ -38,5 +39,12 @@
       "description": "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde."
     },
     "home": "Volver al inicio"
+  },
+  "legal": {
+    "updated": "Última actualización: {date}",
+    "legalNotice": {
+      "title": "Aviso legal",
+      "description": "Quién gestiona skuz.link y cómo contactarme."
+    }
   }
 }

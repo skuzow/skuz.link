@@ -16,6 +16,13 @@ const currentYear: number = new Date().getFullYear();
 
       <ul class="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-4">
         <li>
+          <UiButton as-child variant="link">
+            <NuxtLinkLocale to="/legal-notice">
+              {{ $t('nav.footer.legalNotice') }}
+            </NuxtLinkLocale>
+          </UiButton>
+        </li>
+        <li>
           <UiButton as-child variant="link" class="gap-1">
             <NuxtLink
               to="mailto:contact@skuz.link"

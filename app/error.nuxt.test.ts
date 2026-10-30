@@ -1,6 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { DOMWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { langMenuLink, openLangMenu } from '@/testing/langMenu';
 import ErrorPage from './error.vue';
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
@@ -41,18 +42,6 @@ const clickUserMenuItem = async (label: string) => {
 
   await new DOMWrapper(item).trigger('click');
 };
-
-const openLangMenu = async (label: string) => {
-  const trigger = [
-    ...document.body.querySelectorAll('[aria-haspopup="menu"]')
-  ].find((element) => element.textContent?.includes(label));
-  await openMenu(trigger, 'language');
-};
-
-const langMenuLink = (title: string) =>
-  document.body
-    .querySelector(`[role="menuitem"][title="${title}"]`)
-    ?.getAttribute('href');
 
 beforeEach(() => {
   // better-auth calls fetch on an absolute URL, which registerEndpoint misses

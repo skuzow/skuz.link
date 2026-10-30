@@ -17,6 +17,7 @@
       }
     },
     "footer": {
+      "legalNotice": "Legal notice",
       "contact": "Contact"
     }
   },
@@ -38,5 +39,13 @@
       "description": "An unexpected error occurred. Please try again later."
     },
     "home": "Back home"
+  },
+  "legal": {
+    "updated": "Last updated: {date}",
+    "translation": "This is a translation. If it differs from the Spanish version, the Spanish one prevails.",
+    "legalNotice": {
+      "title": "Legal notice",
+      "description": "Who runs skuz.link and how to contact me."
+    }
   }
 }
