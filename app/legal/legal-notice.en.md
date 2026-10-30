@@ -16,7 +16,7 @@ The code of skuz.link is free software under the GNU GPL v3 and is available at 
 
 The links on skuz.link are created by its users. I don't check in advance the addresses they redirect to, and I don't answer for what they lead to.
 
-I remove any link that breaks the Terms of use as soon as I learn about it. To report one, write to [abuse@skuz.link](mailto:abuse@skuz.link).
+I remove any link that breaks the [Terms of use](/terms) as soon as I learn about it. To report one, write to [abuse@skuz.link](mailto:abuse@skuz.link).
 
 ## 5. Applicable law
 

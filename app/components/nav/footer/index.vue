@@ -23,6 +23,13 @@ const currentYear: number = new Date().getFullYear();
           </UiButton>
         </li>
         <li>
+          <UiButton as-child variant="link">
+            <NuxtLinkLocale to="/terms">
+              {{ $t('nav.footer.terms') }}
+            </NuxtLinkLocale>
+          </UiButton>
+        </li>
+        <li>
           <UiButton as-child variant="link" class="gap-1">
             <NuxtLink
               to="mailto:contact@skuz.link"

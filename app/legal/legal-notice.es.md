@@ -16,7 +16,7 @@ El código de skuz.link es software libre bajo la licencia GNU GPL v3 y está di
 
 Los enlaces de skuz.link los crean sus usuarios. No reviso de antemano las direcciones a las que redirigen y no respondo de aquello a lo que llevan.
 
-Retiro cualquier enlace que incumpla los Términos de uso en cuanto tengo conocimiento de ello. Para denunciar uno, escribe a [abuse@skuz.link](mailto:abuse@skuz.link).
+Retiro cualquier enlace que incumpla los [Términos de uso](/es/terminos) en cuanto tengo conocimiento de ello. Para denunciar uno, escribe a [abuse@skuz.link](mailto:abuse@skuz.link).
 
 ## 5. Ley aplicable
 
