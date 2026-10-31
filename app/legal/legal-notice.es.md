@@ -10,7 +10,7 @@ skuz.link es un acortador de URLs gratuito. Quien inicia sesión puede crear enl
 
 ## 3. Código fuente
 
-El código de skuz.link es software libre bajo la licencia GNU GPL v3 y está disponible en [github.com/skuzow/skuz.link](https://github.com/skuzow/skuz.link). La licencia se aplica al código.
+El código de skuz.link es software libre bajo la licencia [GNU GPL v3](https://github.com/skuzow/skuz.link/blob/main/LICENSE) y está disponible en [github.com/skuzow/skuz.link](https://github.com/skuzow/skuz.link). La licencia se aplica al código.
 
 ## 4. Enlaces a otros sitios
 

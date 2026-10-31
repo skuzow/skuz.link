@@ -10,7 +10,7 @@ skuz.link is a free URL shortener. Anyone who signs in can create links that red
 
 ## 3. Source code
 
-The code of skuz.link is free software under the GNU GPL v3 and is available at [github.com/skuzow/skuz.link](https://github.com/skuzow/skuz.link). The license applies to the code.
+The code of skuz.link is free software under the [GNU GPL v3](https://github.com/skuzow/skuz.link/blob/main/LICENSE) and is available at [github.com/skuzow/skuz.link](https://github.com/skuzow/skuz.link). The license applies to the code.
 
 ## 4. Links to other sites
 
