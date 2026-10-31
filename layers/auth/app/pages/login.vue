@@ -38,7 +38,7 @@ seoMeta({
     <i18n-t
       keypath="login.acceptance"
       tag="p"
-      class="text-muted-foreground -mt-6 text-center text-xs text-balance"
+      class="text-muted-foreground text-center text-xs text-balance"
     >
       <template #terms>
         <NuxtLinkLocale
