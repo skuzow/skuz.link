@@ -14,7 +14,7 @@ const currentYear: number = new Date().getFullYear();
         <span class="font-bold">/ {{ currentYear }}</span>
       </div>
 
-      <ul class="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-4">
+      <ul class="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-0">
         <li>
           <UiButton as-child variant="link">
             <NuxtLinkLocale to="/legal-notice">
@@ -35,6 +35,9 @@ const currentYear: number = new Date().getFullYear();
               {{ $t('nav.footer.terms') }}
             </NuxtLinkLocale>
           </UiButton>
+        </li>
+        <li class="hidden md:block">
+          <span class="mx-2" aria-hidden="true">/</span>
         </li>
         <li>
           <UiButton as-child variant="link" class="gap-1">
