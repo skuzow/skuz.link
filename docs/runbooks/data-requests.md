@@ -29,7 +29,7 @@ The answer is free, and goes to the account's email address.
 
 Both get the same JSON export: the User's record, Connected accounts, Sessions and Links.
 
-1. Save this query as `export.sql` outside the repo, with the User's id in all four places:
+1. Save this query as `~/export.sql`, outside the repo, with the User's id in all four places:
 
    ```sql
    SELECT json_object(
@@ -78,15 +78,15 @@ Both get the same JSON export: the User's record, Connected accounts, Sessions a
    ) AS export;
    ```
 
-2. Run it and write the JSON to a file:
+2. Run it and write the JSON to a file, also outside the repo:
 
    ```sh
-   pnpm wrangler d1 execute db --remote --json --file export.sql \
-     | jq -r '.[0].results[0].export' | jq . > skuz-link-export.json
+   pnpm wrangler d1 execute db --remote --json --file ~/export.sql \
+     | jq -r '.[0].results[0].export' | jq . > ~/skuz-link-export.json
    ```
 
 3. Read the file before you send it. Times are UTC.
-4. Email it to the User as an attachment, then delete `export.sql` and the export from your machine.
+4. Email it to the User as an attachment, then delete `~/export.sql` and `~/skuz-link-export.json` from your machine.
 
 What the export leaves out, and why:
 
