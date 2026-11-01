@@ -32,7 +32,10 @@
   },
   "login": {
     "title": "Iniciar sesión",
-    "description": "Inicia sesión para gestionar tus links."
+    "description": "Inicia sesión para gestionar tus links.",
+    "acceptance": "Al continuar, aceptas los {terms} y confirmas que has leído la {privacy}.",
+    "termsLink": "Términos de uso",
+    "privacyLink": "Política de privacidad"
   },
   "alert": {
     "auth": {

@@ -43,10 +43,12 @@ export default defineConfig({
           Unimport.vite({
             imports: [
               ...Object.keys(h3).map((name) => ({ name, from: 'h3' })),
-              ...['useNitroApp', 'defineNitroPlugin'].map((name) => ({
-                name,
-                from: resolvePath('./server/testing/nitro.ts')
-              }))
+              ...['useNitroApp', 'defineNitroPlugin', 'defineTask'].map(
+                (name) => ({
+                  name,
+                  from: resolvePath('./server/testing/nitro.ts')
+                })
+              )
             ],
             include: [/[\\/]server[\\/].+\.ts$/],
             dts: false

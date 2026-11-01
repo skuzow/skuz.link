@@ -32,7 +32,10 @@
   },
   "login": {
     "title": "Login",
-    "description": "Login to manage your links."
+    "description": "Login to manage your links.",
+    "acceptance": "By continuing, you accept the {terms} and confirm you've read the {privacy}.",
+    "termsLink": "Terms of use",
+    "privacyLink": "Privacy policy"
   },
   "alert": {
     "auth": {

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@plugin '@tailwindcss/typography';
 
 /* automatic detection only scans the root app, so scan every layer too */
 @source '../../../../*/app/**/*';

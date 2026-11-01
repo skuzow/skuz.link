@@ -57,6 +57,13 @@ const createAuth = (event?: H3Event<EventHandlerRequest>) => {
         clientSecret: runtimeConfig.github.clientSecret
       }
     },
+    advanced: {
+      ipAddress: {
+        // Cloudflare sets it to the real client address, while a client can
+        // forge x-forwarded-for; IPv6 keeps the default /64 shortening (ADR-0005)
+        ipAddressHeaders: ['cf-connecting-ip']
+      }
+    },
     plugins: [admin()]
   });
 };

@@ -17,6 +17,9 @@
       }
     },
     "footer": {
+      "legalNotice": "Legal notice",
+      "privacy": "Privacy",
+      "terms": "Terms",
       "contact": "Contact"
     }
   },
@@ -38,5 +41,21 @@
       "description": "An unexpected error occurred. Please try again later."
     },
     "home": "Back home"
+  },
+  "legal": {
+    "updated": "Last updated: {date}",
+    "translation": "This is a translation. If it differs from the Spanish version, the Spanish one prevails.",
+    "legalNotice": {
+      "title": "Legal notice",
+      "description": "Who runs skuz.link and how to contact me."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "What personal data skuz.link processes, why, and your rights."
+    },
+    "terms": {
+      "title": "Terms of use",
+      "description": "The rules for using skuz.link and its links."
+    }
   }
 }

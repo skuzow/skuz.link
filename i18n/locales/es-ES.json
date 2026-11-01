@@ -17,6 +17,9 @@
       }
     },
     "footer": {
+      "legalNotice": "Aviso legal",
+      "privacy": "Privacidad",
+      "terms": "Términos",
       "contact": "Contactar"
     }
   },
@@ -38,5 +41,20 @@
       "description": "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde."
     },
     "home": "Volver al inicio"
+  },
+  "legal": {
+    "updated": "Última actualización: {date}",
+    "legalNotice": {
+      "title": "Aviso legal",
+      "description": "Quién gestiona skuz.link y cómo contactarme."
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "description": "Qué datos personales trata skuz.link, para qué y cuáles son tus derechos."
+    },
+    "terms": {
+      "title": "Términos de uso",
+      "description": "Las normas para usar skuz.link y sus enlaces."
+    }
   }
 }
