@@ -13,7 +13,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const daysAgo = (days: number) => new Date(Date.now() - days * DAY_MS);
 
 describe('auth:purge-sessions task', () => {
-  it('deletes the Sessions that expired more than 30 days ago', async () => {
+  it('deletes the Sessions that expired more than 29 days ago', async () => {
     const { user } = await server.login();
     const expiredSession = (id: string, expiresAt: Date) => ({
       id,
@@ -26,8 +26,8 @@ describe('auth:purge-sessions task', () => {
     await server.db
       .insert(session)
       .values([
-        expiredSession('expired-31-days-ago', daysAgo(31)),
-        expiredSession('expired-29-days-ago', daysAgo(29))
+        expiredSession('expired-29-days-ago', daysAgo(29)),
+        expiredSession('expired-28-days-ago', daysAgo(28))
       ]);
 
     await purgeSessions.run({
@@ -41,8 +41,8 @@ describe('auth:purge-sessions task', () => {
       .from(session)
       .where(eq(session.userId, user.id));
 
-    expect(remaining.map(({ id }) => id)).not.toContain('expired-31-days-ago');
-    expect(remaining.map(({ id }) => id)).toContain('expired-29-days-ago');
+    expect(remaining.map(({ id }) => id)).not.toContain('expired-29-days-ago');
+    expect(remaining.map(({ id }) => id)).toContain('expired-28-days-ago');
     // the login's active Session stays too
     expect(
       remaining.filter(({ expiresAt }) => expiresAt > new Date())
