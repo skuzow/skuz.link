@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
 import type {
   DropdownMenuContentEmits,
@@ -6,12 +5,12 @@ import type {
 } from 'reka-ui';
 import type { HTMLAttributes } from 'vue';
 import { reactiveOmit } from '@vueuse/core';
+import { cn } from 'cn';
 import {
   DropdownMenuContent,
   DropdownMenuPortal,
   useForwardPropsEmits
 } from 'reka-ui';
-import { cn } from '#layers/base/app/lib/utils';
 
 defineOptions({
   inheritAttrs: false

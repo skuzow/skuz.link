@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Settings2Icon } from 'lucide-vue-next';
+import { Settings2Icon } from '@lucide/vue';
 </script>
 
 <template>

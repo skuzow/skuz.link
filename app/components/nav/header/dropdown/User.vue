@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { LinkIcon, Settings2Icon, LogOutIcon } from 'lucide-vue-next';
+import { LinkIcon, Settings2Icon, LogOutIcon } from '@lucide/vue';
 
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 

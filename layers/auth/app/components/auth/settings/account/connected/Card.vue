@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Account } from 'better-auth/types';
-import { MailIcon, CalendarIcon, UnlinkIcon } from 'lucide-vue-next';
+import { MailIcon, CalendarIcon, UnlinkIcon } from '@lucide/vue';
 import { toast } from 'vue-sonner';
 
 import { authProviderIconMap } from '#layers/auth/app/constants/auth.constant';

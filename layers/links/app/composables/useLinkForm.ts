@@ -1,5 +1,4 @@
 import type { Link } from '#layers/links/shared/domain/link.type';
-import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { toast } from 'vue-sonner';
 
@@ -19,16 +18,14 @@ export const useLinkForm = (options: {
   const isSlug = (input: string) => input === LinkFormInput.SLUG;
 
   const linkErrorMap = errorMap({
-    invalid_string: (_, input) =>
+    invalid_format: (_, input) =>
       formatMessage(input, isSlug(input) ? 'slugFormat' : 'urlFormat'),
     custom: (_, input) =>
       formatMessage(input, isSlug(input) ? 'slugReserved' : 'urlFormat')
   });
 
   const form = useForm({
-    validationSchema: toTypedSchema(LinkInputSchema, {
-      errorMap: linkErrorMap
-    })
+    validationSchema: toTypedSchema(LinkInputSchema, linkErrorMap)
   });
 
   const currentLink = computed(() => toValue(options.link));

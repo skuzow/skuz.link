@@ -1,9 +1,19 @@
 allowBuilds:
-  '@prisma/client': true
-  better-sqlite3: true
   esbuild: true
-  node: true
   sharp: true
   unrs-resolver: true
-  vue-demi: true
   workerd: true
+# pnpm rechecks the lockfile on every install, so these stay until they clear
+# the 24-hour wait. Remove after 2026-11-02 23:19 UTC.
+minimumReleaseAgeExclude:
+  - '@better-auth/core@1.7.15'
+  - '@better-auth/drizzle-adapter@1.7.15'
+  - '@better-auth/kysely-adapter@1.7.15'
+  - '@better-auth/memory-adapter@1.7.15'
+  - '@better-auth/mongo-adapter@1.7.15'
+  - '@better-auth/prisma-adapter@1.7.15'
+  - '@better-auth/telemetry@1.7.15'
+  - auth@1.7.15
+  - better-auth@1.7.15
+  - miniflare@5.20261101.0-beta
+  - wrangler@4.156.1

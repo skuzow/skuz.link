@@ -1,8 +1,7 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 import type { InputGroupVariants } from '.';
-import { cn } from '#layers/base/app/lib/utils';
+import { cn } from 'cn';
 import { inputGroupAddonVariants } from '.';
 
 const props = withDefaults(
@@ -15,14 +14,16 @@ const props = withDefaults(
   }
 );
 
-const handleInputGroupAddonClick = (event: MouseEvent) => {
-  const currentTarget = event.currentTarget as HTMLElement | null;
-  const target = event.target as HTMLElement | null;
-
-  if (target && target.closest('button')) return;
-
-  currentTarget?.parentElement?.querySelector('input')?.focus();
-};
+function handleInputGroupAddonClick(e: MouseEvent) {
+  const currentTarget = e.currentTarget as HTMLElement | null;
+  const target = e.target as HTMLElement | null;
+  if (target && target.closest('button')) {
+    return;
+  }
+  if (currentTarget && currentTarget?.parentElement) {
+    currentTarget.parentElement?.querySelector('input')?.focus();
+  }
+}
 </script>
 
 <template>

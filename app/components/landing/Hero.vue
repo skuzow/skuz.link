@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { RocketIcon } from 'lucide-vue-next';
+import { RocketIcon } from '@lucide/vue';
 
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 

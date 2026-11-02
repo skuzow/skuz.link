@@ -107,10 +107,10 @@ describe('LinkSlugSchema', () => {
   });
 
   it.each(['-a', 'a-', '_a', 'a_', 'a.b', 'a b', 'a/b', 'ñu', 'a?b'])(
-    'rejects badly formatted %j with invalid_string',
+    'rejects badly formatted %j with invalid_format',
     (input) => {
       expect(issueCodes(LinkSlugSchema.safeParse(input))).toEqual([
-        'invalid_string'
+        'invalid_format'
       ]);
     }
   );

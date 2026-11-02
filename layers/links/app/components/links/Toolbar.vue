@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PlusIcon, SearchIcon } from 'lucide-vue-next';
+import { PlusIcon, SearchIcon } from '@lucide/vue';
 
 const searchQuery = defineModel<string>('searchQuery', { required: true });
 

@@ -5,7 +5,7 @@ import {
   CalendarX2Icon,
   UserRoundIcon,
   UserRoundXIcon
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { toast } from 'vue-sonner';
 
 interface Props {

@@ -1,5 +1,4 @@
 import type { NitroRuntimeConfig } from 'nitropack/types';
-import { config } from 'dotenv';
 
 export const generateRuntimeConfig = () => ({
   betterAuth: {
@@ -15,8 +14,5 @@ export const generateRuntimeConfig = () => ({
     clientSecret: process.env.NUXT_GITHUB_CLIENT_SECRET as string
   }
 });
-
-// for cli: pnpm auth:schema
-if (!process.env.NUXT_BETTER_AUTH_SECRET) config();
 
 export const runtimeConfig = generateRuntimeConfig() as NitroRuntimeConfig;

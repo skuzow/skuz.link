@@ -6,7 +6,7 @@ import {
   MousePointerClickIcon,
   PencilIcon,
   Trash2Icon
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { toast } from 'vue-sonner';
 
 const props = defineProps<{

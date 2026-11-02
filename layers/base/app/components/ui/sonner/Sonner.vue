@@ -7,9 +7,9 @@ import {
   OctagonXIcon,
   TriangleAlertIcon,
   XIcon
-} from 'lucide-vue-next';
+} from '@lucide/vue';
+import { cn } from 'cn';
 import { Toaster as Sonner } from 'vue-sonner';
-import { cn } from '#layers/base/app/lib/utils';
 
 const props = defineProps<ToasterProps>();
 </script>

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { toast } from 'vue-sonner';
 
@@ -21,9 +20,7 @@ export const useAuthUpdateProfile = () => {
     name: z.string().min(USER_NAME_MIN).max(USER_NAME_MAX).trim()
   });
 
-  const validationSchema = toTypedSchema(UpdateProfileSchema, {
-    errorMap: errorMap()
-  });
+  const validationSchema = toTypedSchema(UpdateProfileSchema, errorMap());
   const updateProfileForm = useForm({ validationSchema });
 
   const updateProfile = updateProfileForm.handleSubmit(async ({ name }) => {

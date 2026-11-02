@@ -1,17 +1,19 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 
 enum MinMax {
   MIN = 'least',
   MAX = 'most'
 }
 
-type IssueOverride<K extends z.ZodIssueCode> = (
-  issue: Extract<z.ZodIssueOptionalMessage, { code: K }>,
+type Issue = z.core.$ZodRawIssue;
+
+type IssueOverride<K extends Issue['code']> = (
+  issue: Extract<Issue, { code: K }>,
   input: string
 ) => string | undefined;
 
 export type IssueOverrides = {
-  [K in z.ZodIssueCode]?: IssueOverride<K>;
+  [K in Issue['code']]?: IssueOverride<K>;
 };
 
 export const useFormMessage = () => {
@@ -40,33 +42,29 @@ export const useFormMessage = () => {
   const formatMessage = (input: string, reason: string) =>
     `${$t(`form.${input}`)} ${$t(`form.${reason}`)}.`;
 
-  const defaultMessage = (issue: z.ZodIssueOptionalMessage, input: string) => {
+  const defaultMessage = (issue: Issue, input: string) => {
     switch (issue.code) {
-      case z.ZodIssueCode.invalid_type:
-        return issue.received === z.ZodParsedType.undefined
-          ? requiredMessage(input)
-          : undefined;
+      case 'invalid_type':
+        return issue.input === undefined ? requiredMessage(input) : undefined;
 
-      case z.ZodIssueCode.too_small:
+      case 'too_small':
         return Number(issue.minimum) <= 1
           ? requiredMessage(input)
           : minMessage(input, Number(issue.minimum));
 
-      case z.ZodIssueCode.too_big:
+      case 'too_big':
         return maxMessage(input, Number(issue.maximum));
     }
   };
 
   const errorMap =
-    (overrides: IssueOverrides = {}): z.ZodErrorMap =>
-    (issue, ctx) => {
-      const input = issue.path[0] as string;
+    (overrides: IssueOverrides = {}): z.core.$ZodErrorMap =>
+    (issue) => {
+      const input = issue.path?.[0] as string;
       const override = overrides[issue.code] as
         IssueOverride<typeof issue.code> | undefined;
 
-      const message = override?.(issue, input) ?? defaultMessage(issue, input);
-
-      return { message: message ?? ctx.defaultError };
+      return override?.(issue, input) ?? defaultMessage(issue, input);
     };
 
   return {

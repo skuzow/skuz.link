@@ -1,16 +1,15 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
 import type { DialogContentEmits, DialogContentProps } from 'reka-ui';
 import type { HTMLAttributes } from 'vue';
+import { X } from '@lucide/vue';
 import { reactiveOmit } from '@vueuse/core';
-import { X } from 'lucide-vue-next';
+import { cn } from 'cn';
 import {
   DialogClose,
   DialogContent,
   DialogPortal,
   useForwardPropsEmits
 } from 'reka-ui';
-import { cn } from '#layers/base/app/lib/utils';
 import DialogOverlay from './DialogOverlay.vue';
 
 defineOptions({
