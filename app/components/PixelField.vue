@@ -130,7 +130,7 @@ watch(
       cn(
         'pointer-events-none absolute inset-0 -z-1 size-full opacity-60 [image-rendering:pixelated]',
         variant === 'landing' &&
-          'mask-[linear-gradient(to_right,transparent_30%,black_62%)] max-lg:hidden',
+          'mask-[linear-gradient(to_right,transparent_30%,black_62%)] max-lg:mask-[linear-gradient(to_bottom,transparent_54%,black_80%)]',
         variant === 'login' &&
           'mask-[linear-gradient(to_right,transparent_45%,black_72%)] max-md:hidden'
       )
