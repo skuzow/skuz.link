@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
-import { vAutoAnimate } from '@formkit/auto-animate/vue';
 import {
   LINKS_GRID_ITEM_CLASS,
   LINKS_GRID_LIST_CLASS
@@ -18,7 +17,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="@container">
-    <ul v-auto-animate :class="LINKS_GRID_LIST_CLASS">
+    <ul :class="LINKS_GRID_LIST_CLASS">
       <li v-for="link in links" :key="link.id" :class="LINKS_GRID_ITEM_CLASS">
         <LinksCard
           :link="link"

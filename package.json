@@ -26,7 +26,6 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.10.0",
     "@nuxtjs/color-mode": "^4.1.0",
     "@nuxtjs/i18n": "^10.6.0",
     "@nuxtjs/robots": "7.0.2",

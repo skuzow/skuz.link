@@ -12,14 +12,13 @@
   "links": {
     "empty": {
       "title": "Aún no tienes links",
-      "description": "Crea tu primer link corto para empezar a compartir.",
+      "description": "Crea tu primer link para empezar a compartir.",
       "button": "Crear link"
     },
     "search": {
       "placeholder": "Buscar por slug",
       "empty": {
-        "title": "No se encontraron links",
-        "description": "Prueba con otro slug."
+        "title": "No se encontraron links"
       }
     },
     "create": {
