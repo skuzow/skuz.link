@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
-import { toast } from 'vue-sonner';
 import { linkHueStyle } from '#layers/links/app/lib/slugMark';
 import CopyIcon from '~icons/pixelarticons/copy';
 import MoreHorizontalIcon from '~icons/pixelarticons/more-horizontal';
@@ -16,24 +15,10 @@ const emit = defineEmits<{
   delete: [link: Link];
 }>();
 
-const { t: $t } = useI18n();
-const requestURL = useRequestURL();
+const { copyShortUrl } = useLinkCopy();
 
 const shortPath = computed(() => `/${props.link.slug}`);
-const shortUrl = computed(() => `${requestURL.origin}/${props.link.slug}`);
 const hueStyle = computed(() => linkHueStyle(props.link.slug));
-
-const copyLink = async () => {
-  try {
-    await navigator.clipboard.writeText(shortUrl.value);
-
-    toast.success($t('toast.links.copy.title'), {
-      description: shortUrl.value
-    });
-  } catch {
-    toast.error($t('toast.links.error'));
-  }
-};
 </script>
 
 <template>
@@ -56,7 +41,7 @@ const copyLink = async () => {
           </UiDropdownMenuTrigger>
           <UiDropdownMenuContent align="end" class="link-hue" :style="hueStyle">
             <UiDropdownMenuGroup>
-              <UiDropdownMenuItem @click="copyLink">
+              <UiDropdownMenuItem @click="copyShortUrl(link.slug)">
                 <CopyIcon />
                 {{ $t('links.copy') }}
               </UiDropdownMenuItem>

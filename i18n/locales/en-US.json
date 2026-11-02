@@ -30,7 +30,8 @@
       "second": "amplify your reach."
     },
     "subline": "Simple, fast, and reliable URL shortener. Take control of every link you share.",
-    "cta": "Get started"
+    "cta": "Get started",
+    "example": "Example"
   },
   "error": {
     "notFound": {
