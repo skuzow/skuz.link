@@ -5,7 +5,10 @@ import CalendarIcon from '~icons/pixelarticons/calendar';
 import MailIcon from '~icons/pixelarticons/mail';
 import UnlinkIcon from '~icons/pixelarticons/unlink';
 
-import { authProviderIconMap } from '#layers/auth/app/constants/auth.constant';
+import {
+  authProviderIconMap,
+  authProviderNameMap
+} from '#layers/auth/app/constants/auth.constant';
 
 interface Props {
   account: Account;
@@ -23,9 +26,8 @@ const { disconnectAccount } = useAuth();
 const isLoadingDisconnectAccount: Ref<boolean> = ref(false);
 
 const accountProvider: string =
-  account.providerId === 'credential'
-    ? $t('auth.settings.account.connected.credential')
-    : titleCase(account.providerId);
+  authProviderNameMap[account.providerId] ??
+  $t('auth.settings.account.connected.credential');
 
 const clickDisconnectAccount = async () => {
   if (isLoadingDisconnectAccount.value) return;

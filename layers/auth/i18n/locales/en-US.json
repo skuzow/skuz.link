@@ -3,8 +3,7 @@
     "name": "Name"
   },
   "auth": {
-    "google": "Continue with Google",
-    "github": "Continue with Github",
+    "continueWith": "Continue with {provider}",
     "settings": {
       "title": "Settings",
       "profile": {

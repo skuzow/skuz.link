@@ -360,6 +360,19 @@ describe('privacy policy', () => {
 });
 
 describe('login page', () => {
+  it.each([
+    ['/login', ['Continue with Google', 'Continue with GitHub']],
+    ['/es/login', ['Continuar con Google', 'Continuar con GitHub']]
+  ])('offers both Providers by name at %s', async (route, labels) => {
+    await mountApp(route);
+
+    const buttons = [
+      ...(document.body.querySelector('main')?.querySelectorAll('button') ?? [])
+    ].map((button) => button.textContent?.trim());
+
+    expect(buttons).toEqual(labels);
+  });
+
   it('links the Terms of use and the Privacy policy under the Provider buttons at an unprefixed path', async () => {
     await mountApp('/login');
 

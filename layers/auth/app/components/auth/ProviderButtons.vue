@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import {
+  AuthProvider,
+  authProviderNameMap
+} from '#layers/auth/app/constants/auth.constant';
+
 const {
   isLoadingWithGoogle,
   isLoadingWithGithub,
@@ -8,15 +13,23 @@ const {
 </script>
 
 <template>
-  <UiButton variant="outline" class="gap-4" @click="loginWithGoogle">
+  <UiButton variant="outline" @click="loginWithGoogle">
     <IconLoader v-if="isLoadingWithGoogle" />
     <IconGoogle v-else />
-    {{ $t('auth.google') }}
+    {{
+      $t('auth.continueWith', {
+        provider: authProviderNameMap[AuthProvider.GOOGLE]
+      })
+    }}
   </UiButton>
 
-  <UiButton variant="outline" class="gap-4" @click="loginWithGithub">
+  <UiButton variant="outline" @click="loginWithGithub">
     <IconLoader v-if="isLoadingWithGithub" />
     <IconGithub v-else />
-    {{ $t('auth.github') }}
+    {{
+      $t('auth.continueWith', {
+        provider: authProviderNameMap[AuthProvider.GITHUB]
+      })
+    }}
   </UiButton>
 </template>

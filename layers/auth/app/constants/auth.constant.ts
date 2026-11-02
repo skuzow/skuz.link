@@ -11,3 +11,8 @@ export const authProviderIconMap: Record<string, Component> = {
   [AuthProvider.GOOGLE]: IconGoogle,
   [AuthProvider.GITHUB]: IconGithub
 };
+
+export const authProviderNameMap: Record<string, string> = {
+  [AuthProvider.GOOGLE]: 'Google',
+  [AuthProvider.GITHUB]: 'GitHub'
+};
