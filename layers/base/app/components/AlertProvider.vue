@@ -1,9 +1,15 @@
 <script lang="ts" setup>
+import type { DrawerOpenChangeDetails } from 'reka-ui';
 import { useMediaQuery } from '@vueuse/core';
 
 const { isOpen, options, dismiss } = useAlert();
 
 const isDesktop: Ref<boolean> = useMediaQuery('(min-width: 768px)');
+
+// an alert only answers through its buttons, so nothing else may close it
+const keepDrawerOpen = (open: boolean, details: DrawerOpenChangeDetails) => {
+  if (!open && details.reason !== 'close-press') details.cancel();
+};
 </script>
 
 <template>
@@ -31,7 +37,7 @@ const isDesktop: Ref<boolean> = useMediaQuery('(min-width: 768px)');
     </UiAlertDialogContent>
   </UiAlertDialog>
 
-  <UiDrawer v-else v-model:open="isOpen" :dismissible="false">
+  <UiDrawer v-else :open="isOpen" @update:open="keepDrawerOpen">
     <UiDrawerContent>
       <UiDrawerHeader class="mt-3 gap-3">
         <UiDrawerTitle>{{ options?.title }}</UiDrawerTitle>

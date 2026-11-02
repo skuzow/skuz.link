@@ -1,9 +1,8 @@
-<!-- eslint-disable vue/require-default-prop -->
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 import type { InputGroupButtonVariants } from '.';
 import type { ButtonVariants } from '#layers/base/app/components/ui/button';
-import { cn } from '#layers/base/app/lib/utils';
+import { cn } from 'cn';
 import { Button } from '#layers/base/app/components/ui/button';
 import { inputGroupButtonVariants } from '.';
 
