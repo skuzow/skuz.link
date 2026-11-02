@@ -8,7 +8,6 @@ const { authUser } = useAuth();
 
 interface Props {
   size?: AvatarVariants['size'];
-  shape?: AvatarVariants['shape'];
   width?: number;
   height?: number;
   loading?: 'lazy' | 'eager';
@@ -20,7 +19,6 @@ interface Props {
 
 const {
   size,
-  shape,
   width = 36,
   height = 36,
   loading,
@@ -35,7 +33,6 @@ const {
   <UiAvatar
     v-if="user"
     :size="size"
-    :shape="shape"
     :class="
       cn(
         pointer && 'cursor-pointer',

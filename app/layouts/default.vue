@@ -15,22 +15,24 @@ const ogLocales: Record<LocaleCode, string> = {
 };
 
 const ogLocale = computed(() => ogLocales[locale.value as LocaleCode]);
+// the server can't see a first visit's system theme, so it renders the fallback
 const themeColor = computed(() =>
-  colorMode.value === Theme.DARK ? ThemeColor.DARK : ThemeColor.LIGHT
+  colorMode.value === Theme.LIGHT ? ThemeColor.LIGHT : ThemeColor.DARK
 );
 const isLanding = computed(() => route.path === localePath('/'));
 
 if (import.meta.server) {
   useHead({
-    link: [
-      {
+    // Pixel labels sit on Buttons above the fold, and Geist Mono loads when needed
+    link: ['/fonts/Geist-Variable.woff2', '/fonts/GeistPixel-Square.woff2'].map(
+      (href) => ({
         rel: 'preload',
-        href: '/fonts/Geist[wght].woff2',
+        href,
         as: 'font',
         type: 'font/woff2',
         crossorigin: ''
-      }
-    ]
+      })
+    )
   });
 }
 

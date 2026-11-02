@@ -14,15 +14,10 @@ export const avatarVariant = cva(
         base: 'size-16 text-2xl',
         lg: 'size-24 text-5xl',
         xl: 'size-32 text-6xl'
-      },
-      shape: {
-        circle: 'rounded-full',
-        square: 'rounded-md'
       }
     },
     defaultVariants: {
-      size: 'xs',
-      shape: 'square'
+      size: 'xs'
     }
   }
 );

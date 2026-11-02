@@ -26,6 +26,10 @@ export default defineNuxtConfig({
     'nitro-cloudflare-dev'
   ],
 
+  colorMode: {
+    fallback: 'dark'
+  },
+
   i18n: {
     defaultLocale: 'en',
     locales: [

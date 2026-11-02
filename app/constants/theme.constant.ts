@@ -4,8 +4,7 @@ export enum Theme {
   SYSTEM = 'system'
 }
 
-// TODO: Review colors when color change
 export enum ThemeColor {
-  DARK = '#0A0A0A',
-  LIGHT = '#FFFFFF'
+  DARK = '#0a0a0b',
+  LIGHT = '#f6f5f1'
 }
