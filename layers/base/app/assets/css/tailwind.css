@@ -99,6 +99,7 @@
 
 :root {
   --radius: 0;
+  --type-status-size: 96px;
   --control-sm: 32px;
   --control-md: 40px;
   --control-lg: 48px;
@@ -290,10 +291,6 @@
   font-weight: 400;
   letter-spacing: 0.52px;
   text-transform: uppercase;
-}
-
-:root {
-  --type-status-size: 96px;
 }
 
 @media (width < 640px) {
