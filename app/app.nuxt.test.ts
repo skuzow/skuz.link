@@ -190,25 +190,20 @@ describe('pixel field', () => {
     expect(field()).toBeNull();
   });
 
-  const headerBlurs = () =>
+  const blurs = (selector: string) =>
     document.body
-      .querySelector('header')
+      .querySelector(selector)
       ?.classList.contains('backdrop-blur-md');
 
-  it.each(fieldRoutes)(
-    'leaves the header transparent over the field at %s',
+  it.each([...fieldRoutes, '/privacy'])(
+    'keeps the field behind the header and footer backgrounds at %s',
     async (route) => {
       await mountApp(route);
 
-      expect(headerBlurs()).toBe(false);
+      expect(blurs('header')).toBe(true);
+      expect(blurs('footer')).toBe(true);
     }
   );
-
-  it('keeps the header blur on a page without the field', async () => {
-    await mountApp('/privacy');
-
-    expect(headerBlurs()).toBe(true);
-  });
 });
 
 describe('legal notice', () => {

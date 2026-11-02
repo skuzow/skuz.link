@@ -1,25 +1,12 @@
 <script lang="ts" setup>
 import KeyIcon from '~icons/pixelarticons/key';
 
-import { cn } from '#layers/base/app/lib/utils';
-
-interface Props {
-  transparent?: boolean;
-}
-
-const { transparent = false } = defineProps<Props>();
-
 const { isAuthenticated } = useAuth();
 </script>
 
 <template>
   <header
-    :class="
-      cn(
-        'sticky top-0 z-10 h-16 border-b',
-        !transparent && 'bg-background/80 backdrop-blur-md'
-      )
-    "
+    class="bg-background/80 sticky top-0 z-10 h-16 border-b backdrop-blur-md"
   >
     <nav
       class="mx-auto flex h-full w-full max-w-6xl items-center justify-between px-4 md:px-8"
