@@ -292,21 +292,23 @@
   text-transform: uppercase;
 }
 
+:root {
+  --type-status-size: 96px;
+}
+
+@media (width < 640px) {
+  :root {
+    --type-status-size: 72px;
+  }
+}
+
 @utility type-status {
   font-family: var(--font-pixel);
-  font-size: 96px;
-  line-height: 96px;
+  font-size: var(--type-status-size);
+  line-height: var(--type-status-size);
   font-weight: 400;
   letter-spacing: -1px;
   text-transform: uppercase;
-
-  /* & because Sonar's css:S8767 rejects a declaration directly in @media */
-  @media (width < 640px) {
-    & {
-      font-size: 72px;
-      line-height: 72px;
-    }
-  }
 }
 
 @utility type-chip {
