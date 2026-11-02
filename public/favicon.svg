@@ -1,18 +1,20 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
-  fill="none"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+  shape-rendering="crispEdges"
 >
-  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  <rect x="4" y="6" width="7" height="2"/>
+  <rect x="13" y="6" width="7" height="2"/>
+  <rect x="2" y="8" width="2" height="8"/>
+  <rect x="20" y="8" width="2" height="8"/>
+  <rect x="7" y="11" width="10" height="2"/>
+  <rect x="4" y="16" width="7" height="2"/>
+  <rect x="13" y="16" width="7" height="2"/>
 
   <style>
-		path { stroke: #000; }
+		rect { fill: #000; }
 		@media (prefers-color-scheme: dark) {
-			path { stroke: #FFF; }
+			rect { fill: #FFF; }
 		}
 	</style>
 </svg>

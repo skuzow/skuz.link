@@ -16,7 +16,7 @@ Use `add` only for a component we don't have yet. The CLI changes more than the 
 
 2. Fix what the CLI changed outside `ui/`, then run `pnpm install`:
    - **`tailwind.css`**: if the CLI changed it, undo any import from a third-party host and any token the design system doesn't describe.
-   - **`package.json`**: the registry's `form` item pins `zod` to 3.25.76 and adds `@vee-validate/zod`, which only supports Zod 3. Put `zod` back on its previous version and remove `@vee-validate/zod`: forms use the local `toTypedSchema`. Keep any other new dependency.
+   - **`package.json`**: the registry's `form` item pins `zod` to 3.25.76 and adds `@vee-validate/zod`, which only supports Zod 3. Put `zod` back on its previous version and remove `@vee-validate/zod`: forms use the local `toTypedSchema`. Remove `@lucide/vue` if the CLI added it. Keep any other new dependency.
    - **`pnpm-workspace.yaml`**: the CLI's install can write a release under 24 hours old into `minimumReleaseAgeExclude`, so undo any change here.
 3. Swap the component's `@lucide/vue` icons for the ones the design system names, and restyle it to match.
 4. Run `pnpm exec prettier --write layers/base/app/components/ui`.

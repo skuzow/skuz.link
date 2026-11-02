@@ -15,7 +15,7 @@ seoMeta({
     class="mx-auto flex h-11/12 max-w-xs flex-col justify-center gap-y-10"
   >
     <div class="flex flex-col items-center gap-y-6 text-center">
-      <NavLogo :size="28" />
+      <IconLogo :size="32" />
 
       <div class="space-y-1">
         <h1 class="text-lg font-semibold">

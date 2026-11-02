@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import type { Session } from 'better-auth/types';
-import {
-  LaptopMinimalIcon,
-  CalendarX2Icon,
-  UserRoundIcon,
-  UserRoundXIcon
-} from '@lucide/vue';
 import { toast } from 'vue-sonner';
+import Calendar2Icon from '~icons/pixelarticons/calendar-2';
+import LaptopIcon from '~icons/pixelarticons/laptop';
+import UserIcon from '~icons/pixelarticons/user';
+import UserXIcon from '~icons/pixelarticons/user-x';
 
 interface Props {
   session: Session;
@@ -56,13 +54,13 @@ const clickRevokeSession = async () => {
   >
     <div>
       <p class="flex items-center gap-x-2">
-        <LaptopMinimalIcon :size="16" />
+        <LaptopIcon />
         {{ userAgent }}
       </p>
 
       <div class="flex flex-row gap-x-3">
         <p class="flex items-center gap-x-2">
-          <CalendarX2Icon :size="16" />
+          <Calendar2Icon />
           <SharedDate :date="session.expiresAt" />
         </p>
 
@@ -70,7 +68,7 @@ const clickRevokeSession = async () => {
           v-if="authSession?.token === session.token"
           class="flex items-center gap-x-2"
         >
-          <UserRoundIcon :size="16" />
+          <UserIcon />
           {{ $t('auth.settings.sessions.current') }}
         </p>
       </div>
@@ -83,7 +81,7 @@ const clickRevokeSession = async () => {
         @click="clickRevokeSession"
       >
         <IconLoader v-if="isLoadingRevokeSession" class="fill-destructive" />
-        <UserRoundXIcon v-else :size="16" />
+        <UserXIcon v-else />
         {{ $t('auth.settings.sessions.button') }}
       </UiButton>
     </div>

@@ -4,7 +4,6 @@ import type {
   DropdownMenuRadioItemProps
 } from 'reka-ui';
 import type { HTMLAttributes } from 'vue';
-import { Circle } from '@lucide/vue';
 import { reactiveOmit } from '@vueuse/core';
 import { cn } from 'cn';
 import {
@@ -12,6 +11,7 @@ import {
   DropdownMenuRadioItem,
   useForwardPropsEmits
 } from 'reka-ui';
+import CircleIcon from '~icons/pixelarticons/circle';
 
 const props = defineProps<
   DropdownMenuRadioItemProps & { class?: HTMLAttributes['class'] }
@@ -40,7 +40,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
     >
       <DropdownMenuItemIndicator>
         <slot name="indicator-icon">
-          <Circle class="size-2 fill-current" />
+          <CircleIcon class="size-2" />
         </slot>
       </DropdownMenuItemIndicator>
     </span>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { AtSignIcon } from '@lucide/vue';
+import AtSignIcon from '~icons/pixelarticons/at-sign';
 
 const currentYear: number = new Date().getFullYear();
 </script>
@@ -10,7 +10,7 @@ const currentYear: number = new Date().getFullYear();
       class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-y-4 px-4 md:flex-row md:gap-y-0 md:px-8"
     >
       <div class="flex items-center justify-center gap-x-2">
-        <NavLogo :size="20" />
+        <IconLogo />
         <span class="font-bold">/ {{ currentYear }}</span>
       </div>
 
@@ -45,7 +45,7 @@ const currentYear: number = new Date().getFullYear();
               to="mailto:contact@skuz.link"
               :title="$t('nav.footer.contact')"
             >
-              <AtSignIcon :size="16" />
+              <AtSignIcon />
               {{ $t('nav.footer.contact') }}
             </NuxtLink>
           </UiButton>

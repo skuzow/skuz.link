@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { Account } from 'better-auth/types';
-import { MailIcon, CalendarIcon, UnlinkIcon } from '@lucide/vue';
 import { toast } from 'vue-sonner';
+import CalendarIcon from '~icons/pixelarticons/calendar';
+import MailIcon from '~icons/pixelarticons/mail';
+import UnlinkIcon from '~icons/pixelarticons/unlink';
 
 import { authProviderIconMap } from '#layers/auth/app/constants/auth.constant';
 
@@ -61,12 +63,12 @@ const clickDisconnectAccount = async () => {
           :is="authProviderIconMap[account.providerId]"
           v-if="authProviderIconMap[account.providerId]"
         />
-        <MailIcon v-else :size="16" />
+        <MailIcon v-else />
         {{ accountProvider }}
       </p>
 
       <p class="flex items-center gap-x-2">
-        <CalendarIcon :size="16" />
+        <CalendarIcon />
         <SharedDate :date="account.createdAt" />
       </p>
     </div>
@@ -78,7 +80,7 @@ const clickDisconnectAccount = async () => {
       @click="clickDisconnectAccount"
     >
       <IconLoader v-if="isLoadingDisconnectAccount" class="fill-destructive" />
-      <UnlinkIcon v-else :size="16" />
+      <UnlinkIcon v-else />
       {{ $t('auth.settings.account.connected.disconnect') }}
     </UiButton>
   </UiCard>

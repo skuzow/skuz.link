@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import type { ToasterProps } from 'vue-sonner';
-import {
-  CircleCheckIcon,
-  InfoIcon,
-  Loader2Icon,
-  OctagonXIcon,
-  TriangleAlertIcon,
-  XIcon
-} from '@lucide/vue';
 import { cn } from 'cn';
 import { Toaster as Sonner } from 'vue-sonner';
+import CheckIcon from '~icons/pixelarticons/check';
+import CircleInfoIcon from '~icons/pixelarticons/circle-info';
+import CloseIcon from '~icons/pixelarticons/close';
+import LoaderIcon from '~icons/pixelarticons/loader';
+import SquareAlertIcon from '~icons/pixelarticons/square-alert';
+import WarningDiamondIcon from '~icons/pixelarticons/warning-diamond';
 
 const props = defineProps<ToasterProps>();
 </script>
@@ -26,24 +24,24 @@ const props = defineProps<ToasterProps>();
     v-bind="props"
   >
     <template #success-icon>
-      <CircleCheckIcon class="size-4" />
+      <CheckIcon />
     </template>
     <template #info-icon>
-      <InfoIcon class="size-4" />
+      <CircleInfoIcon />
     </template>
     <template #warning-icon>
-      <TriangleAlertIcon class="size-4" />
+      <WarningDiamondIcon />
     </template>
     <template #error-icon>
-      <OctagonXIcon class="size-4" />
+      <SquareAlertIcon />
     </template>
     <template #loading-icon>
       <div>
-        <Loader2Icon class="size-4 animate-spin" />
+        <LoaderIcon class="animate-spin" />
       </div>
     </template>
     <template #close-icon>
-      <XIcon class="size-4" />
+      <CloseIcon />
     </template>
   </Sonner>
 </template>

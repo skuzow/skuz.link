@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { PlusIcon, SearchIcon } from '@lucide/vue';
+import PlusIcon from '~icons/pixelarticons/plus';
+import SearchIcon from '~icons/pixelarticons/search';
 
 const searchQuery = defineModel<string>('searchQuery', { required: true });
 

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { LinkIcon, Settings2Icon, LogOutIcon } from '@lucide/vue';
+import LogoutIcon from '~icons/pixelarticons/logout';
+import SlidersIcon from '~icons/pixelarticons/sliders';
 
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
@@ -26,13 +27,13 @@ const { openAuthSettings } = useAuthSettings();
             :to="LINKS_ROUTE"
             :title="$t('nav.header.user.links')"
           >
-            <LinkIcon :size="16" />
+            <IconLogo class="fill-current" />
             <span>{{ $t('nav.header.user.links') }}</span>
           </NuxtLinkLocale>
         </UiDropdownMenuItem>
 
         <UiDropdownMenuItem @click="openAuthSettings">
-          <Settings2Icon :size="16" />
+          <SlidersIcon />
           <span>{{ $t('auth.settings.title') }}</span>
         </UiDropdownMenuItem>
       </UiDropdownMenuGroup>
@@ -40,7 +41,7 @@ const { openAuthSettings } = useAuthSettings();
       <UiDropdownMenuSeparator />
 
       <UiDropdownMenuItem @click="signOut">
-        <LogOutIcon :size="16" />
+        <LogoutIcon />
         <span>{{ $t('nav.header.user.logout') }}</span>
       </UiDropdownMenuItem>
     </UiDropdownMenuContent>

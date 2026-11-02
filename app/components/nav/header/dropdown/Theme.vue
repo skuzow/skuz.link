@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { SunIcon, MoonIcon, LaptopMinimalIcon } from '@lucide/vue';
+import LaptopIcon from '~icons/pixelarticons/laptop';
+import MoonIcon from '~icons/pixelarticons/moon';
+import SunIcon from '~icons/pixelarticons/sun';
 
 import { Theme } from '@/constants/theme.constant';
 
@@ -10,24 +12,24 @@ const colorMode = useColorMode();
   <UiDropdownMenu>
     <UiDropdownMenuTrigger as-child>
       <UiButton variant="ghost" size="icon">
-        <SunIcon :size="18" class="scale-100 dark:scale-0" />
-        <MoonIcon :size="18" class="absolute scale-0 dark:scale-100" />
+        <SunIcon class="scale-100 dark:scale-0" />
+        <MoonIcon class="absolute scale-0 dark:scale-100" />
         <span class="sr-only">{{ $t('nav.header.theme.button') }}</span>
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="font-medium">
       <UiDropdownMenuItem @click="colorMode.preference = Theme.LIGHT">
-        <SunIcon :size="16" />
+        <SunIcon />
         <span>{{ $t('nav.header.theme.light') }}</span>
       </UiDropdownMenuItem>
 
       <UiDropdownMenuItem @click="colorMode.preference = Theme.DARK">
-        <MoonIcon :size="16" />
+        <MoonIcon />
         <span>{{ $t('nav.header.theme.dark') }}</span>
       </UiDropdownMenuItem>
 
       <UiDropdownMenuItem @click="colorMode.preference = Theme.SYSTEM">
-        <LaptopMinimalIcon :size="16" />
+        <LaptopIcon />
         <span>{{ $t('nav.header.theme.system') }}</span>
       </UiDropdownMenuItem>
     </UiDropdownMenuContent>

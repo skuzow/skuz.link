@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Settings2Icon } from '@lucide/vue';
+import SlidersIcon from '~icons/pixelarticons/sliders';
 </script>
 
 <template>
   <UiDialogContent class="max-h-[90dvh] gap-0 p-0 sm:max-w-xl md:max-w-2xl">
     <UiDialogHeader class="border-b p-6 pb-4">
       <UiDialogTitle class="flex items-center gap-x-2.5">
-        <Settings2Icon :size="20" />
+        <SlidersIcon />
         {{ $t('auth.settings.title') }}
       </UiDialogTitle>
     </UiDialogHeader>

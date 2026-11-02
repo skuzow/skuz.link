@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { LinkIcon } from '@lucide/vue';
+import PlugIcon from '~icons/pixelarticons/plug';
 
 import {
   AuthProviderValues,
@@ -21,7 +21,7 @@ const availableProviders: ComputedRef<AuthProvider[]> = computed(() =>
   <UiDropdownMenu>
     <UiDropdownMenuTrigger as-child>
       <UiButton variant="ghost">
-        <LinkIcon :size="16" />
+        <PlugIcon />
         {{ $t('auth.settings.account.connected.connect') }}
       </UiButton>
     </UiDropdownMenuTrigger>

@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { LinkIcon } from '@lucide/vue';
-
 const props = withDefaults(
   defineProps<{
     search?: boolean;
@@ -29,9 +27,6 @@ const description = computed(() =>
 <template>
   <UiEmpty class="border border-dashed">
     <UiEmptyHeader>
-      <UiEmptyMedia variant="icon">
-        <LinkIcon />
-      </UiEmptyMedia>
       <UiEmptyTitle>{{ title }}</UiEmptyTitle>
       <UiEmptyDescription>{{ description }}</UiEmptyDescription>
     </UiEmptyHeader>

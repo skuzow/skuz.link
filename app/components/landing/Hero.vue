@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { RocketIcon } from '@lucide/vue';
+import ZapIcon from '~icons/pixelarticons/zap';
 
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 
@@ -11,7 +11,7 @@ const { isAuthenticated } = useAuth();
     <section
       class="flex h-11/12 flex-col items-center justify-center gap-y-6 text-center"
     >
-      <NavLogo :size="48" />
+      <IconLogo :size="48" />
 
       <div class="space-y-3">
         <h1
@@ -30,7 +30,7 @@ const { isAuthenticated } = useAuth();
       <UiButton as-child>
         <NuxtLinkLocale :to="isAuthenticated ? LINKS_ROUTE : '/login'">
           {{ $t('landing.cta') }}
-          <RocketIcon :size="16" />
+          <ZapIcon />
         </NuxtLinkLocale>
       </UiButton>
     </section>

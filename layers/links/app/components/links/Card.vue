@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
-import {
-  CopyIcon,
-  MoreHorizontalIcon,
-  MousePointerClickIcon,
-  PencilIcon,
-  Trash2Icon
-} from '@lucide/vue';
 import { toast } from 'vue-sonner';
+import CopyIcon from '~icons/pixelarticons/copy';
+import MoreHorizontalIcon from '~icons/pixelarticons/more-horizontal';
+import PencilIcon from '~icons/pixelarticons/pencil';
+import PointerIcon from '~icons/pixelarticons/pointer';
+import TrashIcon from '~icons/pixelarticons/trash';
 
 const props = defineProps<{
   link: Link;
@@ -71,7 +69,7 @@ const copyLink = async () => {
               variant="destructive"
               @click="emit('delete', link)"
             >
-              <Trash2Icon />
+              <TrashIcon />
               {{ $t('links.delete.button') }}
             </UiDropdownMenuItem>
           </UiDropdownMenuContent>
@@ -80,7 +78,7 @@ const copyLink = async () => {
     </UiCardHeader>
     <UiCardFooter>
       <UiBadge variant="secondary">
-        <MousePointerClickIcon />
+        <PointerIcon />
         {{ $t('links.clicks', { n: link.clicks }) }}
       </UiBadge>
     </UiCardFooter>
