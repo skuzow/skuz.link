@@ -22,6 +22,10 @@ Read ADR-0001 and ADR-0004 in `docs/adr/` before adding a file or an import. Cod
 
 Read `docs/agents/testing.md` before writing a test or test helper, and when a server test fails on an undefined auto-import.
 
+## Design
+
+Read `docs/agents/design.md` before changing how anything looks, and when something visual fails once built.
+
 ## shadcn-vue
 
 Read `docs/agents/shadcn.md` before running the `shadcn-vue` CLI or changing a file in `layers/base/app/components/ui/`.
