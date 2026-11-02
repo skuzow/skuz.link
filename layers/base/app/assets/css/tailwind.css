@@ -353,6 +353,25 @@
   }
 }
 
+/* an outline has no fill to carry the cut, so close each corner with a diagonal */
+@utility chamfer-lines {
+  --cut-near: calc(var(--chamfer) * 0.7071);
+  --cut-far: calc(var(--cut-near) + 1px);
+  --cut-size: calc(var(--chamfer) + 2px);
+  --cut-stops:
+    transparent var(--cut-near), var(--cut-edge) var(--cut-near) var(--cut-far),
+    transparent var(--cut-far);
+  background:
+    linear-gradient(135deg, var(--cut-stops)) top left / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(225deg, var(--cut-stops)) top right / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(315deg, var(--cut-stops)) bottom right / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(45deg, var(--cut-stops)) bottom left / var(--cut-size)
+      var(--cut-size) no-repeat border-box;
+}
+
 /* only pixel icons carry shape-rendering: the official logos never light */
 /* data-lit lights what isn't an icon, like a language code */
 @utility lit-icon {

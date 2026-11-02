@@ -13,7 +13,8 @@ const props = defineProps<{
     data-slot="input-group-control"
     :class="
       cn(
-        'flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent',
+        // important: cn can't merge the control height or the chamfer's utilities
+        'h-full! flex-1 border-0 bg-none! [clip-path:none]! focus-visible:outline-0',
         props.class
       )
     "

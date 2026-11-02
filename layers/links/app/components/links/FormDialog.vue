@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { LinkFormInput } from '#layers/links/app/constants/form.constant';
+import { linkHueStyle } from '#layers/links/app/lib/slugMark';
+import CheckIcon from '~icons/pixelarticons/check';
+import CloseIcon from '~icons/pixelarticons/close';
+import PlusIcon from '~icons/pixelarticons/plus';
 
 const open = defineModel<boolean>('open', { required: true });
 
@@ -27,6 +31,9 @@ const description = computed(() =>
     ? $t('links.edit.description')
     : $t('links.create.description')
 );
+const hueStyle = computed(() =>
+  props.link ? linkHueStyle(props.link.slug) : undefined
+);
 
 watch(open, (isOpen) => {
   if (isOpen) resetWithLink(props.link);
@@ -35,7 +42,11 @@ watch(open, (isOpen) => {
 
 <template>
   <UiDialog v-model:open="open">
-    <UiDialogContent>
+    <UiDialogContent
+      :show-close-button="false"
+      :class="{ 'link-hue': isEditing }"
+      :style="hueStyle"
+    >
       <UiDialogHeader>
         <UiDialogTitle>{{ title }}</UiDialogTitle>
         <UiDialogDescription>{{ description }}</UiDialogDescription>
@@ -88,12 +99,20 @@ watch(open, (isOpen) => {
           </UiFormItem>
         </UiFormField>
 
-        <UiDialogFooter class="sm:justify-between">
+        <UiDialogFooter>
           <UiButton type="button" variant="secondary" @click="open = false">
+            <CloseIcon data-icon="inline-start" />
             {{ $t('cancel') }}
           </UiButton>
           <UiButton type="submit" :loading="isLoading">
-            {{ $t('save') }}
+            <template v-if="isEditing">
+              <CheckIcon data-icon="inline-start" />
+              {{ $t('save') }}
+            </template>
+            <template v-else>
+              <PlusIcon data-icon="inline-start" />
+              {{ $t('links.create.button') }}
+            </template>
           </UiButton>
         </UiDialogFooter>
       </form>

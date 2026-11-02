@@ -35,3 +35,7 @@ export const slugMark = (slug: string): SlugMark => {
 
   return { hue: `hue-${HUES[hash % HUES.length]}`, cells };
 };
+
+export const linkHueStyle = (slug: string) => ({
+  '--link-hue': `var(--${slugMark(slug).hue})`
+});

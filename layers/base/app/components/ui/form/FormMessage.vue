@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'vue';
 import { cn } from 'cn';
 import { ErrorMessage } from 'vee-validate';
 import { toValue } from 'vue';
+import SquareAlertIcon from '~icons/pixelarticons/square-alert';
 import { useFormField } from './useFormField';
 
 const props = defineProps<{
@@ -15,9 +16,15 @@ const { name, formMessageId } = useFormField();
 <template>
   <ErrorMessage
     :id="formMessageId"
+    v-slot="{ message }"
     data-slot="form-message"
     as="p"
     :name="toValue(name)"
-    :class="cn('text-destructive text-sm', props.class)"
-  />
+    :class="
+      cn('text-destructive type-small flex items-center gap-1.5', props.class)
+    "
+  >
+    <SquareAlertIcon class="shrink-0" />
+    {{ message }}
+  </ErrorMessage>
 </template>

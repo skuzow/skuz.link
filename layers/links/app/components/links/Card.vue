@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { toast } from 'vue-sonner';
-import { slugMark } from '#layers/links/app/lib/slugMark';
+import { linkHueStyle } from '#layers/links/app/lib/slugMark';
 import CopyIcon from '~icons/pixelarticons/copy';
 import MoreHorizontalIcon from '~icons/pixelarticons/more-horizontal';
 import PencilIcon from '~icons/pixelarticons/pencil';
@@ -21,9 +21,7 @@ const requestURL = useRequestURL();
 
 const shortPath = computed(() => `/${props.link.slug}`);
 const shortUrl = computed(() => `${requestURL.origin}/${props.link.slug}`);
-const hueStyle = computed(() => ({
-  '--link-hue': `var(--${slugMark(props.link.slug).hue})`
-}));
+const hueStyle = computed(() => linkHueStyle(props.link.slug));
 
 const copyLink = async () => {
   try {
