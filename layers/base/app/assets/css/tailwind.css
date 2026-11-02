@@ -300,9 +300,12 @@
   letter-spacing: -1px;
   text-transform: uppercase;
 
+  /* & because Sonar's css:S8767 rejects a declaration directly in @media */
   @media (width < 640px) {
-    font-size: 72px;
-    line-height: 72px;
+    & {
+      font-size: 72px;
+      line-height: 72px;
+    }
   }
 }
 
