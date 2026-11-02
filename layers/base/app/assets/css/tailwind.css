@@ -34,6 +34,7 @@
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --font-pixel: 'Geist Pixel', ui-monospace, monospace;
   --animate-pixel-step: pixel-step 0.6s steps(1) infinite;
+  --animate-skeleton-blink: skeleton-blink 1.2s steps(1) infinite;
 
   @keyframes pixel-step {
     0% {
@@ -42,6 +43,12 @@
     33%,
     100% {
       opacity: 0.25;
+    }
+  }
+
+  @keyframes skeleton-blink {
+    50% {
+      opacity: 0.55;
     }
   }
 }
@@ -378,6 +385,20 @@
 
   @variant dark {
     box-shadow: 0 0 8px currentColor;
+  }
+}
+
+/* a Link's own hue in place of cyan: its portalled surfaces need --link-hue too */
+@utility link-hue {
+  --signal: var(--link-hue);
+  --ring: var(--link-hue);
+  --primary: var(--link-hue);
+  --primary-foreground: var(--hue-foreground);
+  --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #000);
+  --primary-edge: color-mix(in srgb, var(--link-hue) 60%, #000);
+
+  @variant dark {
+    --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #fff);
   }
 }
 

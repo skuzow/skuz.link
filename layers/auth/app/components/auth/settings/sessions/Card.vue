@@ -50,7 +50,7 @@ const clickRevokeSession = async () => {
 
 <template>
   <UiCard
-    class="flex flex-col justify-between gap-y-3 p-3 sm:flex-row sm:items-center sm:gap-y-0"
+    class="flex flex-col justify-between gap-x-6 gap-y-3 p-3 sm:flex-row sm:items-center sm:gap-y-0"
   >
     <div>
       <p class="flex items-center gap-x-2">

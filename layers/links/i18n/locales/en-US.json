@@ -37,7 +37,11 @@
     },
     "copy": "Copy",
     "actions": "Link actions",
-    "clicks": "{n} clicks"
+    "card": {
+      "label": "Link",
+      "clicks": "Clicks",
+      "created": "Created"
+    }
   },
   "alert": {
     "links": {

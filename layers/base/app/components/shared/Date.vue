@@ -5,9 +5,10 @@ interface Props {
 
 const { date } = defineProps<Props>();
 
-const { d } = useI18n();
+const { locale } = useI18n();
 </script>
 
 <template>
-  <time :datetime="date.toString()">{{ d(date) }}</time>
+  <!-- not d(): the Worker formats in UTC, so a Link created near midnight would fail hydration -->
+  <NuxtTime :datetime="date" :locale="locale" date-style="medium" />
 </template>

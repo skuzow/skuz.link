@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { toast } from 'vue-sonner';
+import { slugMark } from '#layers/links/app/lib/slugMark';
 import CopyIcon from '~icons/pixelarticons/copy';
 import MoreHorizontalIcon from '~icons/pixelarticons/more-horizontal';
 import PencilIcon from '~icons/pixelarticons/pencil';
-import PointerIcon from '~icons/pixelarticons/pointer';
 import TrashIcon from '~icons/pixelarticons/trash';
 
 const props = defineProps<{
@@ -21,6 +21,9 @@ const requestURL = useRequestURL();
 
 const shortPath = computed(() => `/${props.link.slug}`);
 const shortUrl = computed(() => `${requestURL.origin}/${props.link.slug}`);
+const hueStyle = computed(() => ({
+  '--link-hue': `var(--${slugMark(props.link.slug).hue})`
+}));
 
 const copyLink = async () => {
   try {
@@ -36,24 +39,24 @@ const copyLink = async () => {
 </script>
 
 <template>
-  <UiCard class="h-full">
+  <UiCard class="h-full" :style="hueStyle">
     <UiCardHeader>
-      <UiCardTitle class="truncate">{{ shortPath }}</UiCardTitle>
-      <UiCardDescription class="truncate">
-        {{ link.redirectUrl }}
-      </UiCardDescription>
-      <UiCardAction>
+      <span class="led text-(color:--link-hue)" />
+      <span class="type-eyebrow text-faint-foreground">
+        {{ $t('links.card.label') }}
+      </span>
+      <UiCardAction class="-mr-3 items-stretch self-stretch">
         <UiDropdownMenu>
+          <!-- outside the Tooltip's root, or the menu anchors to the Tooltip's popper -->
           <UiDropdownMenuTrigger as-child>
-            <UiButton
-              variant="ghost"
-              size="icon"
-              :aria-label="$t('links.actions')"
+            <SharedIconButton
+              :label="$t('links.actions')"
+              class="lit-icon border-l-border h-auto w-9 border-0 border-l [--lit-icon-on:var(--link-hue)] focus-visible:-outline-offset-2 data-[state=open]:[--lit-icon-rest:var(--link-hue)] data-[state=open]:[&_svg]:drop-shadow-[0_0_4px_var(--link-hue)]"
             >
               <MoreHorizontalIcon />
-            </UiButton>
+            </SharedIconButton>
           </UiDropdownMenuTrigger>
-          <UiDropdownMenuContent align="end">
+          <UiDropdownMenuContent align="end" class="link-hue" :style="hueStyle">
             <UiDropdownMenuGroup>
               <UiDropdownMenuItem @click="copyLink">
                 <CopyIcon />
@@ -76,11 +79,26 @@ const copyLink = async () => {
         </UiDropdownMenu>
       </UiCardAction>
     </UiCardHeader>
+    <UiCardContent class="flex-row items-center gap-5">
+      <div class="min-w-0 flex-1">
+        <UiCardTitle class="truncate">{{ shortPath }}</UiCardTitle>
+        <UiCardDescription class="mt-1 truncate">
+          {{ link.redirectUrl }}
+        </UiCardDescription>
+      </div>
+      <LinksSlugMark :slug="link.slug" class="size-[55px]" />
+    </UiCardContent>
     <UiCardFooter>
-      <UiBadge variant="secondary">
-        <PointerIcon />
-        {{ $t('links.clicks', { n: link.clicks }) }}
-      </UiBadge>
+      <span class="flex gap-1.5">
+        <span class="text-faint-foreground">{{ $t('links.card.clicks') }}</span>
+        <span>{{ $n(link.clicks) }}</span>
+      </span>
+      <span class="flex gap-1.5">
+        <span class="text-faint-foreground">
+          {{ $t('links.card.created') }}
+        </span>
+        <SharedDate :date="link.createdAt" />
+      </span>
     </UiCardFooter>
   </UiCard>
 </template>

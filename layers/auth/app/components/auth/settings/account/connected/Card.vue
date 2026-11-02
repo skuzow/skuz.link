@@ -56,7 +56,7 @@ const clickDisconnectAccount = async () => {
 </script>
 
 <template>
-  <UiCard class="flex flex-row items-center justify-between p-3">
+  <UiCard class="flex flex-row items-center justify-between gap-6 p-3">
     <div>
       <p class="flex items-center gap-x-2">
         <component
