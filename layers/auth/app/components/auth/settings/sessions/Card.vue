@@ -78,10 +78,10 @@ const clickRevokeSession = async () => {
       <UiButton
         class="text-destructive hover:text-destructive"
         variant="ghost"
+        :loading="isLoadingRevokeSession"
         @click="clickRevokeSession"
       >
-        <IconLoader v-if="isLoadingRevokeSession" class="fill-destructive" />
-        <UserXIcon v-else />
+        <UserXIcon />
         {{ $t('auth.settings.sessions.button') }}
       </UiButton>
     </div>

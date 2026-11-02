@@ -14,22 +14,22 @@ const currentYear: number = new Date().getFullYear();
         <span class="font-bold">/ {{ currentYear }}</span>
       </div>
 
-      <ul class="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-0">
-        <li>
+      <ul class="flex flex-wrap items-center justify-center gap-x-4">
+        <li class="flex">
           <UiButton as-child variant="link">
             <NuxtLinkLocale to="/legal-notice">
               {{ $t('nav.footer.legalNotice') }}
             </NuxtLinkLocale>
           </UiButton>
         </li>
-        <li>
+        <li class="flex">
           <UiButton as-child variant="link">
             <NuxtLinkLocale to="/privacy">
               {{ $t('nav.footer.privacy') }}
             </NuxtLinkLocale>
           </UiButton>
         </li>
-        <li>
+        <li class="flex">
           <UiButton as-child variant="link">
             <NuxtLinkLocale to="/terms">
               {{ $t('nav.footer.terms') }}
@@ -37,9 +37,9 @@ const currentYear: number = new Date().getFullYear();
           </UiButton>
         </li>
         <li class="hidden md:block">
-          <span class="mx-2" aria-hidden="true">/</span>
+          <span aria-hidden="true">/</span>
         </li>
-        <li>
+        <li class="flex">
           <UiButton as-child variant="link" class="gap-1">
             <NuxtLink
               to="mailto:contact@skuz.link"

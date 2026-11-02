@@ -33,6 +33,17 @@
   --font-sans: 'Geist', sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --font-pixel: 'Geist Pixel', ui-monospace, monospace;
+  --animate-pixel-step: pixel-step 0.6s steps(1) infinite;
+
+  @keyframes pixel-step {
+    0% {
+      opacity: 1;
+    }
+    33%,
+    100% {
+      opacity: 0.25;
+    }
+  }
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -315,6 +326,40 @@
   font-weight: 400;
   letter-spacing: 0.66px;
   text-transform: uppercase;
+}
+
+/* drop the cut on focus, because it would cut the outline off */
+@utility chamfer {
+  clip-path: polygon(
+    var(--chamfer) 0,
+    calc(100% - var(--chamfer)) 0,
+    100% var(--chamfer),
+    100% calc(100% - var(--chamfer)),
+    calc(100% - var(--chamfer)) 100%,
+    var(--chamfer) 100%,
+    0 calc(100% - var(--chamfer)),
+    0 var(--chamfer)
+  );
+
+  &:focus-visible {
+    clip-path: none;
+  }
+}
+
+/* only pixel icons carry shape-rendering: the official logos never light */
+@utility lit-icon {
+  & svg[shape-rendering] {
+    color: var(--lit-icon-rest, currentColor);
+    transition:
+      color 120ms,
+      filter 120ms;
+  }
+
+  &:hover svg[shape-rendering],
+  &:focus-visible svg[shape-rendering] {
+    color: var(--lit-icon-on, currentColor);
+    filter: drop-shadow(0 0 4px var(--lit-icon-on, currentColor));
+  }
 }
 
 @layer base {

@@ -77,10 +77,10 @@ const clickDisconnectAccount = async () => {
       class="text-destructive hover:text-destructive"
       variant="ghost"
       :disabled="length === 1"
+      :loading="isLoadingDisconnectAccount"
       @click="clickDisconnectAccount"
     >
-      <IconLoader v-if="isLoadingDisconnectAccount" class="fill-destructive" />
-      <UnlinkIcon v-else />
+      <UnlinkIcon />
       {{ $t('auth.settings.account.connected.disconnect') }}
     </UiButton>
   </UiCard>

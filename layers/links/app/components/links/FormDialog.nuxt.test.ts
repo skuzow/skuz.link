@@ -103,6 +103,35 @@ describe('LinksFormDialog', () => {
     expect(toast.success).toHaveBeenCalledWith('Link updated successfully');
   });
 
+  it('marks the submit button busy while saving', async () => {
+    let finishSaving = () => {};
+    createLink.mockImplementationOnce(async (event) => {
+      await new Promise<void>((resolve) => (finishSaving = resolve));
+
+      return makeLink(await readBody(event));
+    });
+    const { fill, submit, onSuccess } = await mountDialog();
+
+    const submitButton = () =>
+      document.body.querySelector('button[type="submit"]');
+
+    expect(submitButton()?.hasAttribute('aria-busy')).toBe(false);
+
+    await fill({ slug: 'repo', redirectUrl: 'https://example.com' });
+    await submit();
+
+    await vi.waitFor(() =>
+      expect(submitButton()?.getAttribute('aria-busy')).toBe('true')
+    );
+
+    finishSaving();
+
+    await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() =>
+      expect(submitButton()?.hasAttribute('aria-busy')).toBe(false)
+    );
+  });
+
   it('marks the slug as taken on a 409', async () => {
     createLink.mockImplementationOnce(() => {
       throw createError({ statusCode: 409 });

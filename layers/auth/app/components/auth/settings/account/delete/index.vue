@@ -49,8 +49,11 @@ const deleteAccount = async () => {
     <UiAccordionContent class="flex items-center justify-between pl-2.5">
       <p>{{ $t('auth.settings.account.delete.description') }}</p>
 
-      <UiButton variant="destructive" @click="deleteAccount">
-        <IconLoader v-if="isLoadingDeleteAccount" class="mr-2" />
+      <UiButton
+        variant="destructive"
+        :loading="isLoadingDeleteAccount"
+        @click="deleteAccount"
+      >
         {{ $t('auth.settings.account.delete.title') }}
       </UiButton>
     </UiAccordionContent>

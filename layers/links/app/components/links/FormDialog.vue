@@ -92,8 +92,7 @@ watch(open, (isOpen) => {
           <UiButton type="button" variant="secondary" @click="open = false">
             {{ $t('cancel') }}
           </UiButton>
-          <UiButton type="submit" :disabled="isLoading">
-            <IconLoader v-if="isLoading" class="fill-primary-foreground mr-2" />
+          <UiButton type="submit" :loading="isLoading">
             {{ $t('save') }}
           </UiButton>
         </UiDialogFooter>

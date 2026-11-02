@@ -41,11 +41,7 @@ const { isLoadingUpdateProfile, updateProfile, closeUpdateProfile } =
             {{ $t('cancel') }}
           </UiButton>
 
-          <UiButton type="submit">
-            <IconLoader
-              v-if="isLoadingUpdateProfile"
-              class="fill-primary-foreground mr-2"
-            />
+          <UiButton type="submit" :loading="isLoadingUpdateProfile">
             {{ $t('save') }}
           </UiButton>
         </div>
