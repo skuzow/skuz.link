@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { LinkIcon } from 'lucide-vue-next';
+import { LinkIcon } from '@lucide/vue';
 
 const props = withDefaults(
   defineProps<{

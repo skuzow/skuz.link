@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { AtSignIcon } from 'lucide-vue-next';
+import { AtSignIcon } from '@lucide/vue';
 
 const currentYear: number = new Date().getFullYear();
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { SunIcon, MoonIcon, LaptopMinimalIcon } from 'lucide-vue-next';
+import { SunIcon, MoonIcon, LaptopMinimalIcon } from '@lucide/vue';
 
 import { Theme } from '@/constants/theme.constant';
 
