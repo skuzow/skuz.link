@@ -1,8 +1,5 @@
 allowBuilds:
-  '@prisma/client': true
-  better-sqlite3: true
   esbuild: true
-  node: true
   sharp: true
   unrs-resolver: true
   vue-demi: true
