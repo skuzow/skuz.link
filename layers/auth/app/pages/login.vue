@@ -11,8 +11,10 @@ seoMeta({
 </script>
 
 <template>
-  <section class="flex h-full max-w-xs flex-col justify-center gap-y-8">
-    <IconLogo :size="32" />
+  <section
+    class="flex h-full max-w-xs flex-col justify-center gap-y-8 max-md:mx-auto max-md:text-center"
+  >
+    <IconLogo :size="32" class="max-md:mx-auto" />
 
     <div class="-mt-2 flex flex-col gap-y-2">
       <h1 class="type-display-sm">
