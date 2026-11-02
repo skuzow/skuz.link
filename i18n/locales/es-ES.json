@@ -3,6 +3,7 @@
     "home": "Inicio",
     "header": {
       "user": {
+        "menu": "Menú de usuario",
         "links": "Links",
         "logout": "Cerrar sesión"
       },

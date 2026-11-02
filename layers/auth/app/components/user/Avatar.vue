@@ -13,35 +13,22 @@ interface Props {
   loading?: 'lazy' | 'eager';
   decoding?: 'async' | 'auto' | 'sync';
   alt?: string;
-  pointer?: boolean;
   user: User | typeof authUser.value;
 }
 
 const {
   size,
-  width = 36,
-  height = 36,
+  width = 32,
+  height = 32,
   loading,
   decoding = 'async',
   alt = 'Avatar',
-  pointer = true,
   user
 } = defineProps<Props>();
 </script>
 
 <template>
-  <UiAvatar
-    v-if="user"
-    :size="size"
-    :class="
-      cn(
-        pointer && 'cursor-pointer',
-        pointer &&
-          !user.image &&
-          'transition-all duration-200 hover:brightness-95 dark:hover:brightness-110'
-      )
-    "
-  >
+  <UiAvatar v-if="user" :size="size">
     <UiAvatarImage
       v-if="user.image"
       :src="user.image"

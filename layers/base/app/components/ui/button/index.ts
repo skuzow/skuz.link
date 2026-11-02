@@ -20,7 +20,8 @@ export const buttonVariants = cva(
           'border-destructive-edge bg-destructive text-destructive-foreground',
         outline: `border-input text-secondary-foreground hover:bg-accent ${signalIcon}`,
         secondary: `border-secondary-edge bg-secondary text-secondary-foreground hover:bg-accent ${signalIcon}`,
-        ghost: 'border-transparent text-secondary-foreground hover:bg-accent',
+        ghost:
+          'border-transparent text-secondary-foreground hover:bg-accent data-[state=open]:bg-accent data-[state=open]:text-foreground',
         // important: cn can't merge the control heights, and the size comes later
         link: 'h-auto! border-0 p-0! text-muted-foreground decoration-1 underline-offset-4 hover:text-foreground hover:underline'
       },

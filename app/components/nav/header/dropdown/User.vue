@@ -12,12 +12,17 @@ const { openAuthSettings } = useAuthSettings();
 <template>
   <UiDropdownMenu>
     <UiDropdownMenuTrigger as-child>
-      <UserAvatar loading="eager" :user="authUser" />
+      <button
+        type="button"
+        :aria-label="$t('nav.header.user.menu')"
+        class="hover:outline-input data-[state=open]:outline-input focus-visible:outline-ring flex cursor-pointer outline-offset-2 transition-[outline-color] duration-120 hover:outline focus-visible:outline-2 data-[state=open]:outline"
+      >
+        <UserAvatar loading="eager" :user="authUser" />
+      </button>
     </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="w-56 font-medium">
-      <UiDropdownMenuLabel>
-        <h3>{{ authUser?.name }}</h3>
-      </UiDropdownMenuLabel>
+    <!-- a limit on the width is what cuts a long name with an ellipsis -->
+    <UiDropdownMenuContent align="end" class="max-w-52">
+      <UiDropdownMenuLabel>{{ authUser?.name }}</UiDropdownMenuLabel>
 
       <UiDropdownMenuSeparator />
 
@@ -27,7 +32,7 @@ const { openAuthSettings } = useAuthSettings();
             :to="LINKS_ROUTE"
             :title="$t('nav.header.user.links')"
           >
-            <IconLogo class="fill-current" />
+            <IconLogo />
             <span>{{ $t('nav.header.user.links') }}</span>
           </NuxtLinkLocale>
         </UiDropdownMenuItem>

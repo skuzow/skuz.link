@@ -20,7 +20,6 @@ const isUpdateProfileOpen: Ref<boolean> = ref(false);
           :width="40"
           :height="40"
           loading="eager"
-          :pointer="false"
           :user="authUser"
         />
         <p>{{ authUser?.name }}</p>

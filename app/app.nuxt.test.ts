@@ -1,6 +1,13 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { DOMWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { langMenuLink, openLangMenu } from '@/testing/langMenu';
+import {
+  langMenuLink,
+  langMenuRow,
+  menuTooltip,
+  openLangMenu,
+  openMenu
+} from '@/testing/headerMenu';
 import App from './app.vue';
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
@@ -51,6 +58,84 @@ afterEach(() => {
   mounted?.unmount();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
+  useColorMode().preference = 'light';
+  useState('auth:session').value = null;
+  useState('auth:user').value = null;
+});
+
+const selectedThemeRows = () =>
+  [
+    ...document.body.querySelectorAll(
+      '[role="menuitemradio"][aria-checked="true"]'
+    )
+  ].map((element) => element.textContent?.trim());
+
+const themeRow = (label: string) => {
+  const row = [
+    ...document.body.querySelectorAll('[role="menuitemradio"]')
+  ].find((element) => element.textContent?.trim() === label);
+  if (!row) throw new Error(`Missing theme row ${label}`);
+
+  return row;
+};
+
+describe('app header', () => {
+  it('marks English as the current language at an unprefixed path', async () => {
+    await mountApp('/');
+
+    await openLangMenu('Toggle language');
+
+    expect(langMenuRow('EN')?.getAttribute('aria-current')).toBe('true');
+    expect(langMenuRow('ES')?.hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('marks Spanish as the current language at a Spanish path', async () => {
+    await mountApp('/es');
+
+    await openLangMenu('Alternar idioma');
+
+    expect(langMenuRow('ES')?.getAttribute('aria-current')).toBe('true');
+    expect(langMenuRow('EN')?.hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('shows the same words as the label in the language and theme Tooltips', async () => {
+    await mountApp('/');
+    expect(await menuTooltip('Toggle language')).toBe('Toggle language');
+    mounted?.unmount();
+
+    await mountApp('/es');
+    expect(await menuTooltip('Alternar tema')).toBe('Alternar tema');
+  });
+
+  it('selects the chosen theme in the theme menu', async () => {
+    const colorMode = useColorMode();
+    await mountApp('/');
+
+    await openMenu('Toggle theme');
+    expect(selectedThemeRows()).toEqual(['Light']);
+
+    await new DOMWrapper(themeRow('Dark')).trigger('click');
+    expect(colorMode.preference).toBe('dark');
+
+    await openMenu('Toggle theme');
+    expect(selectedThemeRows()).toEqual(['Dark']);
+  });
+
+  it('names the User menu trigger in English and Spanish', async () => {
+    useState('auth:session').value = { token: 'session-token' };
+    useState('auth:user').value = { name: 'Ada Lovelace', image: null };
+
+    await mountApp('/');
+    expect(
+      document.body.querySelector('button[aria-label="User menu"]')
+    ).not.toBeNull();
+    mounted?.unmount();
+
+    await mountApp('/es');
+    expect(
+      document.body.querySelector('button[aria-label="Menú de usuario"]')
+    ).not.toBeNull();
+  });
 });
 
 describe('app footer', () => {

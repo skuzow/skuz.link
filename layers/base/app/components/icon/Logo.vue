@@ -16,7 +16,7 @@ const { size = 16, class: className } = defineProps<Props>();
     xmlns="http://www.w3.org/2000/svg"
     shape-rendering="crispEdges"
     aria-hidden="true"
-    :class="cn('fill-foreground shrink-0', className)"
+    :class="cn('shrink-0 fill-current', className)"
   >
     <rect x="4" y="6" width="7" height="2" />
     <rect x="13" y="6" width="7" height="2" />

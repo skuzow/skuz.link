@@ -3,6 +3,7 @@
     "home": "Home",
     "header": {
       "user": {
+        "menu": "User menu",
         "links": "Links",
         "logout": "Logout"
       },

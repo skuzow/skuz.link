@@ -17,7 +17,6 @@ const { isLoadingUpdateProfile, updateProfile, closeUpdateProfile } =
         :width="64"
         :height="64"
         loading="eager"
-        :pointer="false"
         :user="authUser"
       />
 

@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { DOMWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { langMenuLink, openLangMenu } from '@/testing/langMenu';
+import { langMenuLink, menuTooltip, openLangMenu } from '@/testing/headerMenu';
 import ErrorPage from './error.vue';
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
@@ -96,6 +96,15 @@ describe('error page', () => {
       'An unexpected error occurred. Please try again later.'
     );
     expect(wrapper.text()).not.toContain('Cannot read db of undefined');
+  });
+
+  it('shows the language and theme Tooltips, because the layout provides them here too', async () => {
+    await mountErrorPage(404, '/typo');
+    expect(await menuTooltip('Toggle language')).toBe('Toggle language');
+    mounted?.unmount();
+
+    await mountErrorPage(404, '/es/typo');
+    expect(await menuTooltip('Alternar tema')).toBe('Alternar tema');
   });
 
   it('offers the Spanish path from the language menu at an unprefixed path', async () => {

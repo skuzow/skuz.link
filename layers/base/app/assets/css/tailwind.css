@@ -347,8 +347,10 @@
 }
 
 /* only pixel icons carry shape-rendering: the official logos never light */
+/* data-lit lights what isn't an icon, like a language code */
 @utility lit-icon {
-  & svg[shape-rendering] {
+  & svg[shape-rendering],
+  & [data-lit] {
     color: var(--lit-icon-rest, currentColor);
     transition:
       color 120ms,
@@ -356,9 +358,26 @@
   }
 
   &:hover svg[shape-rendering],
-  &:focus-visible svg[shape-rendering] {
+  &:hover [data-lit],
+  &:focus-visible svg[shape-rendering],
+  &:focus-visible [data-lit],
+  &[data-highlighted] svg[shape-rendering],
+  &[data-highlighted] [data-lit] {
     color: var(--lit-icon-on, currentColor);
     filter: drop-shadow(0 0 4px var(--lit-icon-on, currentColor));
+  }
+}
+
+/* the glow turns off in light */
+@utility led {
+  display: inline-block;
+  flex: none;
+  width: var(--led-size);
+  height: var(--led-size);
+  background: currentColor;
+
+  @variant dark {
+    box-shadow: 0 0 8px currentColor;
   }
 }
 
