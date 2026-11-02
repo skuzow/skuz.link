@@ -79,7 +79,7 @@ const rebuild = () => {
   if (!element || !context) return;
 
   const { width, height } = element.getBoundingClientRect();
-  // not laid out yet, and the resize observer fires again once it is
+  // dropped by its breakpoint, and it rebuilds when it comes back
   if (!width || !height) return;
 
   const style = getComputedStyle(element);
@@ -132,7 +132,7 @@ watch(
         variant === 'landing' &&
           'mask-[linear-gradient(to_right,transparent_30%,black_62%)] max-lg:mask-[linear-gradient(to_bottom,transparent_50%,black_76%)]',
         variant === 'login' &&
-          'mask-[linear-gradient(to_right,transparent_45%,black_72%)] max-md:mask-[radial-gradient(ellipse_260px_300px_at_50%_calc(50%-26px),transparent_72%,black_100%)]'
+          'mask-[linear-gradient(to_right,transparent_45%,black_72%)] max-md:hidden'
       )
     "
   />
