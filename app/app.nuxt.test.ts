@@ -170,6 +170,47 @@ describe('app footer', () => {
   });
 });
 
+describe('pixel field', () => {
+  const fieldRoutes = ['/', '/es', '/login', '/es/login'];
+
+  const field = () => document.body.querySelector('canvas');
+
+  it.each(fieldRoutes)(
+    'draws behind %s with no meaning for a screen reader',
+    async (route) => {
+      await mountApp(route);
+
+      expect(field()?.getAttribute('aria-hidden')).toBe('true');
+    }
+  );
+
+  it.each(['/privacy', '/es/privacidad'])('stays off %s', async (route) => {
+    await mountApp(route);
+
+    expect(field()).toBeNull();
+  });
+
+  const headerBlurs = () =>
+    document.body
+      .querySelector('header')
+      ?.classList.contains('backdrop-blur-md');
+
+  it.each(fieldRoutes)(
+    'leaves the header transparent over the field at %s',
+    async (route) => {
+      await mountApp(route);
+
+      expect(headerBlurs()).toBe(false);
+    }
+  );
+
+  it('keeps the header blur on a page without the field', async () => {
+    await mountApp('/privacy');
+
+    expect(headerBlurs()).toBe(true);
+  });
+});
+
 describe('legal notice', () => {
   it('shows the English Legal notice with the translation line at its English path', async () => {
     await mountApp('/legal-notice');

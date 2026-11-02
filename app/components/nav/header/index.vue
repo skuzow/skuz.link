@@ -4,10 +4,10 @@ import KeyIcon from '~icons/pixelarticons/key';
 import { cn } from '#layers/base/app/lib/utils';
 
 interface Props {
-  isLanding?: boolean;
+  transparent?: boolean;
 }
 
-const { isLanding = false } = defineProps<Props>();
+const { transparent = false } = defineProps<Props>();
 
 const { isAuthenticated } = useAuth();
 </script>
@@ -17,7 +17,7 @@ const { isAuthenticated } = useAuth();
     :class="
       cn(
         'sticky top-0 z-10 h-16 border-b',
-        !isLanding && 'bg-background/80 backdrop-blur-md'
+        !transparent && 'bg-background/80 backdrop-blur-md'
       )
     "
   >

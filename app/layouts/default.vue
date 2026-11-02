@@ -19,7 +19,12 @@ const ogLocale = computed(() => ogLocales[locale.value as LocaleCode]);
 const themeColor = computed(() =>
   colorMode.value === Theme.LIGHT ? ThemeColor.LIGHT : ThemeColor.DARK
 );
-const isLanding = computed(() => route.path === localePath('/'));
+const fieldVariant = computed(() => {
+  if (route.path === localePath('/')) return 'landing';
+  if (route.path === localePath('/login')) return 'login';
+
+  return undefined;
+});
 
 if (import.meta.server) {
   useHead({
@@ -79,9 +84,9 @@ useSeoMeta({
   <UiTooltipProvider>
     <!-- here, not in app.vue: Nuxt renders error.vue in place of the app -->
     <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
-      <LandingGridBackground v-if="isLanding" />
+      <PixelField v-if="fieldVariant" :variant="fieldVariant" />
 
-      <NavHeader :is-landing="isLanding" />
+      <NavHeader :transparent="Boolean(fieldVariant)" />
       <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
         <slot />
       </main>
