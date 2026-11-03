@@ -56,6 +56,13 @@ const mountDialog = async (link: ReturnType<typeof makeLink> | null = null) => {
 
 const dialogText = () => document.body.textContent ?? '';
 
+const submitButton = () => document.body.querySelector('button[type="submit"]');
+
+const dialogHue = () =>
+  document.body
+    .querySelector<HTMLElement>('[role="dialog"]')
+    ?.style.getPropertyValue('--link-hue');
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -65,6 +72,42 @@ afterEach(() => {
 });
 
 describe('LinksFormDialog', () => {
+  it('submits with Create link when creating', async () => {
+    await mountDialog();
+
+    expect(submitButton()?.textContent?.trim()).toBe('Create link');
+  });
+
+  it('submits with Save changes when editing', async () => {
+    await mountDialog(makeLink({ id: 'link-1' }));
+
+    expect(submitButton()?.textContent?.trim()).toBe('Save changes');
+  });
+
+  it("keeps the browser's validation bubble off its own messages", async () => {
+    await mountDialog();
+
+    expect(document.body.querySelector('form')?.noValidate).toBe(true);
+  });
+
+  it('has no hue of its own when creating', async () => {
+    await mountDialog();
+
+    expect(dialogHue()).toBeFalsy();
+  });
+
+  it('holds the saved slug hue while the slug changes', async () => {
+    const { fill } = await mountDialog(
+      makeLink({ id: 'link-1', slug: 'repo' })
+    );
+
+    expect(dialogHue()).toBe('var(--hue-gold)');
+
+    await fill({ slug: 'github' });
+
+    expect(dialogHue()).toBe('var(--hue-gold)');
+  });
+
   it('creates a link with the normalized slug', async () => {
     const { fill, submit, onSuccess } = await mountDialog();
 
@@ -101,6 +144,32 @@ describe('LinksFormDialog', () => {
     });
     expect(createLink).not.toHaveBeenCalled();
     expect(toast.success).toHaveBeenCalledWith('Link updated successfully');
+  });
+
+  it('marks the submit button busy while saving', async () => {
+    let finishSaving = () => {};
+    createLink.mockImplementationOnce(async (event) => {
+      await new Promise<void>((resolve) => (finishSaving = resolve));
+
+      return makeLink(await readBody(event));
+    });
+    const { fill, submit, onSuccess } = await mountDialog();
+
+    expect(submitButton()?.hasAttribute('aria-busy')).toBe(false);
+
+    await fill({ slug: 'repo', redirectUrl: 'https://example.com' });
+    await submit();
+
+    await vi.waitFor(() =>
+      expect(submitButton()?.getAttribute('aria-busy')).toBe('true')
+    );
+
+    finishSaving();
+
+    await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() =>
+      expect(submitButton()?.hasAttribute('aria-busy')).toBe(false)
+    );
   });
 
   it('marks the slug as taken on a 409', async () => {

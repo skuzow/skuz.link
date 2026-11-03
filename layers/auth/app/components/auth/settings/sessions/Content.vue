@@ -13,7 +13,7 @@ const {
 
   <ul
     v-else-if="status === 'success' && sessions?.data"
-    class="flex flex-col gap-y-2 pt-1"
+    class="flex flex-col gap-y-2"
   >
     <li v-for="session in sessions.data" :key="session.id">
       <AuthSettingsSessionsCard

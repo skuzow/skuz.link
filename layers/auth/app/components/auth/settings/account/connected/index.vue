@@ -1,11 +1,9 @@
 <template>
   <UiAccordionItem value="connected-accounts">
     <UiAccordionTrigger>
-      <h3 class="font-bold">
-        {{ $t('auth.settings.account.connected.title') }}
-      </h3>
+      {{ $t('auth.settings.account.connected.title') }}
     </UiAccordionTrigger>
-    <UiAccordionContent class="pl-2.5">
+    <UiAccordionContent>
       <AuthSettingsAccountConnectedContent />
     </UiAccordionContent>
   </UiAccordionItem>

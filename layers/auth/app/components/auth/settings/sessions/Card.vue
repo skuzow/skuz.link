@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import type { Session } from 'better-auth/types';
-import {
-  LaptopMinimalIcon,
-  CalendarX2Icon,
-  UserRoundIcon,
-  UserRoundXIcon
-} from '@lucide/vue';
 import { toast } from 'vue-sonner';
+import Calendar2Icon from '~icons/pixelarticons/calendar-2';
+import LaptopIcon from '~icons/pixelarticons/laptop';
+import UserXIcon from '~icons/pixelarticons/user-x';
 
 interface Props {
   session: Session;
@@ -51,41 +48,31 @@ const clickRevokeSession = async () => {
 </script>
 
 <template>
-  <UiCard
-    class="flex flex-col justify-between gap-y-3 p-3 sm:flex-row sm:items-center sm:gap-y-0"
-  >
-    <div>
-      <p class="flex items-center gap-x-2">
-        <LaptopMinimalIcon :size="16" />
-        {{ userAgent }}
-      </p>
+  <AuthSettingsRow>
+    <LaptopIcon />
+    {{ userAgent }}
 
-      <div class="flex flex-row gap-x-3">
-        <p class="flex items-center gap-x-2">
-          <CalendarX2Icon :size="16" />
-          <SharedDate :date="session.expiresAt" />
-        </p>
+    <template #details>
+      <span class="text-muted-foreground flex items-center gap-x-2">
+        <Calendar2Icon />
+        <SharedDate :date="session.expiresAt" />
+      </span>
 
-        <p
-          v-if="authSession?.token === session.token"
-          class="flex items-center gap-x-2"
-        >
-          <UserRoundIcon :size="16" />
-          {{ $t('auth.settings.sessions.current') }}
-        </p>
-      </div>
-    </div>
+      <UiBadge v-if="authSession?.token === session.token">
+        {{ $t('auth.settings.sessions.current') }}
+      </UiBadge>
+    </template>
 
-    <div class="text-end">
+    <template #action>
       <UiButton
-        class="text-destructive hover:text-destructive"
+        class="text-destructive"
         variant="ghost"
+        :loading="isLoadingRevokeSession"
         @click="clickRevokeSession"
       >
-        <IconLoader v-if="isLoadingRevokeSession" class="fill-destructive" />
-        <UserRoundXIcon v-else :size="16" />
+        <UserXIcon />
         {{ $t('auth.settings.sessions.button') }}
       </UiButton>
-    </div>
-  </UiCard>
+    </template>
+  </AuthSettingsRow>
 </template>

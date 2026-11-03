@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
-import type { InputGroupVariants } from '.';
 import { cn } from 'cn';
-import { inputGroupAddonVariants } from '.';
 
-const props = withDefaults(
-  defineProps<{
-    align?: InputGroupVariants['align'];
-    class?: HTMLAttributes['class'];
-  }>(),
-  {
-    align: 'inline-start'
-  }
-);
+const props = defineProps<{
+  class?: HTMLAttributes['class'];
+}>();
 
 function handleInputGroupAddonClick(e: MouseEvent) {
   const currentTarget = e.currentTarget as HTMLElement | null;
@@ -30,8 +22,12 @@ function handleInputGroupAddonClick(e: MouseEvent) {
   <div
     role="group"
     data-slot="input-group-addon"
-    :data-align="props.align"
-    :class="cn(inputGroupAddonVariants({ align: props.align }), props.class)"
+    :class="
+      cn(
+        `bg-muted text-muted-foreground type-code flex cursor-text items-center gap-2 border-r px-3 select-none [&>svg:not([class*='size-'])]:size-4`,
+        props.class
+      )
+    "
     @click="handleInputGroupAddonClick"
   >
     <slot />

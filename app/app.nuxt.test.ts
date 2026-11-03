@@ -1,6 +1,13 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { DOMWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { langMenuLink, openLangMenu } from '@/testing/langMenu';
+import {
+  langMenuLink,
+  langMenuRow,
+  menuTooltip,
+  openLangMenu,
+  openMenu
+} from '@/testing/headerMenu';
 import App from './app.vue';
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
@@ -51,6 +58,84 @@ afterEach(() => {
   mounted?.unmount();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
+  useColorMode().preference = 'light';
+  useState('auth:session').value = null;
+  useState('auth:user').value = null;
+});
+
+const selectedThemeRows = () =>
+  [
+    ...document.body.querySelectorAll(
+      '[role="menuitemradio"][aria-checked="true"]'
+    )
+  ].map((element) => element.textContent?.trim());
+
+const themeRow = (label: string) => {
+  const row = [
+    ...document.body.querySelectorAll('[role="menuitemradio"]')
+  ].find((element) => element.textContent?.trim() === label);
+  if (!row) throw new Error(`Missing theme row ${label}`);
+
+  return row;
+};
+
+describe('app header', () => {
+  it('marks English as the current language at an unprefixed path', async () => {
+    await mountApp('/');
+
+    await openLangMenu('Toggle language');
+
+    expect(langMenuRow('EN')?.getAttribute('aria-current')).toBe('true');
+    expect(langMenuRow('ES')?.hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('marks Spanish as the current language at a Spanish path', async () => {
+    await mountApp('/es');
+
+    await openLangMenu('Alternar idioma');
+
+    expect(langMenuRow('ES')?.getAttribute('aria-current')).toBe('true');
+    expect(langMenuRow('EN')?.hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('shows the same words as the label in the language and theme Tooltips', async () => {
+    await mountApp('/');
+    expect(await menuTooltip('Toggle language')).toBe('Toggle language');
+    mounted?.unmount();
+
+    await mountApp('/es');
+    expect(await menuTooltip('Alternar tema')).toBe('Alternar tema');
+  });
+
+  it('selects the chosen theme in the theme menu', async () => {
+    const colorMode = useColorMode();
+    await mountApp('/');
+
+    await openMenu('Toggle theme');
+    expect(selectedThemeRows()).toEqual(['Light']);
+
+    await new DOMWrapper(themeRow('Dark')).trigger('click');
+    expect(colorMode.preference).toBe('dark');
+
+    await openMenu('Toggle theme');
+    expect(selectedThemeRows()).toEqual(['Dark']);
+  });
+
+  it('names the User menu trigger in English and Spanish', async () => {
+    useState('auth:session').value = { token: 'session-token' };
+    useState('auth:user').value = { name: 'Ada Lovelace', image: null };
+
+    await mountApp('/');
+    expect(
+      document.body.querySelector('button[aria-label="User menu"]')
+    ).not.toBeNull();
+    mounted?.unmount();
+
+    await mountApp('/es');
+    expect(
+      document.body.querySelector('button[aria-label="Menú de usuario"]')
+    ).not.toBeNull();
+  });
 });
 
 describe('app footer', () => {
@@ -85,6 +170,42 @@ describe('app footer', () => {
   });
 });
 
+describe('pixel field', () => {
+  const fieldRoutes = ['/', '/es', '/login', '/es/login'];
+
+  const field = () => document.body.querySelector('canvas');
+
+  it.each(fieldRoutes)(
+    'draws behind %s with no meaning for a screen reader',
+    async (route) => {
+      await mountApp(route);
+
+      expect(field()?.getAttribute('aria-hidden')).toBe('true');
+    }
+  );
+
+  it.each(['/privacy', '/es/privacidad'])('stays off %s', async (route) => {
+    await mountApp(route);
+
+    expect(field()).toBeNull();
+  });
+
+  const blurs = (selector: string) =>
+    document.body
+      .querySelector(selector)
+      ?.classList.contains('backdrop-blur-md');
+
+  it.each([...fieldRoutes, '/privacy'])(
+    'keeps the field behind the header and footer backgrounds at %s',
+    async (route) => {
+      await mountApp(route);
+
+      expect(blurs('header')).toBe(true);
+      expect(blurs('footer')).toBe(true);
+    }
+  );
+});
+
 describe('legal notice', () => {
   it('shows the English Legal notice with the translation line at its English path', async () => {
     await mountApp('/legal-notice');
@@ -96,7 +217,7 @@ describe('legal notice', () => {
       'This is a translation. If it differs from the Spanish version, the Spanish one prevails.'
     );
     expect(document.getElementById('who-runs-skuz-link')?.textContent).toBe(
-      '1. Who runs skuz.link'
+      '/ 01Who runs skuz.link'
     );
   });
 
@@ -109,7 +230,7 @@ describe('legal notice', () => {
     expect(mainText()).not.toContain('This is a translation.');
     expect(
       document.getElementById('quien-gestiona-skuz-link')?.textContent
-    ).toBe('1. Quién gestiona skuz.link');
+    ).toBe('/ 01Quién gestiona skuz.link');
   });
 
   it('offers the Spanish path from the language menu at its English path', async () => {
@@ -190,6 +311,35 @@ describe('terms of use', () => {
 });
 
 describe('privacy policy', () => {
+  it('labels a section with its number and keeps its anchor', async () => {
+    await mountApp('/privacy');
+
+    const section = document.getElementById('what-i-process-and-why');
+
+    expect(section?.tagName).toBe('H2');
+    expect(section?.textContent).toBe('/ 02What I process and why');
+    expect(section?.querySelector('[aria-hidden="true"]')?.textContent).toBe(
+      '/'
+    );
+  });
+
+  it('labels a Spanish section with its number and keeps its anchor', async () => {
+    await mountApp('/es/privacidad');
+
+    expect(
+      document.getElementById('que-datos-trato-y-para-que')?.textContent
+    ).toBe('/ 02Qué datos trato y para qué');
+  });
+
+  it('gives a subsection its anchor and no number', async () => {
+    await mountApp('/privacy');
+
+    const subsection = document.getElementById('anyone-who-opens-skuz-link');
+
+    expect(subsection?.tagName).toBe('H3');
+    expect(subsection?.textContent).toBe('Anyone who opens skuz.link');
+  });
+
   it('shows the English Privacy policy with the translation line at its English path', async () => {
     await mountApp('/privacy');
 
@@ -239,6 +389,19 @@ describe('privacy policy', () => {
 });
 
 describe('login page', () => {
+  it.each([
+    ['/login', ['Continue with Google', 'Continue with GitHub']],
+    ['/es/login', ['Continuar con Google', 'Continuar con GitHub']]
+  ])('offers both Providers by name at %s', async (route, labels) => {
+    await mountApp(route);
+
+    const buttons = [
+      ...(document.body.querySelector('main')?.querySelectorAll('button') ?? [])
+    ].map((button) => button.textContent?.trim());
+
+    expect(buttons).toEqual(labels);
+  });
+
   it('links the Terms of use and the Privacy policy under the Provider buttons at an unprefixed path', async () => {
     await mountApp('/login');
 

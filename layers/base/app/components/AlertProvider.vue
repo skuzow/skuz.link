@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { DrawerOpenChangeDetails } from 'reka-ui';
 import { useMediaQuery } from '@vueuse/core';
+import CheckIcon from '~icons/pixelarticons/check';
+import CloseIcon from '~icons/pixelarticons/close';
 
 const { isOpen, options, dismiss } = useAlert();
 
@@ -24,6 +26,7 @@ const keepDrawerOpen = (open: boolean, details: DrawerOpenChangeDetails) => {
       </UiAlertDialogHeader>
       <UiAlertDialogFooter>
         <UiAlertDialogCancel @click="dismiss(false)">
+          <CloseIcon data-icon="inline-start" />
           {{ options?.cancel || $t('cancel') }}
         </UiAlertDialogCancel>
 
@@ -31,6 +34,7 @@ const keepDrawerOpen = (open: boolean, details: DrawerOpenChangeDetails) => {
           :variant="options?.danger ? 'destructive' : 'default'"
           @click="dismiss(true)"
         >
+          <CheckIcon data-icon="inline-start" />
           {{ options?.confirm || $t('confirm') }}
         </UiAlertDialogAction>
       </UiAlertDialogFooter>
@@ -39,25 +43,27 @@ const keepDrawerOpen = (open: boolean, details: DrawerOpenChangeDetails) => {
 
   <UiDrawer v-else :open="isOpen" @update:open="keepDrawerOpen">
     <UiDrawerContent>
-      <UiDrawerHeader class="mt-3 gap-3">
+      <UiDrawerHeader>
         <UiDrawerTitle>{{ options?.title }}</UiDrawerTitle>
 
         <UiDrawerDescription>
           {{ options?.description }}
         </UiDrawerDescription>
       </UiDrawerHeader>
-      <UiDrawerFooter class="mb-6">
+      <UiDrawerFooter>
         <UiDrawerClose as-child>
           <UiButton
             :variant="options?.danger ? 'destructive' : 'default'"
             @click="dismiss(true)"
           >
+            <CheckIcon data-icon="inline-start" />
             {{ options?.confirm || $t('confirm') }}
           </UiButton>
         </UiDrawerClose>
 
         <UiDrawerClose as-child>
-          <UiButton variant="outline" @click="dismiss(false)">
+          <UiButton variant="secondary" @click="dismiss(false)">
+            <CloseIcon data-icon="inline-start" />
             {{ options?.cancel || $t('cancel') }}
           </UiButton>
         </UiDrawerClose>

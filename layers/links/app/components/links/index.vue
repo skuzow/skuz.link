@@ -15,12 +15,10 @@ const {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex h-full flex-col gap-6">
     <LinksSkeleton v-if="pending && !hasLinks" />
 
-    <template v-else-if="!hasLinks">
-      <LinksEmpty @create="openCreate" />
-    </template>
+    <LinksEmpty v-else-if="!hasLinks" @create="openCreate" />
 
     <template v-else>
       <LinksToolbar v-model:search-query="searchQuery" @create="openCreate" />
@@ -30,7 +28,10 @@ const {
         @edit="openEdit"
         @delete="deleteLink"
       />
-      <LinksEmpty v-else search />
+      <!-- here before the results change, or screen readers miss the message -->
+      <p class="sr-only" aria-live="polite">
+        {{ hasFilteredLinks ? '' : $t('links.search.empty.title') }}
+      </p>
     </template>
 
     <LinksFormDialog

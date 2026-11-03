@@ -12,25 +12,21 @@ seoMeta({
 
 <template>
   <section
-    class="mx-auto flex h-11/12 max-w-xs flex-col justify-center gap-y-10"
+    class="flex h-full max-w-xs flex-col justify-center gap-y-8 max-md:mx-auto max-md:text-center"
   >
-    <div class="flex flex-col items-center gap-y-6 text-center">
-      <NavLogo :size="28" />
+    <IconLogo :size="32" class="max-md:mx-auto" />
 
-      <div class="space-y-1">
-        <h1 class="text-lg font-semibold">
-          {{ $t('login.title') }}
-        </h1>
+    <div class="-mt-2 flex flex-col gap-y-2">
+      <h1 class="type-display-sm">
+        {{ $t('login.title') }}
+      </h1>
 
-        <p class="text-muted-foreground text-sm">
-          {{ $t('login.description') }}
-        </p>
-      </div>
+      <p class="type-body text-muted-foreground">
+        {{ $t('login.description') }}
+      </p>
     </div>
 
-    <UiSeparator />
-
-    <div class="flex w-full flex-col gap-y-2.5">
+    <div class="flex flex-col gap-y-2.5">
       <AuthProviderButtons />
     </div>
 
@@ -38,12 +34,12 @@ seoMeta({
     <i18n-t
       keypath="login.acceptance"
       tag="p"
-      class="text-muted-foreground text-center text-xs text-balance"
+      class="type-caption text-muted-foreground text-balance"
     >
       <template #terms>
         <NuxtLinkLocale
           :to="auth.termsRoute"
-          class="hover:text-foreground underline underline-offset-4"
+          class="hover:text-foreground focus-visible:outline-ring underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           {{ $t('login.termsLink') }}
         </NuxtLinkLocale>
@@ -51,7 +47,7 @@ seoMeta({
       <template #privacy>
         <NuxtLinkLocale
           :to="auth.privacyRoute"
-          class="hover:text-foreground underline underline-offset-4"
+          class="hover:text-foreground focus-visible:outline-ring underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           {{ $t('login.privacyLink') }}
         </NuxtLinkLocale>

@@ -1,6 +1,7 @@
 {
   "description": "Acortador de urls",
   "cancel": "Cancelar",
+  "close": "Cerrar",
   "confirm": "Confirmar",
   "save": "Guardar cambios",
   "form": {

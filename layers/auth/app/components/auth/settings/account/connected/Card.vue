@@ -1,9 +1,14 @@
 <script lang="ts" setup>
 import type { Account } from 'better-auth/types';
-import { MailIcon, CalendarIcon, UnlinkIcon } from '@lucide/vue';
 import { toast } from 'vue-sonner';
+import CalendarIcon from '~icons/pixelarticons/calendar';
+import MailIcon from '~icons/pixelarticons/mail';
+import UnlinkIcon from '~icons/pixelarticons/unlink';
 
-import { authProviderIconMap } from '#layers/auth/app/constants/auth.constant';
+import {
+  authProviderIconMap,
+  authProviderNameMap
+} from '#layers/auth/app/constants/auth.constant';
 
 interface Props {
   account: Account;
@@ -21,9 +26,8 @@ const { disconnectAccount } = useAuth();
 const isLoadingDisconnectAccount: Ref<boolean> = ref(false);
 
 const accountProvider: string =
-  account.providerId === 'credential'
-    ? $t('auth.settings.account.connected.credential')
-    : titleCase(account.providerId);
+  authProviderNameMap[account.providerId] ??
+  $t('auth.settings.account.connected.credential');
 
 const clickDisconnectAccount = async () => {
   if (isLoadingDisconnectAccount.value) return;
@@ -54,32 +58,32 @@ const clickDisconnectAccount = async () => {
 </script>
 
 <template>
-  <UiCard class="flex flex-row items-center justify-between p-3">
-    <div>
-      <p class="flex items-center gap-x-2">
-        <component
-          :is="authProviderIconMap[account.providerId]"
-          v-if="authProviderIconMap[account.providerId]"
-        />
-        <MailIcon v-else :size="16" />
-        {{ accountProvider }}
-      </p>
+  <AuthSettingsRow>
+    <component
+      :is="authProviderIconMap[account.providerId]"
+      v-if="authProviderIconMap[account.providerId]"
+    />
+    <MailIcon v-else />
+    {{ accountProvider }}
 
-      <p class="flex items-center gap-x-2">
-        <CalendarIcon :size="16" />
+    <template #details>
+      <span class="text-muted-foreground flex items-center gap-x-2">
+        <CalendarIcon />
         <SharedDate :date="account.createdAt" />
-      </p>
-    </div>
+      </span>
+    </template>
 
-    <UiButton
-      class="text-destructive hover:text-destructive"
-      variant="ghost"
-      :disabled="length === 1"
-      @click="clickDisconnectAccount"
-    >
-      <IconLoader v-if="isLoadingDisconnectAccount" class="fill-destructive" />
-      <UnlinkIcon v-else :size="16" />
-      {{ $t('auth.settings.account.connected.disconnect') }}
-    </UiButton>
-  </UiCard>
+    <template #action>
+      <UiButton
+        class="text-destructive"
+        variant="ghost"
+        :disabled="length === 1"
+        :loading="isLoadingDisconnectAccount"
+        @click="clickDisconnectAccount"
+      >
+        <UnlinkIcon />
+        {{ $t('auth.settings.account.connected.disconnect') }}
+      </UiButton>
+    </template>
+  </AuthSettingsRow>
 </template>

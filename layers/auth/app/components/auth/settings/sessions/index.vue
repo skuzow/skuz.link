@@ -1,11 +1,9 @@
 <template>
   <UiAccordionItem value="sessions">
     <UiAccordionTrigger>
-      <h3 class="font-bold">
-        {{ $t('auth.settings.sessions.title') }}
-      </h3>
+      {{ $t('auth.settings.sessions.title') }}
     </UiAccordionTrigger>
-    <UiAccordionContent class="pl-2.5">
+    <UiAccordionContent>
       <AuthSettingsSessionsContent />
     </UiAccordionContent>
   </UiAccordionItem>

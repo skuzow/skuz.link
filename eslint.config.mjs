@@ -116,7 +116,7 @@ const layerBoundaries = LAYERS.flatMap((layer, index) => {
 export default withNuxt(
   eslintConfigPrettier,
   {
-    // copied from the shadcn-vue registry, so a reinstall can't undo this
+    // started as shadcn-vue registry source (ADR-0006), which leaves optional props without defaults
     name: 'skuz/shadcn-components',
     files: ['layers/base/app/components/ui/**'],
     rules: { 'vue/require-default-prop': 'off' }

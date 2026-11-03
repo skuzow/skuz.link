@@ -6,20 +6,29 @@ const switchLocalePath = useSwitchLocalePath();
 
 <template>
   <UiDropdownMenu>
+    <!-- outside the Tooltip's root, or the menu anchors to the Tooltip's popper -->
     <UiDropdownMenuTrigger as-child>
-      <UiButton variant="ghost" size="icon">
-        <span class="mt-0.5 text-base">{{ locale.toUpperCase() }}</span>
-        <span class="sr-only">{{ $t('nav.header.lang.button') }}</span>
-      </UiButton>
+      <SharedIconButton
+        :label="$t('nav.header.lang.button')"
+        class="lit-icon [--lit-icon-on:var(--signal)]"
+      >
+        <span data-lit>{{ locale }}</span>
+      </SharedIconButton>
     </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="font-medium">
+    <UiDropdownMenuContent align="end" class="w-40">
       <UiDropdownMenuItem
         v-for="{ code, name } in locales"
         :key="code"
         as-child
       >
-        <NuxtLink :to="switchLocalePath(code)" :title="code.toUpperCase()">
+        <NuxtLink
+          :to="switchLocalePath(code)"
+          :title="code.toUpperCase()"
+          :aria-current="code === locale ? 'true' : undefined"
+        >
+          <span data-lit class="type-control w-5">{{ code }}</span>
           <span>{{ name }}</span>
+          <span v-if="code === locale" class="led text-signal ml-auto" />
         </NuxtLink>
       </UiDropdownMenuItem>
     </UiDropdownMenuContent>

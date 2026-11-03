@@ -1,35 +1,49 @@
 <script lang="ts" setup>
-import { SunIcon, MoonIcon, LaptopMinimalIcon } from '@lucide/vue';
+import LaptopIcon from '~icons/pixelarticons/laptop';
+import MoonIcon from '~icons/pixelarticons/moon';
+import SunIcon from '~icons/pixelarticons/sun';
 
 import { Theme } from '@/constants/theme.constant';
+
+const themeIcons: Record<Theme, Component> = {
+  [Theme.LIGHT]: SunIcon,
+  [Theme.DARK]: MoonIcon,
+  [Theme.SYSTEM]: LaptopIcon
+};
 
 const colorMode = useColorMode();
 </script>
 
 <template>
   <UiDropdownMenu>
+    <!-- outside the Tooltip's root, or the menu anchors to the Tooltip's popper -->
     <UiDropdownMenuTrigger as-child>
-      <UiButton variant="ghost" size="icon">
-        <SunIcon :size="18" class="scale-100 dark:scale-0" />
-        <MoonIcon :size="18" class="absolute scale-0 dark:scale-100" />
-        <span class="sr-only">{{ $t('nav.header.theme.button') }}</span>
-      </UiButton>
+      <SharedIconButton
+        :label="$t('nav.header.theme.button')"
+        class="lit-icon [--lit-icon-on:var(--signal)]"
+      >
+        <ClientOnly>
+          <component :is="themeIcons[colorMode.preference as Theme]" />
+
+          <!-- the server can't know a stored System preference, only the applied theme -->
+          <template #fallback>
+            <SunIcon class="dark:hidden" />
+            <MoonIcon class="hidden dark:block" />
+          </template>
+        </ClientOnly>
+      </SharedIconButton>
     </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="font-medium">
-      <UiDropdownMenuItem @click="colorMode.preference = Theme.LIGHT">
-        <SunIcon :size="16" />
-        <span>{{ $t('nav.header.theme.light') }}</span>
-      </UiDropdownMenuItem>
-
-      <UiDropdownMenuItem @click="colorMode.preference = Theme.DARK">
-        <MoonIcon :size="16" />
-        <span>{{ $t('nav.header.theme.dark') }}</span>
-      </UiDropdownMenuItem>
-
-      <UiDropdownMenuItem @click="colorMode.preference = Theme.SYSTEM">
-        <LaptopMinimalIcon :size="16" />
-        <span>{{ $t('nav.header.theme.system') }}</span>
-      </UiDropdownMenuItem>
+    <UiDropdownMenuContent align="end" class="w-40">
+      <UiDropdownMenuRadioGroup v-model="colorMode.preference">
+        <UiDropdownMenuRadioItem
+          v-for="(icon, theme) in themeIcons"
+          :key="theme"
+          :value="theme"
+        >
+          <component :is="icon" />
+          <span>{{ $t(`nav.header.theme.${theme}`) }}</span>
+        </UiDropdownMenuRadioItem>
+      </UiDropdownMenuRadioGroup>
     </UiDropdownMenuContent>
   </UiDropdownMenu>
 </template>

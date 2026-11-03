@@ -20,6 +20,10 @@ _Avoid_: short path, alias, name, key
 A Slug kept for skuz.link's own pages. No Link can use it, and it never redirects.
 _Avoid_: blocked slug, forbidden slug
 
+**Slug mark**:
+A small pixel picture drawn from a Slug, which helps tell Links apart at a glance. It follows the Slug, so changing the Slug changes the mark, and two Slugs can share one.
+_Avoid_: identicon, avatar
+
 **Short URL**:
 The address people share: `skuz.link/` followed by a Slug.
 _Avoid_: short link

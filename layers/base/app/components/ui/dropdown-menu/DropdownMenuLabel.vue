@@ -19,7 +19,10 @@ const forwardedProps = useForwardProps(delegatedProps);
     :data-inset="inset ? '' : undefined"
     v-bind="forwardedProps"
     :class="
-      cn('px-2 py-1.5 text-sm font-medium data-[inset]:pl-8', props.class)
+      cn(
+        'type-small truncate px-2 py-[7px] font-semibold data-[inset]:pl-8',
+        props.class
+      )
     "
   >
     <slot />

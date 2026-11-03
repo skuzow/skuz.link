@@ -1,5 +1,10 @@
 import { toast } from 'vue-sonner';
 
+import {
+  AuthProvider,
+  authProviderNameMap
+} from '#layers/auth/app/constants/auth.constant';
+
 export const useAuthProviders = () => {
   const localePath = useLocalePath();
   const { t: $t } = useI18n();
@@ -22,7 +27,7 @@ export const useAuthProviders = () => {
 
     isLoadingWithGoogle.value = false;
 
-    if (error) showErrorToast('Google', error.message);
+    if (error) showErrorToast(AuthProvider.GOOGLE, error.message);
   };
 
   const loginWithGithub = async () => {
@@ -37,11 +42,11 @@ export const useAuthProviders = () => {
 
     isLoadingWithGithub.value = false;
 
-    if (error) showErrorToast('Github', error.message);
+    if (error) showErrorToast(AuthProvider.GITHUB, error.message);
   };
 
-  const showErrorToast = (provider: string, description?: string) => {
-    toast.error(`${$t('toast.auth.error')} ${provider}`, {
+  const showErrorToast = (provider: AuthProvider, description?: string) => {
+    toast.error(`${$t('toast.auth.error')} ${authProviderNameMap[provider]}`, {
       description
     });
   };

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { PlusIcon, SearchIcon } from '@lucide/vue';
+import PlusIcon from '~icons/pixelarticons/plus';
+import SearchIcon from '~icons/pixelarticons/search';
 
 const searchQuery = defineModel<string>('searchQuery', { required: true });
 
@@ -10,7 +11,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-    <UiInputGroup class="flex-1">
+    <UiInputGroup class="sm:flex-1">
       <UiInputGroupAddon>
         <SearchIcon />
       </UiInputGroupAddon>

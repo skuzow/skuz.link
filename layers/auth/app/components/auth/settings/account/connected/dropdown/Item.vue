@@ -3,6 +3,7 @@ import { toast } from 'vue-sonner';
 
 import {
   authProviderIconMap,
+  authProviderNameMap,
   type AuthProvider
 } from '#layers/auth/app/constants/auth.constant';
 
@@ -39,6 +40,6 @@ const clickConnectAccount = async (provider: AuthProvider) => {
   <UiDropdownMenuItem @click="clickConnectAccount(provider)">
     <IconLoader v-if="isLoadingConnectAccount" />
     <component :is="authProviderIconMap[provider]" v-else />
-    <span>{{ titleCase(provider) }}</span>
+    <span>{{ authProviderNameMap[provider] }}</span>
   </UiDropdownMenuItem>
 </template>

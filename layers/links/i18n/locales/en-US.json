@@ -12,14 +12,13 @@
   "links": {
     "empty": {
       "title": "No links yet",
-      "description": "Create your first short link to start sharing.",
+      "description": "Create your first link to start sharing.",
       "button": "Create link"
     },
     "search": {
       "placeholder": "Search by slug",
       "empty": {
-        "title": "No links found",
-        "description": "Try a different slug."
+        "title": "No links found"
       }
     },
     "create": {
@@ -37,7 +36,11 @@
     },
     "copy": "Copy",
     "actions": "Link actions",
-    "clicks": "{n} clicks"
+    "card": {
+      "label": "Link",
+      "clicks": "Clicks",
+      "created": "Created"
+    }
   },
   "alert": {
     "links": {

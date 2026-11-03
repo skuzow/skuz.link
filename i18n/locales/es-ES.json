@@ -3,6 +3,7 @@
     "home": "Inicio",
     "header": {
       "user": {
+        "menu": "Menú de usuario",
         "links": "Links",
         "logout": "Cerrar sesión"
       },
@@ -29,7 +30,8 @@
       "second": "amplifica tu alcance."
     },
     "subline": "Acortador de URLs simple, rápido y fiable. Toma el control de cada enlace que compartes.",
-    "cta": "Empezar"
+    "cta": "Empezar",
+    "example": "Ejemplo"
   },
   "error": {
     "notFound": {

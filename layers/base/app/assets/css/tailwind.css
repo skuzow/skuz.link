@@ -7,23 +7,70 @@
 
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist[wght].woff2') format('woff2');
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
   font-weight: 400 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist Pixel';
+  src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
+  font-weight: 400;
   font-display: swap;
   font-style: normal;
 }
 
 @theme {
   --font-sans: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-pixel: 'Geist Pixel', ui-monospace, monospace;
+  --animate-pixel-step: pixel-step 0.6s steps(1) infinite;
+  --animate-skeleton-blink: skeleton-blink 1.2s steps(1) infinite;
+  --animate-cursor-blink: cursor-blink 1.06s steps(1) infinite;
+
+  @keyframes pixel-step {
+    0% {
+      opacity: 1;
+    }
+    33%,
+    100% {
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes skeleton-blink {
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes cursor-blink {
+    50% {
+      opacity: 0;
+    }
+  }
 }
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -31,99 +78,472 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-edge: var(--primary-edge);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-edge: var(--secondary-edge);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-faint-foreground: var(--faint-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-signal: var(--signal);
+  --color-signal-wash: var(--signal-wash);
   --color-destructive: var(--destructive);
+  --color-destructive-edge: var(--destructive-edge);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-scrim: var(--scrim);
+  --color-hue-lime: var(--hue-lime);
+  --color-hue-coral: var(--hue-coral);
+  --color-hue-mint: var(--hue-mint);
+  --color-hue-bone: var(--hue-bone);
+  --color-hue-violet: var(--hue-violet);
+  --color-hue-pink: var(--hue-pink);
+  --color-hue-blue: var(--hue-blue);
+  --color-hue-gold: var(--hue-gold);
+  --color-hue-foreground: var(--hue-foreground);
+  --spacing-control-sm: var(--control-sm);
+  --spacing-control-md: var(--control-md);
+  --spacing-control-lg: var(--control-lg);
+  --spacing-edge-depth: var(--edge-depth);
+  --spacing-chamfer: var(--chamfer);
+  --spacing-led-size: var(--led-size);
+  --spacing-pixel-cell: var(--pixel-cell);
+  --spacing-container: var(--container);
+  --spacing-measure: var(--measure);
+  /* not --shadow-popover in the blocks below: it would reference itself here */
+  --shadow-popover: var(--popover-shadow);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0;
+  --type-status-size: 96px;
+  --control-sm: 32px;
+  --control-md: 40px;
+  --control-lg: 48px;
+  --edge-depth: 4px;
+  --chamfer: 3px;
+  --led-size: 6px;
+  --pixel-cell: 7px;
+  --container: 1152px;
+  --measure: 65ch;
+  --background: #f6f5f1;
+  --foreground: #17171a;
+  --card: #fdfcf9;
+  --card-foreground: #17171a;
+  --popover: #ffffff;
+  --popover-foreground: #17171a;
+  --primary: #4fd8ff;
+  --primary-hover: #7ee3ff;
+  --primary-edge: #1a86a6;
+  --primary-foreground: #0a0a0b;
+  --secondary: #ecebe5;
+  --secondary-edge: #c9c7bd;
+  --secondary-foreground: #17171a;
+  --muted: #ecebe5;
+  --muted-foreground: #57575e;
+  --faint-foreground: #6b6b72;
+  --accent: #e3e1d9;
+  --accent-foreground: #17171a;
+  --signal: #006d8c;
+  --signal-wash: #4fd8ff33;
+  --destructive: #c42c14;
+  --destructive-edge: #8a1c0a;
+  --destructive-foreground: #ffffff;
+  --success: #12763a;
+  --border: #0000001a;
+  --border-strong: #00000029;
+  --input: #85857f;
+  --ring: #006d8c;
+  --scrim: #17171a66;
+  --hue-lime: #4f7a00;
+  --hue-coral: #c4431f;
+  --hue-mint: #007f55;
+  --hue-bone: #4a4a52;
+  --hue-violet: #6d4ad9;
+  --hue-pink: #c2246a;
+  --hue-blue: #2b5fd9;
+  --hue-gold: #8a6a00;
+  --hue-foreground: #ffffff;
+  --popover-shadow: 0 8px 24px #17171a1f;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0a0a0b;
+  --foreground: #f2f2ee;
+  --card: #111113;
+  --card-foreground: #f2f2ee;
+  --popover: #19191c;
+  --popover-foreground: #f2f2ee;
+  --primary: #4fd8ff;
+  --primary-hover: #7ee3ff;
+  --primary-edge: #1a86a6;
+  --primary-foreground: #0a0a0b;
+  --secondary: #19191c;
+  --secondary-edge: #3a3a44;
+  --secondary-foreground: #f2f2ee;
+  --muted: #19191c;
+  --muted-foreground: #a3a3a8;
+  --faint-foreground: #85858c;
+  --accent: #222226;
+  --accent-foreground: #f2f2ee;
+  --signal: #4fd8ff;
+  --signal-wash: #4fd8ff14;
+  --destructive: #ff6a4a;
+  --destructive-edge: #b3401f;
+  --destructive-foreground: #0a0a0b;
+  --success: #4ade80;
+  --border: #ffffff17;
+  --border-strong: #ffffff29;
+  --input: #75757c;
+  --ring: #4fd8ff;
+  --scrim: #000000b3;
+  --hue-lime: #b8f34a;
+  --hue-coral: #ff7a59;
+  --hue-mint: #43e5a0;
+  --hue-bone: #e4e4dc;
+  --hue-violet: #a78bfa;
+  --hue-pink: #ff5c9e;
+  --hue-blue: #6c97ff;
+  --hue-gold: #ffd23f;
+  --hue-foreground: #0a0a0b;
+  --popover-shadow: 0 8px 24px #00000066;
+}
+
+/* not text-*: cn would drop an unknown text-* class beside a text colour */
+@utility type-display {
+  font-family: var(--font-sans);
+  font-size: 60px;
+  line-height: 60px;
+  font-weight: 600;
+  letter-spacing: -1.8px;
+}
+
+@utility type-display-sm {
+  font-family: var(--font-sans);
+  font-size: 36px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -1.08px;
+}
+
+@utility type-title {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.84px;
+}
+
+@utility type-heading {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.48px;
+}
+
+@utility type-subtitle {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.27px;
+}
+
+@utility type-lead {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 400;
+}
+
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+@utility type-small {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+}
+
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+
+@utility type-plate {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 500;
+}
+
+@utility type-code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+@utility type-eyebrow {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 400;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+}
+
+@utility type-control {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 400;
+  letter-spacing: 0.52px;
+  text-transform: uppercase;
+}
+
+@media (width < 640px) {
+  :root {
+    --type-status-size: 72px;
+  }
+}
+
+@utility type-status {
+  font-family: var(--font-pixel);
+  font-size: var(--type-status-size);
+  line-height: var(--type-status-size);
+  font-weight: 400;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+}
+
+@utility type-chip {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  line-height: 11px;
+  font-weight: 400;
+  letter-spacing: 0.66px;
+  text-transform: uppercase;
+}
+
+/* drop the cut on focus, because it would cut the outline off */
+@utility chamfer {
+  clip-path: polygon(
+    var(--chamfer) 0,
+    calc(100% - var(--chamfer)) 0,
+    100% var(--chamfer),
+    100% calc(100% - var(--chamfer)),
+    calc(100% - var(--chamfer)) 100%,
+    var(--chamfer) 100%,
+    0 calc(100% - var(--chamfer)),
+    0 var(--chamfer)
+  );
+
+  &:focus-visible {
+    clip-path: none;
+  }
+}
+
+/* an outline has no fill to carry the cut, so close each corner with a diagonal */
+@utility chamfer-lines {
+  --cut-near: calc(var(--chamfer) * 0.7071);
+  --cut-far: calc(var(--cut-near) + 1px);
+  --cut-size: calc(var(--chamfer) + 2px);
+  --cut-stops:
+    transparent var(--cut-near), var(--cut-edge) var(--cut-near) var(--cut-far),
+    transparent var(--cut-far);
+  background:
+    linear-gradient(135deg, var(--cut-stops)) top left / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(225deg, var(--cut-stops)) top right / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(315deg, var(--cut-stops)) bottom right / var(--cut-size)
+      var(--cut-size) no-repeat border-box,
+    linear-gradient(45deg, var(--cut-stops)) bottom left / var(--cut-size)
+      var(--cut-size) no-repeat border-box;
+}
+
+/* the artifact's LegalDocument: prose takes its colors from the tokens, in both themes */
+@utility legal-prose {
+  /* doubled, because prose sets these too and comes later in the sheet */
+  &.prose {
+    --tw-prose-body: var(--muted-foreground);
+    --tw-prose-headings: var(--foreground);
+    --tw-prose-links: var(--foreground);
+    --tw-prose-bold: var(--foreground);
+    --tw-prose-code: var(--foreground);
+    --tw-prose-bullets: var(--faint-foreground);
+    --tw-prose-counters: var(--faint-foreground);
+    --tw-prose-th-borders: var(--border-strong);
+    --tw-prose-td-borders: var(--border);
+    line-height: 26px;
+  }
+
+  & p {
+    margin: 0 0 --spacing(4);
+  }
+
+  /* the sticky header is 64px tall, so an anchor must clear it */
+  & h2,
+  & h3 {
+    scroll-margin-top: --spacing(20);
+  }
+
+  & h2 {
+    @apply type-heading;
+    margin: --spacing(8) 0 --spacing(4);
+    padding-top: --spacing(6);
+    border-top: 1px solid var(--border);
+  }
+
+  /* the section number, split off by the heading rule in nuxt.config.ts */
+  & h2 > span {
+    @apply type-eyebrow;
+    display: block;
+    margin-bottom: --spacing(3);
+    color: var(--signal);
+  }
+
+  & h2 > span > span {
+    color: var(--faint-foreground);
+  }
+
+  & h3 {
+    margin: --spacing(6) 0 --spacing(2);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  & a {
+    font-weight: 400;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: color 120ms;
+  }
+
+  & a:hover {
+    color: var(--signal);
+  }
+
+  & a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  & code {
+    font: 400 13px/20px var(--font-mono);
+  }
+
+  & code::before,
+  & code::after {
+    content: none;
+  }
+
+  & table {
+    margin: 0 0 --spacing(4);
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  & th {
+    @apply type-chip;
+    /* chip's 11px would stack a wrapped header's lines on each other */
+    line-height: 16px;
+    color: var(--faint-foreground);
+  }
+
+  & th,
+  & td {
+    padding: --spacing(2) --spacing(3) --spacing(2) 0;
+  }
+
+  & td {
+    vertical-align: top;
+  }
+
+  /* long cookie names and Spanish headers would push a phone screen sideways */
+  & th,
+  & td code {
+    overflow-wrap: anywhere;
+  }
+
+  /* a long name would stack in fragments beside columns of whole words */
+  & td:first-child:has(> code) {
+    min-width: --spacing(24);
+  }
+}
+
+/* four columns of whole words don't fit the narrowest phones */
+@media (width < 375px) {
+  .legal-prose td {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* only pixel icons carry shape-rendering: the official logos never light */
+/* data-lit lights what isn't an icon, like a language code */
+@utility lit-icon {
+  & svg[shape-rendering],
+  & [data-lit] {
+    color: var(--lit-icon-rest, currentColor);
+    transition:
+      color 120ms,
+      filter 120ms;
+  }
+
+  &:hover svg[shape-rendering],
+  &:hover [data-lit],
+  &:focus-visible svg[shape-rendering],
+  &:focus-visible [data-lit],
+  &[data-highlighted] svg[shape-rendering],
+  &[data-highlighted] [data-lit] {
+    color: var(--lit-icon-on, currentColor);
+    filter: drop-shadow(0 0 4px var(--lit-icon-on, currentColor));
+  }
+}
+
+/* the glow turns off in light */
+@utility led {
+  display: inline-block;
+  flex: none;
+  width: var(--led-size);
+  height: var(--led-size);
+  background: currentColor;
+
+  @variant dark {
+    box-shadow: 0 0 8px currentColor;
+  }
+}
+
+/* a Link's own hue in place of cyan: its portalled surfaces need --link-hue too */
+@utility link-hue {
+  --signal: var(--link-hue);
+  --ring: var(--link-hue);
+  --primary: var(--link-hue);
+  --primary-foreground: var(--hue-foreground);
+  --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #000);
+  --primary-edge: color-mix(in srgb, var(--link-hue) 60%, #000);
+
+  @variant dark {
+    --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #fff);
+  }
 }
 
 @layer base {
@@ -131,6 +551,20 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+  /* the browser's own clear X isn't pixel art: this is pixelarticons' close */
+  input[type='search']::-webkit-search-cancel-button {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    background-color: var(--faint-foreground);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Cpath d='M7 19H5v-2h2zm12 0h-2v-2h2zM9 15v2H7v-2zm8 2h-2v-2h2zm-6-2H9v-2h2zm4 0h-2v-2h2zm-2-2h-2v-2h2zm-2-2H9V9h2zm4 0h-2V9h2zM9 9H7V7h2zm8 0h-2V7h2zM7 7H5V5h2zm12 0h-2V5h2z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transition: background-color 120ms;
+  }
+  input[type='search']::-webkit-search-cancel-button:hover {
+    background-color: var(--signal);
   }
 }

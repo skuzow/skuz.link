@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { Theme, ThemeColor } from '@/constants/theme.constant';
 
+const { hideField = false } = defineProps<{ hideField?: boolean }>();
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { locale, locales } = useI18n();
 const colorMode = useColorMode();
@@ -15,22 +17,30 @@ const ogLocales: Record<LocaleCode, string> = {
 };
 
 const ogLocale = computed(() => ogLocales[locale.value as LocaleCode]);
+// the server can't see a first visit's system theme, so it renders the fallback
 const themeColor = computed(() =>
-  colorMode.value === Theme.DARK ? ThemeColor.DARK : ThemeColor.LIGHT
+  colorMode.value === Theme.LIGHT ? ThemeColor.LIGHT : ThemeColor.DARK
 );
-const isLanding = computed(() => route.path === localePath('/'));
+const fieldVariant = computed(() => {
+  if (hideField) return undefined;
+  if (route.path === localePath('/')) return 'landing';
+  if (route.path === localePath('/login')) return 'login';
+
+  return undefined;
+});
 
 if (import.meta.server) {
   useHead({
-    link: [
-      {
+    // Pixel labels sit on Buttons above the fold, and Geist Mono loads when needed
+    link: ['/fonts/Geist-Variable.woff2', '/fonts/GeistPixel-Square.woff2'].map(
+      (href) => ({
         rel: 'preload',
-        href: '/fonts/Geist[wght].woff2',
+        href,
         as: 'font',
         type: 'font/woff2',
         crossorigin: ''
-      }
-    ]
+      })
+    )
   });
 }
 
@@ -74,13 +84,16 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
-    <LandingGridBackground v-if="isLanding" />
+  <UiTooltipProvider>
+    <!-- here, not in app.vue: Nuxt renders error.vue in place of the app -->
+    <div class="relative grid min-h-dvh grid-rows-[auto_1fr_auto] gap-2">
+      <PixelField v-if="fieldVariant" :variant="fieldVariant" />
 
-    <NavHeader :is-landing="isLanding" />
-    <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
-      <slot />
-    </main>
-    <NavFooter />
-  </div>
+      <NavHeader />
+      <main class="mx-auto mb-4 w-full max-w-6xl min-w-0 p-4 md:my-11 md:px-8">
+        <slot />
+      </main>
+      <NavFooter />
+    </div>
+  </UiTooltipProvider>
 </template>

@@ -11,7 +11,23 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()]
   },
 
-  modules: ['shadcn-nuxt'],
+  modules: [
+    'shadcn-nuxt',
+    [
+      'unplugin-icons/nuxt',
+      {
+        iconCustomizer: (
+          _collection: string,
+          _icon: string,
+          props: Record<string, string>
+        ) => {
+          props.width = '16';
+          props.height = '16';
+          props['shape-rendering'] = 'crispEdges';
+        }
+      }
+    ]
+  ],
 
   shadcn: {
     prefix: 'Ui',
