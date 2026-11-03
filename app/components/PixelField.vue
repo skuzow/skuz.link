@@ -83,7 +83,7 @@ const rebuild = () => {
   if (!width || !height) return;
 
   const style = getComputedStyle(element);
-  const cellSize = parseFloat(style.getPropertyValue('--pixel-cell'));
+  const cellSize = Number.parseFloat(style.getPropertyValue('--pixel-cell'));
   element.width = Math.ceil(width / cellSize);
   element.height = Math.ceil(height / cellSize);
   // resizing a canvas resets its context, so the colour goes on after
