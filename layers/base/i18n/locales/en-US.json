@@ -1,6 +1,7 @@
 {
   "description": "Url shortener",
   "cancel": "Cancel",
+  "close": "Close",
   "confirm": "Confirm",
   "save": "Save changes",
   "form": {

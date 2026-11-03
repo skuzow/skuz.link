@@ -10,7 +10,7 @@ defineOptions({ inheritAttrs: false });
 </script>
 
 <template>
-  <!-- needs the root layout's UiTooltipProvider, so a Dialog outside the layout can't use it yet -->
+  <!-- needs a UiTooltipProvider: the root layout's, or its own outside the layout, as Settings has -->
   <!-- a mouse user's focus coming back from a menu shouldn't open the tooltip -->
   <UiTooltip ignore-non-keyboard-focus>
     <UiTooltipTrigger as-child>

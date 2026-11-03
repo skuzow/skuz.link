@@ -20,12 +20,15 @@ const availableProviders: ComputedRef<AuthProvider[]> = computed(() =>
 <template>
   <UiDropdownMenu>
     <UiDropdownMenuTrigger as-child>
-      <UiButton variant="ghost">
+      <UiButton variant="outline">
         <PlugIcon />
         {{ $t('auth.settings.account.connected.connect') }}
       </UiButton>
     </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="w-44 font-medium">
+    <UiDropdownMenuContent
+      align="start"
+      class="min-w-(--reka-dropdown-menu-trigger-width)"
+    >
       <template
         v-for="availableProvider in availableProviders"
         :key="availableProvider"

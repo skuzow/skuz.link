@@ -3,7 +3,6 @@ import type { Session } from 'better-auth/types';
 import { toast } from 'vue-sonner';
 import Calendar2Icon from '~icons/pixelarticons/calendar-2';
 import LaptopIcon from '~icons/pixelarticons/laptop';
-import UserIcon from '~icons/pixelarticons/user';
 import UserXIcon from '~icons/pixelarticons/user-x';
 
 interface Props {
@@ -49,34 +48,24 @@ const clickRevokeSession = async () => {
 </script>
 
 <template>
-  <UiCard
-    class="flex flex-col justify-between gap-x-6 gap-y-3 p-3 sm:flex-row sm:items-center sm:gap-y-0"
-  >
-    <div>
-      <p class="flex items-center gap-x-2">
-        <LaptopIcon />
-        {{ userAgent }}
-      </p>
+  <AuthSettingsRow>
+    <LaptopIcon />
+    {{ userAgent }}
 
-      <div class="flex flex-row gap-x-3">
-        <p class="flex items-center gap-x-2">
-          <Calendar2Icon />
-          <SharedDate :date="session.expiresAt" />
-        </p>
+    <template #details>
+      <span class="text-muted-foreground flex items-center gap-x-2">
+        <Calendar2Icon />
+        <SharedDate :date="session.expiresAt" />
+      </span>
 
-        <p
-          v-if="authSession?.token === session.token"
-          class="flex items-center gap-x-2"
-        >
-          <UserIcon />
-          {{ $t('auth.settings.sessions.current') }}
-        </p>
-      </div>
-    </div>
+      <UiBadge v-if="authSession?.token === session.token">
+        {{ $t('auth.settings.sessions.current') }}
+      </UiBadge>
+    </template>
 
-    <div class="text-end">
+    <template #action>
       <UiButton
-        class="text-destructive hover:text-destructive"
+        class="text-destructive"
         variant="ghost"
         :loading="isLoadingRevokeSession"
         @click="clickRevokeSession"
@@ -84,6 +73,6 @@ const clickRevokeSession = async () => {
         <UserXIcon />
         {{ $t('auth.settings.sessions.button') }}
       </UiButton>
-    </div>
-  </UiCard>
+    </template>
+  </AuthSettingsRow>
 </template>

@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import CheckIcon from '~icons/pixelarticons/check';
+import CloseIcon from '~icons/pixelarticons/close';
+
 import { AuthFormInput } from '#layers/auth/app/constants/form.constant';
 
 defineEmits(['close-update-profile']);
@@ -10,41 +13,42 @@ const { isLoadingUpdateProfile, updateProfile, closeUpdateProfile } =
 </script>
 
 <template>
-  <UiCard>
-    <UiCardContent class="flex flex-col gap-6 sm:flex-row">
-      <UserAvatar
-        size="base"
-        :width="64"
-        :height="64"
-        loading="eager"
-        :user="authUser"
-      />
+  <form class="flex items-start gap-3" @submit="updateProfile">
+    <UserAvatar
+      class="bg-accent text-accent-foreground"
+      size="sm"
+      :width="40"
+      :height="40"
+      loading="eager"
+      :user="authUser"
+    />
 
-      <form class="w-full space-y-6" @submit="updateProfile">
-        <UiFormField v-slot="{ componentField }" :name="AuthFormInput.NAME">
-          <UiFormItem>
-            <UiFormLabel>{{ $t('form.name') }}</UiFormLabel>
-            <UiFormControl>
-              <UiInput
-                type="text"
-                :placeholder="authUser?.name"
-                v-bind="componentField"
-              />
-            </UiFormControl>
-            <UiFormMessage />
-          </UiFormItem>
-        </UiFormField>
+    <div class="flex min-w-0 flex-1 flex-col gap-6">
+      <UiFormField v-slot="{ componentField }" :name="AuthFormInput.NAME">
+        <UiFormItem>
+          <UiFormLabel>{{ $t('form.name') }}</UiFormLabel>
+          <UiFormControl>
+            <UiInput
+              type="text"
+              :placeholder="authUser?.name"
+              v-bind="componentField"
+            />
+          </UiFormControl>
+          <UiFormMessage />
+        </UiFormItem>
+      </UiFormField>
 
-        <div class="flex justify-end gap-x-2">
-          <UiButton variant="ghost" @click.prevent="closeUpdateProfile">
-            {{ $t('cancel') }}
-          </UiButton>
+      <UiDialogFooter>
+        <UiButton type="button" variant="secondary" @click="closeUpdateProfile">
+          <CloseIcon data-icon="inline-start" />
+          {{ $t('cancel') }}
+        </UiButton>
 
-          <UiButton type="submit" :loading="isLoadingUpdateProfile">
-            {{ $t('save') }}
-          </UiButton>
-        </div>
-      </form>
-    </UiCardContent>
-  </UiCard>
+        <UiButton type="submit" :loading="isLoadingUpdateProfile">
+          <CheckIcon data-icon="inline-start" />
+          {{ $t('save') }}
+        </UiButton>
+      </UiDialogFooter>
+    </div>
+  </form>
 </template>

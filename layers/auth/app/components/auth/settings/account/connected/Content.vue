@@ -21,7 +21,7 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
 
   <ul
     v-else-if="status === 'success' && accounts?.data"
-    class="flex flex-col gap-y-2 pt-1"
+    class="flex flex-col gap-y-2"
   >
     <li v-for="account in accounts.data" :key="account.id">
       <AuthSettingsAccountConnectedCard
@@ -33,7 +33,7 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
 
     <li
       v-if="accountProviders?.length !== AuthProviderValues.length"
-      class="text-end"
+      class="mt-1"
     >
       <AuthSettingsAccountConnectedDropdown
         :account-providers="accountProviders"

@@ -42,11 +42,7 @@ watch(open, (isOpen) => {
 
 <template>
   <UiDialog v-model:open="open">
-    <UiDialogContent
-      :show-close-button="false"
-      :class="{ 'link-hue': isEditing }"
-      :style="hueStyle"
-    >
+    <UiDialogContent :class="{ 'link-hue': isEditing }" :style="hueStyle">
       <UiDialogHeader>
         <UiDialogTitle>{{ title }}</UiDialogTitle>
         <UiDialogDescription>{{ description }}</UiDialogDescription>

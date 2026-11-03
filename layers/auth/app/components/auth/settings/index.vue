@@ -5,7 +5,10 @@ const { isOpen } = useAuthSettings();
 </script>
 
 <template>
-  <UiDialog v-if="isAuthenticated" v-model:open="isOpen">
-    <AuthSettingsContent />
-  </UiDialog>
+  <!-- its own provider: app.vue and error.vue mount Settings outside the layout -->
+  <UiTooltipProvider v-if="isAuthenticated">
+    <UiDialog v-model:open="isOpen">
+      <AuthSettingsContent />
+    </UiDialog>
+  </UiTooltipProvider>
 </template>

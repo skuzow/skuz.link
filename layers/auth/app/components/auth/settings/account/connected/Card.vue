@@ -58,32 +58,32 @@ const clickDisconnectAccount = async () => {
 </script>
 
 <template>
-  <UiCard class="flex flex-row items-center justify-between gap-6 p-3">
-    <div>
-      <p class="flex items-center gap-x-2">
-        <component
-          :is="authProviderIconMap[account.providerId]"
-          v-if="authProviderIconMap[account.providerId]"
-        />
-        <MailIcon v-else />
-        {{ accountProvider }}
-      </p>
+  <AuthSettingsRow>
+    <component
+      :is="authProviderIconMap[account.providerId]"
+      v-if="authProviderIconMap[account.providerId]"
+    />
+    <MailIcon v-else />
+    {{ accountProvider }}
 
-      <p class="flex items-center gap-x-2">
+    <template #details>
+      <span class="text-muted-foreground flex items-center gap-x-2">
         <CalendarIcon />
         <SharedDate :date="account.createdAt" />
-      </p>
-    </div>
+      </span>
+    </template>
 
-    <UiButton
-      class="text-destructive hover:text-destructive"
-      variant="ghost"
-      :disabled="length === 1"
-      :loading="isLoadingDisconnectAccount"
-      @click="clickDisconnectAccount"
-    >
-      <UnlinkIcon />
-      {{ $t('auth.settings.account.connected.disconnect') }}
-    </UiButton>
-  </UiCard>
+    <template #action>
+      <UiButton
+        class="text-destructive"
+        variant="ghost"
+        :disabled="length === 1"
+        :loading="isLoadingDisconnectAccount"
+        @click="clickDisconnectAccount"
+      >
+        <UnlinkIcon />
+        {{ $t('auth.settings.account.connected.disconnect') }}
+      </UiButton>
+    </template>
+  </AuthSettingsRow>
 </template>

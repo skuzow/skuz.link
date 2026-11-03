@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { toast } from 'vue-sonner';
+import UserXIcon from '~icons/pixelarticons/user-x';
 
 const { t: $t } = useI18n();
 
@@ -40,13 +41,13 @@ const deleteAccount = async () => {
 </script>
 
 <template>
-  <UiAccordionItem value="delete-account" class="border-b-transparent">
+  <UiAccordionItem value="delete-account">
     <UiAccordionTrigger>
-      <h3 class="font-bold">
-        {{ $t('auth.settings.account.delete.title') }}
-      </h3>
+      {{ $t('auth.settings.account.delete.title') }}
     </UiAccordionTrigger>
-    <UiAccordionContent class="flex items-center justify-between pl-2.5">
+    <UiAccordionContent
+      class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
       <p>{{ $t('auth.settings.account.delete.description') }}</p>
 
       <UiButton
@@ -54,6 +55,7 @@ const deleteAccount = async () => {
         :loading="isLoadingDeleteAccount"
         @click="deleteAccount"
       >
+        <UserXIcon />
         {{ $t('auth.settings.account.delete.title') }}
       </UiButton>
     </UiAccordionContent>
