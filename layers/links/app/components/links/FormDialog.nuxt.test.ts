@@ -84,6 +84,12 @@ describe('LinksFormDialog', () => {
     expect(submitButton()?.textContent?.trim()).toBe('Save changes');
   });
 
+  it("keeps the browser's validation bubble off its own messages", async () => {
+    await mountDialog();
+
+    expect(document.body.querySelector('form')?.noValidate).toBe(true);
+  });
+
   it('has no hue of its own when creating', async () => {
     await mountDialog();
 

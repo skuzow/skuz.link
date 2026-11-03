@@ -48,7 +48,7 @@ watch(open, (isOpen) => {
         <UiDialogDescription>{{ description }}</UiDialogDescription>
       </UiDialogHeader>
 
-      <form class="flex flex-col gap-6" @submit="submit">
+      <form class="flex flex-col gap-6" novalidate @submit="submit">
         <UiFormField
           v-slot="{ componentField }"
           :name="LinkFormInput.SLUG"
