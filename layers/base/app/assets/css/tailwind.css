@@ -379,6 +379,108 @@
       var(--cut-size) no-repeat border-box;
 }
 
+/* the artifact's LegalDocument: prose takes its colors from the tokens, in both themes */
+@utility legal-prose {
+  /* doubled, because prose sets these too and comes later in the sheet */
+  &.prose {
+    --tw-prose-body: var(--muted-foreground);
+    --tw-prose-headings: var(--foreground);
+    --tw-prose-links: var(--foreground);
+    --tw-prose-bold: var(--foreground);
+    --tw-prose-code: var(--foreground);
+    --tw-prose-bullets: var(--faint-foreground);
+    --tw-prose-counters: var(--faint-foreground);
+    --tw-prose-th-borders: var(--border-strong);
+    --tw-prose-td-borders: var(--border);
+    line-height: 26px;
+  }
+
+  & p {
+    margin: 0 0 --spacing(4);
+  }
+
+  /* the sticky header is 64px tall, so an anchor must clear it */
+  & h2,
+  & h3 {
+    scroll-margin-top: --spacing(20);
+  }
+
+  & h2 {
+    @apply type-heading;
+    margin: --spacing(8) 0 --spacing(4);
+    padding-top: --spacing(6);
+    border-top: 1px solid var(--border);
+  }
+
+  /* the section number, split off by the heading rule in nuxt.config.ts */
+  & h2 > span {
+    @apply type-eyebrow;
+    display: block;
+    margin-bottom: --spacing(3);
+    color: var(--signal);
+  }
+
+  & h2 > span > span {
+    color: var(--faint-foreground);
+  }
+
+  & h3 {
+    margin: --spacing(6) 0 --spacing(2);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  & a {
+    font-weight: 400;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: color 120ms;
+  }
+
+  & a:hover {
+    color: var(--signal);
+  }
+
+  & a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  & code {
+    font: 400 13px/20px var(--font-mono);
+  }
+
+  & code::before,
+  & code::after {
+    content: none;
+  }
+
+  & table {
+    margin: 0 0 --spacing(4);
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  & th {
+    @apply type-chip;
+    /* chip's 11px would stack a wrapped header's lines on each other */
+    line-height: 16px;
+    color: var(--faint-foreground);
+  }
+
+  /* long cookie names and Spanish headers would push a phone screen sideways */
+  & th,
+  & td {
+    padding: --spacing(2) --spacing(3) --spacing(2) 0;
+    overflow-wrap: anywhere;
+  }
+
+  & td {
+    vertical-align: top;
+  }
+}
+
 /* only pixel icons carry shape-rendering: the official logos never light */
 /* data-lit lights what isn't an icon, like a language code */
 @utility lit-icon {

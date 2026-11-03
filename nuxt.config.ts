@@ -1,11 +1,13 @@
 import Markdown from 'unplugin-vue-markdown/vite';
 import { generateRuntimeConfig } from './layers/base/server/platform/runtimeConfig';
 
+const sectionNumber = /^(\d+)\.\s*/;
+
 // "## 1. Quién gestiona skuz.link" gets the id "quien-gestiona-skuz-link":
 // no section number, so links survive renumbering, and no accents to escape
 const slugifyHeading = (heading: string) =>
   heading
-    .replace(/^\d+\.\s*/, '')
+    .replace(sectionNumber, '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
@@ -70,8 +72,20 @@ export default defineNuxtConfig({
           md.core.ruler.push('heading_ids', (state) => {
             state.tokens.forEach((token, index) => {
               const inline = state.tokens[index + 1];
-              if (token.type === 'heading_open' && inline)
-                token.attrSet('id', slugifyHeading(inline.content));
+              if (token.type !== 'heading_open' || !inline) return;
+
+              token.attrSet('id', slugifyHeading(inline.content));
+
+              // "## 2. What I process" gets its number as a label, "/ 02"
+              const number = sectionNumber.exec(inline.content)?.[1];
+              const text = inline.children?.[0];
+              if (token.tag !== 'h2' || !number || !text) return;
+
+              text.content = text.content.replace(sectionNumber, '');
+
+              const label = new state.Token('html_inline', '', 0);
+              label.content = `<span><span aria-hidden="true">/</span> ${number.padStart(2, '0')}</span>`;
+              inline.children?.unshift(label);
             });
           });
         }

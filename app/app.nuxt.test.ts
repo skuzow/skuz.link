@@ -217,7 +217,7 @@ describe('legal notice', () => {
       'This is a translation. If it differs from the Spanish version, the Spanish one prevails.'
     );
     expect(document.getElementById('who-runs-skuz-link')?.textContent).toBe(
-      '1. Who runs skuz.link'
+      '/ 01Who runs skuz.link'
     );
   });
 
@@ -230,7 +230,7 @@ describe('legal notice', () => {
     expect(mainText()).not.toContain('This is a translation.');
     expect(
       document.getElementById('quien-gestiona-skuz-link')?.textContent
-    ).toBe('1. Quién gestiona skuz.link');
+    ).toBe('/ 01Quién gestiona skuz.link');
   });
 
   it('offers the Spanish path from the language menu at its English path', async () => {
@@ -311,6 +311,35 @@ describe('terms of use', () => {
 });
 
 describe('privacy policy', () => {
+  it('labels a section with its number and keeps its anchor', async () => {
+    await mountApp('/privacy');
+
+    const section = document.getElementById('what-i-process-and-why');
+
+    expect(section?.tagName).toBe('H2');
+    expect(section?.textContent).toBe('/ 02What I process and why');
+    expect(section?.querySelector('[aria-hidden="true"]')?.textContent).toBe(
+      '/'
+    );
+  });
+
+  it('labels a Spanish section with its number and keeps its anchor', async () => {
+    await mountApp('/es/privacidad');
+
+    expect(
+      document.getElementById('que-datos-trato-y-para-que')?.textContent
+    ).toBe('/ 02Qué datos trato y para qué');
+  });
+
+  it('gives a subsection its anchor and no number', async () => {
+    await mountApp('/privacy');
+
+    const subsection = document.getElementById('anyone-who-opens-skuz-link');
+
+    expect(subsection?.tagName).toBe('H3');
+    expect(subsection?.textContent).toBe('Anyone who opens skuz.link');
+  });
+
   it('shows the English Privacy policy with the translation line at its English path', async () => {
     await mountApp('/privacy');
 

@@ -15,13 +15,17 @@ const { locale } = useI18n();
 </script>
 
 <template>
-  <article class="mx-auto max-w-prose">
-    <header class="mb-10 space-y-2">
-      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+  <article class="max-w-measure mx-auto">
+    <header class="mb-8 flex flex-col gap-3">
+      <h1 class="type-display-sm">
         {{ title }}
       </h1>
 
-      <i18n-t keypath="legal.updated" tag="p" class="text-muted-foreground">
+      <i18n-t
+        keypath="legal.updated"
+        tag="p"
+        class="type-chip text-faint-foreground"
+      >
         <template #date>
           <!-- UTC, or a reader west of it would see the day before -->
           <time :datetime="updated">
@@ -31,13 +35,12 @@ const { locale } = useI18n();
       </i18n-t>
 
       <!-- the Spanish text prevails, so every other language says so -->
-      <p v-if="locale !== 'es'" class="text-muted-foreground text-sm">
+      <p v-if="locale !== 'es'" class="type-small text-muted-foreground">
         {{ $t('legal.translation') }}
       </p>
     </header>
 
-    <!-- long cookie names in table cells would push a phone screen sideways -->
-    <div class="prose prose-neutral dark:prose-invert [&_td]:wrap-anywhere">
+    <div class="prose legal-prose">
       <component :is="bodies[locale]" />
     </div>
   </article>
