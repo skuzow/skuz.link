@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { Theme, ThemeColor } from '@/constants/theme.constant';
 
+const { hideField = false } = defineProps<{ hideField?: boolean }>();
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { locale, locales } = useI18n();
 const colorMode = useColorMode();
@@ -20,6 +22,7 @@ const themeColor = computed(() =>
   colorMode.value === Theme.LIGHT ? ThemeColor.LIGHT : ThemeColor.DARK
 );
 const fieldVariant = computed(() => {
+  if (hideField) return undefined;
   if (route.path === localePath('/')) return 'landing';
   if (route.path === localePath('/login')) return 'login';
 
@@ -87,7 +90,7 @@ useSeoMeta({
       <PixelField v-if="fieldVariant" :variant="fieldVariant" />
 
       <NavHeader />
-      <main class="mx-auto mb-4 w-full max-w-6xl p-4 md:my-11 md:px-8">
+      <main class="mx-auto mb-4 w-full max-w-6xl min-w-0 p-4 md:my-11 md:px-8">
         <slot />
       </main>
       <NavFooter />

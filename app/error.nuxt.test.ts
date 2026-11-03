@@ -98,6 +98,54 @@ describe('error page', () => {
     expect(wrapper.text()).not.toContain('Cannot read db of undefined');
   });
 
+  it('shows the failed address without its query at an unprefixed path', async () => {
+    const wrapper = await mountErrorPage(404, '/gihub?utm=mail');
+
+    expect(wrapper.find('main').text()).toContain('skuz.link/gihub');
+    expect(wrapper.text()).not.toContain('utm=mail');
+  });
+
+  it('shows the failed address with its locale prefix at a Spanish path', async () => {
+    const wrapper = await mountErrorPage(404, '/es/gihub?utm=mail');
+
+    expect(wrapper.find('main').text()).toContain('skuz.link/es/gihub');
+    expect(wrapper.text()).not.toContain('utm=mail');
+  });
+
+  it('shows no address on a crash', async () => {
+    const wrapper = await mountErrorPage(500, '/crashed?utm=mail');
+
+    expect(wrapper.find('main').text()).not.toContain('skuz.link/');
+    expect(wrapper.find('main').text()).not.toContain('crashed');
+  });
+
+  it('shows no PixelField on a crash at the routes that have one', async () => {
+    const atLanding = await mountErrorPage(500, '/');
+    expect(atLanding.find('canvas').exists()).toBe(false);
+    mounted?.unmount();
+
+    const atLogin = await mountErrorPage(500, '/login');
+    expect(atLogin.find('canvas').exists()).toBe(false);
+  });
+
+  it('escapes markup in the failed address', async () => {
+    const wrapper = await mountErrorPage(404, '/<img src=x>');
+
+    expect(wrapper.find('main img').exists()).toBe(false);
+  });
+
+  it('offers no Copy Button for the failed address', async () => {
+    const wrapper = await mountErrorPage(404, '/gihub');
+
+    expect(wrapper.find('main').text()).not.toContain('Copy');
+  });
+
+  it('never shows the message of a not-found error', async () => {
+    const wrapper = await mountErrorPage(404, '/gihub', 'Page not found: /x');
+
+    expect(wrapper.text()).not.toContain('Page not found: /x');
+  });
+
   it('shows the language and theme Tooltips, because the layout provides them here too', async () => {
     await mountErrorPage(404, '/typo');
     expect(await menuTooltip('Toggle language')).toBe('Toggle language');
