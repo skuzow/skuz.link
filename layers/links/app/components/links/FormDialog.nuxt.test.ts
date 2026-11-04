@@ -13,18 +13,32 @@ vi.mock('vue-sonner', async (importOriginal) => ({
 
 const createLink = vi.fn(async (event) => makeLink(await readBody(event)));
 const updateLink = vi.fn(async (event) => makeLink(await readBody(event)));
+const updateOtherLink = vi.fn(async (event) => makeLink(await readBody(event)));
 
 registerEndpoint('/api/links', { method: 'POST', handler: createLink });
 registerEndpoint('/api/links/link-1', { method: 'PUT', handler: updateLink });
+registerEndpoint('/api/links/link-2', {
+  method: 'PUT',
+  handler: updateOtherLink
+});
 
-const mountDialog = async (link: ReturnType<typeof makeLink> | null = null) => {
+const mountClosedDialog = async (
+  link: ReturnType<typeof makeLink> | null = null
+) => {
   const onSuccess = vi.fn();
+  const onUpdateOpen = vi.fn();
   const wrapper = await mountSuspended(LinksFormDialog, {
-    props: { open: false, link, onSuccess },
+    props: { open: false, link, onSuccess, 'onUpdate:open': onUpdateOpen },
     attachTo: document.body
   });
 
-  // the dialog only resets its fields when it opens
+  return { wrapper, onSuccess, onUpdateOpen };
+};
+
+const mountDialog = async (link: ReturnType<typeof makeLink> | null = null) => {
+  const { wrapper, onSuccess, onUpdateOpen } = await mountClosedDialog(link);
+
+  // the dialog only mounts its form when it opens
   await wrapper.setProps({ open: true });
   await flushPromises();
 
@@ -51,12 +65,29 @@ const mountDialog = async (link: ReturnType<typeof makeLink> | null = null) => {
   const input = (name: string) =>
     find<HTMLInputElement>(`input[name="${name}"]`).element;
 
-  return { wrapper, onSuccess, fill, submit, input };
+  return { wrapper, onSuccess, onUpdateOpen, fill, submit, input };
 };
 
 const dialogText = () => document.body.textContent ?? '';
 
 const submitButton = () => document.body.querySelector('button[type="submit"]');
+
+const formMessage = () =>
+  document.body.querySelector('[data-slot="form-message"]');
+
+const cancelButton = () =>
+  document.body.querySelector<HTMLButtonElement>('button[type="button"]');
+
+const pressEscape = () =>
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+const pressOutside = () =>
+  document.body
+    .querySelector('[data-slot="dialog-overlay"]')
+    ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+
+// longer than the 5ms vee-validate debounces its validation by
+const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
 
 const dialogHue = () =>
   document.body
@@ -82,6 +113,67 @@ describe('LinksFormDialog', () => {
     await mountDialog(makeLink({ id: 'link-1' }));
 
     expect(submitButton()?.textContent?.trim()).toBe('Save changes');
+  });
+
+  it.each([
+    ['creating', null],
+    ['editing', makeLink({ id: 'link-1' })]
+  ])('opens without validation errors when %s', async (_, link) => {
+    const { wrapper } = await mountClosedDialog(link);
+
+    // the page sits for a moment before anyone opens the dialog
+    await settle();
+    await wrapper.setProps({ open: true });
+
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(formMessage()).toBeNull();
+
+    await settle();
+
+    expect(formMessage()).toBeNull();
+  });
+
+  it('reopens without the errors and values of a failed submit', async () => {
+    const { wrapper, fill, submit, input } = await mountDialog();
+
+    await fill({ slug: 'Bad Slug!', redirectUrl: '' });
+    await submit();
+    await vi.waitFor(() => expect(formMessage()).not.toBeNull());
+
+    await wrapper.setProps({ open: false });
+    await settle();
+
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+
+    await wrapper.setProps({ open: true });
+
+    expect(formMessage()).toBeNull();
+
+    await settle();
+
+    expect(formMessage()).toBeNull();
+    expect(input('slug').value).toBe('');
+  });
+
+  it('edits the Link it reopens with', async () => {
+    const other = makeLink({ id: 'link-2', slug: 'other-slug' });
+    const { wrapper, fill, submit, input, onSuccess } = await mountDialog(
+      makeLink({ id: 'link-1', slug: 'old-slug' })
+    );
+
+    await wrapper.setProps({ open: false });
+    await settle();
+    await wrapper.setProps({ open: true, link: other });
+    await settle();
+
+    expect(input('slug').value).toBe('other-slug');
+
+    await fill({ slug: 'new-slug' });
+    await submit();
+
+    await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
+    expect(updateOtherLink).toHaveBeenCalledTimes(1);
+    expect(updateLink).not.toHaveBeenCalled();
   });
 
   it("keeps the browser's validation bubble off its own messages", async () => {
@@ -170,6 +262,41 @@ describe('LinksFormDialog', () => {
     await vi.waitFor(() =>
       expect(submitButton()?.hasAttribute('aria-busy')).toBe(false)
     );
+  });
+
+  it.each([
+    ['Escape', pressEscape],
+    ['a click outside', pressOutside]
+  ])('stays open on %s until the save finishes', async (_, dismiss) => {
+    let finishSaving = () => {};
+    createLink.mockImplementationOnce(async (event) => {
+      await new Promise<void>((resolve) => (finishSaving = resolve));
+
+      return makeLink(await readBody(event));
+    });
+    const { fill, submit, onSuccess, onUpdateOpen } = await mountDialog();
+
+    await fill({ slug: 'repo', redirectUrl: 'https://example.com' });
+    await submit();
+    await vi.waitFor(() =>
+      expect(submitButton()?.getAttribute('aria-busy')).toBe('true')
+    );
+
+    await settle();
+    dismiss();
+    await settle();
+
+    expect(onUpdateOpen).not.toHaveBeenCalled();
+    expect(cancelButton()?.disabled).toBe(true);
+
+    finishSaving();
+    await vi.waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(cancelButton()?.disabled).toBe(false));
+
+    dismiss();
+    await settle();
+
+    expect(onUpdateOpen).toHaveBeenCalledWith(false);
   });
 
   it('marks the slug as taken on a 409', async () => {

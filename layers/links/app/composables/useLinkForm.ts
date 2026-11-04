@@ -5,8 +5,11 @@ import { toast } from 'vue-sonner';
 import { LinkFormInput } from '#layers/links/app/constants/form.constant';
 import { LinkInputSchema } from '#layers/links/shared/domain/link.schema';
 
+// call this where the fields render, and render them for one Link only: while
+// no field is rendered, vee-validate's silent validation stores its errors, and
+// they show on the fields once they mount
 export const useLinkForm = (options: {
-  link: MaybeRefOrGetter<Link | null | undefined>;
+  link?: Link | null;
   onSuccess: () => void | Promise<void>;
 }) => {
   const linkApi = useLinkApi();
@@ -25,20 +28,12 @@ export const useLinkForm = (options: {
   });
 
   const form = useForm({
-    validationSchema: toTypedSchema(LinkInputSchema, linkErrorMap)
+    validationSchema: toTypedSchema(LinkInputSchema, linkErrorMap),
+    initialValues: {
+      slug: options.link?.slug ?? '',
+      redirectUrl: options.link?.redirectUrl ?? ''
+    }
   });
-
-  const currentLink = computed(() => toValue(options.link));
-  const isEditing = computed(() => Boolean(currentLink.value));
-
-  const resetWithLink = (link?: Link | null) => {
-    form.resetForm({
-      values: {
-        slug: link?.slug ?? '',
-        redirectUrl: link?.redirectUrl ?? ''
-      }
-    });
-  };
 
   const submit = form.handleSubmit(async (values) => {
     if (isLoading.value) return;
@@ -46,8 +41,8 @@ export const useLinkForm = (options: {
     isLoading.value = true;
 
     try {
-      if (currentLink.value) {
-        await linkApi.update(currentLink.value.id, values);
+      if (options.link) {
+        await linkApi.update(options.link.id, values);
 
         toast.success($t('toast.links.edit.title'));
       } else {
@@ -77,8 +72,7 @@ export const useLinkForm = (options: {
 
   return {
     isLoading,
-    isEditing,
-    submit,
-    resetWithLink
+    isEditing: Boolean(options.link),
+    submit
   };
 };
