@@ -1,6 +1,6 @@
 <template>
-  <UiCard
-    class="flex-col items-start gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
+  <div
+    class="flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="type-small min-w-0">
       <p class="flex items-center gap-x-2 wrap-anywhere [&>svg]:shrink-0">
@@ -16,5 +16,5 @@
     <div class="-ml-[11px] shrink-0 sm:ml-0">
       <slot name="action" />
     </div>
-  </UiCard>
+  </div>
 </template>

@@ -5,7 +5,7 @@ import SlidersIcon from '~icons/pixelarticons/sliders';
 
 <template>
   <UiDialogContent
-    class="flex max-h-[90dvh] flex-col gap-0 p-0 sm:max-w-xl md:max-w-2xl"
+    class="flex max-h-[90dvh] max-w-[min(42rem,calc(100%-2rem))] flex-col gap-0 p-0 sm:max-w-[min(42rem,calc(100%-2rem))] lg:h-[min(680px,90dvh)] lg:max-w-[min(1080px,calc(100%-4rem))]"
   >
     <UiDialogHeader class="flex-row items-center gap-2 border-b py-3 pr-3 pl-6">
       <SlidersIcon class="text-faint-foreground" />
@@ -17,16 +17,25 @@ import SlidersIcon from '~icons/pixelarticons/sliders';
       </UiDialogClose>
     </UiDialogHeader>
 
-    <div class="min-h-0 overflow-y-auto px-6 pb-6">
-      <AuthSettingsProfile />
+    <!--
+      From lg the middle row fills the height but never shrinks below what Connected accounts needs.
+      Sessions adds no height of its own (size containment), so only its rows scroll. When the left
+      column doesn't fit, as in a short window, the whole grid scrolls instead.
+    -->
+    <div
+      class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3 lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:grid-rows-[auto_minmax(min-content,1fr)_auto]"
+    >
+      <AuthSettingsProfile class="lg:col-start-1 lg:row-start-1" />
 
-      <UiAccordion type="multiple">
-        <AuthSettingsSessions />
+      <AuthSettingsSessions
+        class="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:[contain:size]"
+      />
 
-        <AuthSettingsAccountConnected />
+      <AuthSettingsAccountConnected
+        class="lg:col-start-1 lg:row-span-2 lg:row-start-2"
+      />
 
-        <AuthSettingsAccountDelete />
-      </UiAccordion>
+      <AuthSettingsAccountDelete class="lg:col-start-2 lg:row-start-3" />
     </div>
   </UiDialogContent>
 </template>

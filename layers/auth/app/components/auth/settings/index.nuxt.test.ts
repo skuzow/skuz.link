@@ -1,5 +1,4 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
-import { DOMWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AuthSettings from './index.vue';
 
@@ -25,7 +24,14 @@ const account = (providerId: string) => ({
   updatedAt: '2026-11-01T12:00:00.000Z'
 });
 
+let sessions: ReturnType<typeof session>[] = [];
+
 let accounts: ReturnType<typeof account>[] = [];
+
+// while set, the Sessions list doesn't answer until it settles
+let sessionsHeld: Promise<void> | undefined;
+
+let sessionsRequests = 0;
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
 
@@ -61,23 +67,72 @@ const row = (text: string) =>
     return found;
   });
 
-const openSection = (title: string) =>
-  new DOMWrapper(button(title)).trigger('click');
+const panelHeading = (section: HTMLElement) =>
+  document.getElementById(section.getAttribute('aria-labelledby') ?? '');
+
+// a panel is a section named by its heading
+const panel = (name: string) =>
+  vi.waitFor(() => {
+    const found = [...document.body.querySelectorAll('section')].find(
+      (section) => panelHeading(section)?.textContent?.trim() === name
+    );
+    if (!found) throw new Error(`Missing panel ${name}`);
+
+    return found;
+  });
+
+// what the panel's strip reads after its heading
+const panelCount = (section: HTMLElement) =>
+  panelHeading(section)?.nextElementSibling?.textContent?.trim();
+
+const panelWithRows = async (name: string, rows: number) => {
+  const found = await panel(name);
+
+  await vi.waitFor(() => {
+    if (found.querySelectorAll('li').length !== rows) {
+      throw new Error(`${name} doesn't have ${rows} rows`);
+    }
+  });
+
+  return found;
+};
 
 beforeEach(() => {
+  accounts = [];
+  sessionsHeld = undefined;
+  sessionsRequests = 0;
+  sessions = [
+    session(CURRENT_TOKEN, 'Macintosh; Intel Mac OS X 10_15_7'),
+    session('other-token', 'iPhone; CPU iPhone OS 18_0 like Mac OS X')
+  ];
+
   // better-auth calls fetch on an absolute URL, which registerEndpoint misses
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const { pathname } = new URL(new Request(input, init).url);
 
     if (pathname === '/api/auth/list-sessions') {
-      return Response.json([
-        session(CURRENT_TOKEN, 'Macintosh; Intel Mac OS X 10_15_7'),
-        session('other-token', 'iPhone; CPU iPhone OS 18_0 like Mac OS X')
-      ]);
+      sessionsRequests++;
+      await sessionsHeld;
+
+      return Response.json(sessions);
+    }
+
+    if (pathname === '/api/auth/revoke-session') {
+      const { token } = JSON.parse(String(init?.body));
+      sessions = sessions.filter((listed) => listed.token !== token);
+
+      return Response.json({ status: true });
     }
 
     if (pathname === '/api/auth/list-accounts') {
       return Response.json(accounts);
+    }
+
+    if (pathname === '/api/auth/unlink-account') {
+      const { accountId } = JSON.parse(String(init?.body));
+      accounts = accounts.filter((listed) => listed.id !== accountId);
+
+      return Response.json({ status: true });
     }
 
     return Response.json({});
@@ -89,7 +144,6 @@ afterEach(() => {
   mounted?.unmount();
   vi.restoreAllMocks();
   clearNuxtData();
-  accounts = [];
   useState('auth:session').value = null;
   useState('auth:user').value = null;
   useState('settings:isOpen').value = false;
@@ -106,8 +160,6 @@ describe('AuthSettings', () => {
   it('marks only the current Session as Current, with its User-Agent text', async () => {
     await mountSettings();
 
-    await openSection('Sessions');
-
     const current = await row('Macintosh - Intel Mac OS X 10_15_7');
     const other = await row('iPhone - CPU iPhone OS 18_0 like Mac OS X');
 
@@ -119,8 +171,6 @@ describe('AuthSettings', () => {
     accounts = [account('google')];
     await mountSettings();
 
-    await openSection('Connected accounts');
-
     const disconnect = (await row('Google')).querySelector('button');
 
     expect(disconnect?.textContent).toContain('Disconnect');
@@ -131,9 +181,78 @@ describe('AuthSettings', () => {
     accounts = [account('google'), account('github')];
     await mountSettings();
 
-    await openSection('Connected accounts');
-
     expect((await row('Google')).querySelector('button')?.disabled).toBe(false);
     expect((await row('GitHub')).querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('counts the Sessions in their strip, and again after Revoke', async () => {
+    await mountSettings();
+
+    const sessionsPanel = await panelWithRows('Sessions', 2);
+
+    expect(panelCount(sessionsPanel)).toBe('2');
+
+    const other = await row('iPhone - CPU iPhone OS 18_0 like Mac OS X');
+    other.querySelector('button')?.click();
+
+    await panelWithRows('Sessions', 1);
+    expect(panelCount(sessionsPanel)).toBe('1');
+  });
+
+  it('counts the Connected accounts in their strip, and again after Disconnect', async () => {
+    accounts = [account('google'), account('github')];
+    await mountSettings();
+
+    const accountsPanel = await panelWithRows('Connected accounts', 2);
+
+    expect(panelCount(accountsPanel)).toBe('2');
+
+    (await row('GitHub')).querySelector('button')?.click();
+
+    await panelWithRows('Connected accounts', 1);
+    expect(panelCount(accountsPanel)).toBe('1');
+  });
+
+  it('offers Connect account while a Provider is left to connect', async () => {
+    accounts = [account('google')];
+    await mountSettings();
+
+    const accountsPanel = await panelWithRows('Connected accounts', 1);
+
+    expect(accountsPanel.textContent).toContain('Connect account');
+  });
+
+  it('offers no Connect account once Google and GitHub are both connected', async () => {
+    accounts = [account('google'), account('github')];
+    await mountSettings();
+
+    const accountsPanel = await panelWithRows('Connected accounts', 2);
+
+    expect(accountsPanel.textContent).not.toContain('Connect account');
+  });
+
+  it('keeps the Sessions and their count while they reload after Revoke', async () => {
+    await mountSettings();
+
+    const sessionsPanel = await panelWithRows('Sessions', 2);
+
+    let settle = () => {};
+    sessionsHeld = new Promise((resolve) => (settle = resolve));
+
+    (await row('iPhone - CPU iPhone OS 18_0 like Mac OS X'))
+      .querySelector('button')
+      ?.click();
+
+    await vi.waitFor(() => {
+      if (sessionsRequests !== 2) throw new Error('Sessions not reloading');
+    });
+
+    expect(sessionsPanel.querySelectorAll('li')).toHaveLength(2);
+    expect(panelCount(sessionsPanel)).toBe('2');
+
+    settle();
+
+    await panelWithRows('Sessions', 1);
+    expect(panelCount(sessionsPanel)).toBe('1');
   });
 });
