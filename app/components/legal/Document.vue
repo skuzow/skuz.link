@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from 'vue';
+import InfoIcon from '~icons/pixelarticons/circle-info';
 
 interface Props {
   title: string;
@@ -15,9 +16,10 @@ const { locale } = useI18n();
 </script>
 
 <template>
-  <article class="max-w-measure mx-auto">
-    <header class="mb-8 flex flex-col gap-3">
-      <h1 class="type-display-sm">
+  <!-- left-aligned: the text holds to measure and the rest of the row stays empty -->
+  <article class="grid grid-cols-[minmax(0,1fr)]">
+    <header class="max-w-measure flex flex-col gap-3">
+      <h1 class="type-display-sm text-balance">
         {{ title }}
       </h1>
 
@@ -35,12 +37,19 @@ const { locale } = useI18n();
       </i18n-t>
 
       <!-- the Spanish text prevails, so every other language says so -->
-      <p v-if="locale !== 'es'" class="type-small text-muted-foreground">
+      <p
+        v-if="locale !== 'es'"
+        class="bg-card type-small text-muted-foreground mt-3 flex items-start gap-2 border px-4 py-3"
+      >
+        <InfoIcon
+          class="text-faint-foreground mt-0.5 shrink-0"
+          aria-hidden="true"
+        />
         {{ $t('legal.translation') }}
       </p>
     </header>
 
-    <div class="prose legal-prose">
+    <div class="max-w-measure prose legal-prose min-w-0">
       <component :is="bodies[locale]" />
     </div>
   </article>
