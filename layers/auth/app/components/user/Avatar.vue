@@ -2,6 +2,7 @@
 <script lang="ts" setup>
 import type { AvatarVariants } from '#layers/base/app/components/ui/avatar';
 import type { User } from '#layers/auth/shared/domain/user.type';
+import { avatarSource } from '#layers/auth/app/lib/avatarSource';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { authUser } = useAuth();
@@ -31,7 +32,7 @@ const {
   <UiAvatar v-if="user" :size="size">
     <UiAvatarImage
       v-if="user.image"
-      :src="user.image"
+      :src="avatarSource(user.image)"
       :width="width"
       :height="height"
       :loading="loading"
