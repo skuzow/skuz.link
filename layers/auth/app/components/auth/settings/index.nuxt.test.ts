@@ -33,6 +33,33 @@ let sessionsHeld: Promise<void> | undefined;
 
 let sessionsRequests = 0;
 
+// while set, the Connected accounts list doesn't answer until it settles
+let accountsHeld: Promise<void> | undefined;
+
+// how a list fails: its request throws, or better-auth answers with an error
+type Failure = 'request' | 'answer' | undefined;
+
+let sessionsFailure: Failure;
+
+let accountsFailure: Failure;
+
+const failedAnswer = (failure: Failure) => {
+  if (failure === 'request') throw new TypeError('Failed to fetch');
+
+  return Response.json(
+    { code: 'INTERNAL_SERVER_ERROR', message: 'Internal Server Error' },
+    { status: 500 }
+  );
+};
+
+// a promise to hold a list with, and the function that settles it
+const hold = () => {
+  let settle = () => {};
+  const held = new Promise<void>((resolve) => (settle = resolve));
+
+  return { held, settle };
+};
+
 let updatedNames: string[] = [];
 
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
@@ -117,6 +144,9 @@ beforeEach(() => {
   accounts = [];
   sessionsHeld = undefined;
   sessionsRequests = 0;
+  accountsHeld = undefined;
+  sessionsFailure = undefined;
+  accountsFailure = undefined;
   updatedNames = [];
   sessions = [
     session(CURRENT_TOKEN, 'Macintosh; Intel Mac OS X 10_15_7'),
@@ -131,7 +161,9 @@ beforeEach(() => {
       sessionsRequests++;
       await sessionsHeld;
 
-      return Response.json(sessions);
+      return sessionsFailure
+        ? failedAnswer(sessionsFailure)
+        : Response.json(sessions);
     }
 
     if (pathname === '/api/auth/revoke-session') {
@@ -148,7 +180,11 @@ beforeEach(() => {
     }
 
     if (pathname === '/api/auth/list-accounts') {
-      return Response.json(accounts);
+      await accountsHeld;
+
+      return accountsFailure
+        ? failedAnswer(accountsFailure)
+        : Response.json(accounts);
     }
 
     if (pathname === '/api/auth/unlink-account') {
@@ -332,5 +368,110 @@ describe('AuthSettings', () => {
     );
     expect(updatedNames).toEqual(['Grace Hopper']);
     expect(profilePanel.textContent).not.toContain('Save changes');
+  });
+
+  it('marks loading panels busy, with no count and no Connect account', async () => {
+    accounts = [account('google')];
+    const sessionsLoad = hold();
+    const accountsLoad = hold();
+    sessionsHeld = sessionsLoad.held;
+    accountsHeld = accountsLoad.held;
+    await mountSettings();
+
+    const sessionsPanel = await panel('Sessions');
+    const accountsPanel = await panel('Connected accounts');
+
+    for (const loading of [sessionsPanel, accountsPanel]) {
+      expect(loading.querySelector('[aria-busy="true"]')).toBeTruthy();
+      expect(panelCount(loading)).toBeUndefined();
+    }
+    expect(accountsPanel.textContent).not.toContain('Connect account');
+
+    sessionsLoad.settle();
+    accountsLoad.settle();
+
+    await panelWithRows('Sessions', 2);
+    await panelWithRows('Connected accounts', 1);
+    expect(sessionsPanel.querySelector('[aria-busy="true"]')).toBeNull();
+    expect(accountsPanel.querySelector('[aria-busy="true"]')).toBeNull();
+    expect(accountsPanel.textContent).toContain('Connect account');
+  });
+
+  it.each([
+    ['its request fails', 'request'],
+    ['better-auth answers with an error', 'answer']
+  ] as const)(
+    'says a list failed when %s, with Try again, no count and no Connect account',
+    async (_, failure) => {
+      accounts = [account('google')];
+      sessionsFailure = failure;
+      accountsFailure = failure;
+      await mountSettings();
+
+      const sessionsPanel = await panel('Sessions');
+      const accountsPanel = await panel('Connected accounts');
+
+      await vi.waitFor(() => {
+        expect(sessionsPanel.textContent).toContain(
+          'Something went wrong with your sessions'
+        );
+        expect(accountsPanel.textContent).toContain(
+          'Something went wrong with your connected accounts'
+        );
+      });
+
+      for (const failedPanel of [sessionsPanel, accountsPanel]) {
+        expect(failedPanel.textContent).toContain('Try again');
+        expect(failedPanel.querySelector('[aria-busy="true"]')).toBeNull();
+        expect(panelCount(failedPanel)).toBeUndefined();
+      }
+      expect(accountsPanel.textContent).not.toContain('Connect account');
+    }
+  );
+
+  it('says a failed list in the page language', async () => {
+    sessionsFailure = 'request';
+    accountsFailure = 'request';
+    await mountSettings('/es');
+
+    await vi.waitFor(() => {
+      expect(document.body.textContent).toContain(
+        'Ha ocurrido un error con tus sesiones'
+      );
+      expect(document.body.textContent).toContain(
+        'Ha ocurrido un error con tus cuentas conectadas'
+      );
+    });
+    expect(button('Reintentar')).toBeTruthy();
+  });
+
+  it('requests a failed list again on Try again, and its rows replace the sentence', async () => {
+    sessionsFailure = 'request';
+    await mountSettings();
+
+    const sessionsPanel = await panel('Sessions');
+    const tryAgain = await vi.waitFor(() => button('Try again'));
+
+    sessionsFailure = undefined;
+    const sessionsLoad = hold();
+    sessionsHeld = sessionsLoad.held;
+
+    tryAgain.click();
+
+    // Try again shows its loader while the sentence stays
+    await vi.waitFor(() => {
+      if (sessionsRequests !== 2) throw new Error('Sessions not reloading');
+      expect(tryAgain.getAttribute('aria-busy')).toBe('true');
+    });
+    expect(sessionsPanel.textContent).toContain(
+      'Something went wrong with your sessions'
+    );
+
+    sessionsLoad.settle();
+
+    await panelWithRows('Sessions', 2);
+    expect(sessionsPanel.textContent).not.toContain('Something went wrong');
+    expect(sessionsPanel.textContent).not.toContain('Try again');
+    expect(panelCount(sessionsPanel)).toBe('2');
   });
 });

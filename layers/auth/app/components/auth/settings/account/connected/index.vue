@@ -4,19 +4,16 @@ import { AuthProviderValues } from '#layers/auth/app/constants/auth.constant';
 const { listAccounts } = useAuth();
 
 const {
-  status,
-  refresh,
-  data: accounts
-} = await useLazyAsyncData('connected-accounts', () => listAccounts());
-
-// only once the list has loaded, and kept while it reloads after Revoke or Disconnect:
-// the count is the number of rows below it
-const count: ComputedRef<number | undefined> = computed(() =>
-  status.value === 'error' ? undefined : accounts.value?.data?.length
-);
+  items: accounts,
+  count,
+  isLoading,
+  isFailed,
+  isRetrying,
+  refresh
+} = useAuthSettingsList('connected-accounts', () => listAccounts());
 
 const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
-  accounts.value?.data
+  accounts.value
     ?.filter((account) => account.providerId !== 'credential')
     .map((account) => account.providerId)
 );
@@ -27,17 +24,19 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
     :count="count"
     :title="$t('auth.settings.account.connected.title')"
   >
-    <div v-if="status === 'pending' && !accounts" class="px-4 py-3">
-      <IconLoader />
-    </div>
-
-    <template v-else-if="status !== 'error' && accounts?.data">
+    <AuthSettingsList
+      :failed="isFailed"
+      :failure="$t('auth.settings.account.connected.failure')"
+      :loading="isLoading"
+      :retrying="isRetrying"
+      @retry="refresh()"
+    >
       <ul class="divide-y">
-        <li v-for="account in accounts.data" :key="account.id">
+        <li v-for="account in accounts" :key="account.id">
           <AuthSettingsAccountConnectedCard
             :account="account"
-            :length="accounts.data.length"
-            @refresh-accounts="refresh"
+            :length="accounts?.length ?? 0"
+            @refresh-accounts="refresh()"
           />
         </li>
       </ul>
@@ -51,6 +50,6 @@ const accountProviders: ComputedRef<string[] | undefined> = computed(() =>
           :account-providers="accountProviders"
         />
       </div>
-    </template>
+    </AuthSettingsList>
   </AuthSettingsPanel>
 </template>
