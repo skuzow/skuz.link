@@ -3,7 +3,7 @@
 The Privacy policy tells people exactly what skuz.link stores and sends, so the code must not drift from it. Four of its promises depend on code:
 
 - A Session's IP address comes only from Cloudflare's `CF-Connecting-IP` header (better-auth's `advanced.ipAddress.ipAddressHeaders`). IPv4 is kept in full and IPv6 is shortened to its /64 network. The IP is used only to investigate abuse and to keep accounts secure, and it goes with its Session: on sign-out, on revocation, or at the latest 30 days after the Session expires, when a daily Cron Trigger deletes it.
-- A Click only adds one to its Link's counter and stores nothing about the Visitor.
+- A Click adds one to its Link's Click count and keeps only the details that ADR-0007 lists, never the Visitor's IP address.
 - Pages load nothing from third-party hosts, except a signed-in User's own avatar, which their browser loads from the Provider that issued it. That Provider already knows the User through sign-in, and the avatar is never shown to anyone else. The footer's GitHub avatars were removed for this.
 - The browser holds only what the policy lists: better-auth's sign-in cookies, the `i18n_redirected` language cookie and the `nuxt-color-mode` localStorage entry.
 
@@ -21,4 +21,4 @@ We keep little and state exactly what we keep, because every piece of data needs
 
 - Banning a User revokes their Sessions, so their IPs go with the ban. The moderation runbook has the person who runs skuz.link look for other Users sharing those IPs before banning; nothing extra is kept.
 - Showing a User's avatar to anyone but that User, for example next to a Link, breaks the avatar exception and needs the avatar proxied first.
-- Per-Click analytics, a font or image from a CDN, an embed, a new cookie or storage entry, or a new use of Session IPs needs the Privacy policy updated in both languages first. Anything that is not exempt from consent also needs a consent banner.
+- A new Click detail, a font or image from a CDN, an embed, a new cookie or storage entry, or a new use of Session IPs needs the Privacy policy updated in both languages first. Anything that is not exempt from consent also needs a consent banner.
