@@ -523,6 +523,30 @@ describe('legal documents switcher', () => {
   );
 });
 
+describe('legal document index fold', () => {
+  // the phone row: a disclosure whose summary reads as the index's name
+  const indexFold = (name: string) =>
+    [...navigation(name).querySelectorAll('details')].find(
+      (element) =>
+        element.querySelector('summary')?.textContent?.trim() === name
+    );
+
+  it.each([
+    ['/privacy', 'On this page'],
+    ['/es/privacidad', 'En esta página']
+  ])(
+    'folds the index of %s into a closed %s disclosure',
+    async (route, name) => {
+      await mountApp(route);
+
+      const fold = indexFold(name);
+
+      expect(fold).toBeDefined();
+      expect(fold?.open).toBe(false);
+    }
+  );
+});
+
 describe('login page', () => {
   it.each([
     ['/login', ['Continue with Google', 'Continue with GitHub']],

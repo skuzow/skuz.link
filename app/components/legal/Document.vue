@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { LegalDocumentLocale } from '~/types/legal';
+import ChevronRightIcon from '~icons/pixelarticons/chevron-right';
 import InfoIcon from '~icons/pixelarticons/circle-info';
 
 interface Props {
@@ -116,14 +117,36 @@ const documents = computed(() =>
       :aria-labelledby="indexLabelId"
       class="mt-8 lg:sticky lg:top-21 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:-mx-1 lg:mt-0 lg:max-h-[calc(100dvh-108px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-1"
     >
+      <!-- names the nav at every width, but shows only from lg -->
       <span
         :id="indexLabelId"
-        class="type-eyebrow text-faint-foreground mb-3 block"
+        class="type-eyebrow text-faint-foreground mb-3 hidden lg:block"
       >
         {{ $t('legal.index') }}
       </span>
 
-      <ol class="border-l">
+      <!-- below lg the index folds into this row. The disclosure holds only its
+           summary, and the sibling rule shows the list after it while open, so
+           it works before hydration with no ::details-content support; it
+           starts closed and remembers nothing. From lg it hides and the list
+           shows whatever state it was left in -->
+      <details class="peer lg:hidden">
+        <summary
+          class="text-muted-foreground hover:text-foreground focus-visible:outline-ring flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 border-y transition-colors duration-120 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden"
+        >
+          <span class="type-eyebrow text-faint-foreground">
+            {{ $t('legal.index') }}
+          </span>
+          <ChevronRightIcon
+            class="size-4 shrink-0 transition-transform duration-100 in-open:rotate-90"
+            aria-hidden="true"
+          />
+        </summary>
+      </details>
+
+      <ol
+        class="hidden border-l max-lg:peer-open:mt-3 max-lg:peer-open:block lg:block"
+      >
         <li v-for="section in content[locale]?.sections" :key="section.id">
           <a
             :href="`#${section.id}`"
