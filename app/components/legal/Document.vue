@@ -20,6 +20,11 @@ const localePath = useLocalePath();
 
 const indexLabelId = useId();
 
+const sections = computed(() => content[locale.value]?.sections ?? []);
+const { litId, jumpTo } = useLitSection(() =>
+  sections.value.map((section) => section.id)
+);
+
 // in the footer's order
 const documents = computed(() =>
   [
@@ -147,12 +152,25 @@ const documents = computed(() =>
       <ol
         class="hidden border-l max-lg:peer-open:mt-3 max-lg:peer-open:block lg:block"
       >
-        <li v-for="section in content[locale]?.sections" :key="section.id">
+        <!-- the section being read is current: it wins over hover -->
+        <li v-for="section in sections" :key="section.id">
           <a
             :href="`#${section.id}`"
-            class="type-small text-muted-foreground hover:text-foreground hover:border-input focus-visible:outline-ring -ml-px flex items-baseline gap-3 border-l border-transparent py-2.5 pl-3 transition-colors duration-120 focus-visible:outline-2 focus-visible:outline-offset-2 lg:py-1.5"
+            :aria-current="litId === section.id ? 'true' : undefined"
+            :class="[
+              'type-small focus-visible:outline-ring -ml-px flex items-baseline gap-3 border-l py-2.5 pl-3 transition-colors duration-120 focus-visible:outline-2 focus-visible:outline-offset-2 lg:py-1.5',
+              litId === section.id
+                ? 'text-foreground border-signal'
+                : 'text-muted-foreground hover:text-foreground hover:border-input border-transparent'
+            ]"
+            @click.exact="jumpTo(section.id)"
           >
-            <span class="type-chip text-faint-foreground min-w-4 flex-none">
+            <span
+              :class="[
+                'type-chip min-w-4 flex-none transition-colors duration-120',
+                litId === section.id ? 'text-signal' : 'text-faint-foreground'
+              ]"
+            >
               {{ section.number }}
             </span>
             {{ section.title }}
