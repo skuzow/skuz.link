@@ -33,6 +33,8 @@ let sessionsHeld: Promise<void> | undefined;
 
 let sessionsRequests = 0;
 
+let updatedNames: string[] = [];
+
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
 
 const mountSettings = async (route = '/') => {
@@ -97,10 +99,25 @@ const panelWithRows = async (name: string, rows: number) => {
   return found;
 };
 
+// the field its Name label points at
+const nameField = (section: HTMLElement) =>
+  vi.waitFor(() => {
+    const label = [...section.querySelectorAll('label')].find(
+      (element) => element.textContent?.trim() === 'Name'
+    );
+    const found = label && document.getElementById(label.htmlFor);
+    if (!(found instanceof HTMLInputElement)) {
+      throw new Error('Missing Name field');
+    }
+
+    return found;
+  });
+
 beforeEach(() => {
   accounts = [];
   sessionsHeld = undefined;
   sessionsRequests = 0;
+  updatedNames = [];
   sessions = [
     session(CURRENT_TOKEN, 'Macintosh; Intel Mac OS X 10_15_7'),
     session('other-token', 'iPhone; CPU iPhone OS 18_0 like Mac OS X')
@@ -120,6 +137,12 @@ beforeEach(() => {
     if (pathname === '/api/auth/revoke-session') {
       const { token } = JSON.parse(String(init?.body));
       sessions = sessions.filter((listed) => listed.token !== token);
+
+      return Response.json({ status: true });
+    }
+
+    if (pathname === '/api/auth/update-user') {
+      updatedNames.push(JSON.parse(String(init?.body)).name);
 
       return Response.json({ status: true });
     }
@@ -254,5 +277,60 @@ describe('AuthSettings', () => {
 
     await panelWithRows('Sessions', 1);
     expect(panelCount(sessionsPanel)).toBe('1');
+  });
+
+  it('swaps the Profile body for the Name form, without the Avatar, with focus in Name', async () => {
+    await mountSettings();
+
+    const profilePanel = await panel('Profile');
+
+    // the Avatar's fallback shows the User's initials
+    await vi.waitFor(() => expect(profilePanel.textContent).toContain('AD'));
+
+    button('Update profile').click();
+
+    const name = await nameField(profilePanel);
+
+    expect(profilePanel.textContent).not.toContain('AD');
+    expect(profilePanel.textContent).not.toContain('Update profile');
+    expect(profilePanel.textContent).toContain('Cancel');
+    expect(profilePanel.textContent).toContain('Save changes');
+    await vi.waitFor(() => expect(document.activeElement).toBe(name));
+  });
+
+  it('brings the Profile body back after Cancel, with focus on Update profile', async () => {
+    await mountSettings();
+
+    const profilePanel = await panel('Profile');
+
+    button('Update profile').click();
+    await nameField(profilePanel);
+
+    button('Cancel').click();
+
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(button('Update profile'))
+    );
+    expect(profilePanel.textContent).toContain('AD');
+    expect(profilePanel.textContent).not.toContain('Save changes');
+  });
+
+  it('brings the Profile body back after a successful save, with focus on Update profile', async () => {
+    await mountSettings();
+
+    const profilePanel = await panel('Profile');
+
+    button('Update profile').click();
+    const name = await nameField(profilePanel);
+
+    name.value = 'Grace Hopper';
+    name.dispatchEvent(new Event('input'));
+    button('Save changes').click();
+
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(button('Update profile'))
+    );
+    expect(updatedNames).toEqual(['Grace Hopper']);
+    expect(profilePanel.textContent).not.toContain('Save changes');
   });
 });

@@ -4,6 +4,17 @@ import PencilIcon from '~icons/pixelarticons/pencil';
 const { authUser } = useAuth();
 
 const isUpdateProfileOpen: Ref<boolean> = ref(false);
+
+const updateProfileButton = useTemplateRef('updateProfileButton');
+
+// the form leaves with focus inside it, so focus goes back to Update profile
+const onUpdateProfileClosed = async () => {
+  isUpdateProfileOpen.value = false;
+
+  await nextTick();
+
+  updateProfileButton.value?.$el.focus();
+};
 </script>
 
 <template>
@@ -29,6 +40,7 @@ const isUpdateProfileOpen: Ref<boolean> = ref(false);
           <p class="type-subtitle max-w-full truncate">{{ authUser?.name }}</p>
 
           <UiButton
+            ref="updateProfileButton"
             class="max-[400px]:col-span-full max-[400px]:justify-self-start"
             variant="outline"
             @click="isUpdateProfileOpen = true"
@@ -41,7 +53,7 @@ const isUpdateProfileOpen: Ref<boolean> = ref(false);
 
       <AuthSettingsProfileForm
         v-else
-        @close-update-profile="isUpdateProfileOpen = false"
+        @close-update-profile="onUpdateProfileClosed"
       />
     </div>
   </AuthSettingsPanel>
