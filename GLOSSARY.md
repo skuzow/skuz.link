@@ -54,6 +54,9 @@ Users, how they sign in, their Sessions, and Bans.
 A person who signs in to skuz.link and can own Links.
 _Avoid_: member, customer
 
+**Account**:
+A User's own place on skuz.link, holding their name, Sessions, Connected accounts and Links. It is not a Connected account, and deleting it deletes the User.
+
 **Provider**:
 A service Users sign in with: Google or GitHub.
 
