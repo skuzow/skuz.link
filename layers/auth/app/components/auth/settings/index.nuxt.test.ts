@@ -140,6 +140,9 @@ const nameField = (section: HTMLElement) =>
     return found;
   });
 
+// longer than the 5ms vee-validate debounces its validation by
+const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
+
 beforeEach(() => {
   accounts = [];
   sessionsHeld = undefined;
@@ -349,6 +352,41 @@ describe('AuthSettings', () => {
     );
     expect(profilePanel.textContent).toContain('AD');
     expect(profilePanel.textContent).not.toContain('Save changes');
+  });
+
+  it('shows no Name error when focus leaves the empty field, as on pressing Cancel', async () => {
+    await mountSettings();
+
+    const profilePanel = await panel('Profile');
+
+    button('Update profile').click();
+    const name = await nameField(profilePanel);
+
+    // pressing Cancel takes focus off Name before its click lands
+    await vi.waitFor(() => expect(document.activeElement).toBe(name));
+    button('Cancel').focus();
+
+    await settle();
+
+    expect(profilePanel.textContent).not.toContain('Name is required');
+    expect(name.getAttribute('aria-invalid')).toBe('false');
+  });
+
+  it('still says Name is required when Save changes is pressed with it empty', async () => {
+    await mountSettings();
+
+    const profilePanel = await panel('Profile');
+
+    button('Update profile').click();
+    const name = await nameField(profilePanel);
+
+    button('Save changes').click();
+
+    await vi.waitFor(() =>
+      expect(profilePanel.textContent).toContain('Name is required')
+    );
+    expect(name.getAttribute('aria-invalid')).toBe('true');
+    expect(updatedNames).toEqual([]);
   });
 
   it('brings the Profile body back after a successful save, with focus on Update profile', async () => {

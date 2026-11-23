@@ -19,7 +19,15 @@ onMounted(() => nameInput.value?.$el.focus());
 
 <template>
   <form class="flex flex-col gap-5" @submit="updateProfile">
-    <UiFormField v-slot="{ componentField }" :name="AuthFormInput.NAME">
+    <!--
+      no validation on blur: pressing Cancel blurs Name first, and its error would push Cancel
+      down before the click lands
+    -->
+    <UiFormField
+      v-slot="{ componentField }"
+      :name="AuthFormInput.NAME"
+      :validate-on-blur="false"
+    >
       <UiFormItem>
         <UiFormLabel>{{ $t('form.name') }}</UiFormLabel>
         <UiFormControl>
