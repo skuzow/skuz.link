@@ -547,6 +547,64 @@ describe('legal document index fold', () => {
   );
 });
 
+describe('legal document lit index entry', () => {
+  const indexLinks = () => [
+    ...navigation('On this page').querySelectorAll<HTMLAnchorElement>(
+      'ol > li > a'
+    )
+  ];
+
+  const entryTitle = (link: Element) => link.lastChild?.textContent?.trim();
+
+  const entry = (title: string) => {
+    const link = indexLinks().find((element) => entryTitle(element) === title);
+    if (!link) throw new Error(`Missing index entry ${title}`);
+
+    return link;
+  };
+
+  const currentEntries = () =>
+    indexLinks()
+      .filter((link) => link.getAttribute('aria-current') === 'true')
+      .map(entryTitle);
+
+  // happy-dom sends the hashchange events queued so far together, after a timer
+  const nextHashChange = () =>
+    new Promise((resolve) =>
+      window.addEventListener('hashchange', resolve, { once: true })
+    );
+
+  afterEach(() => {
+    // the next test starts with no section in the address
+    window.history.replaceState(null, '', window.location.pathname);
+  });
+
+  it('lights the section in the address on load', async () => {
+    await mountApp('/privacy#minimum-age');
+
+    expect(currentEntries()).toEqual(['Minimum age']);
+  });
+
+  // happy-dom lays nothing out, so every page sits at its end, like jumps to
+  // the last two sections of the Privacy policy on a desktop screen
+  it('follows Back between two jumps at the end of the page', async () => {
+    await mountApp('/privacy');
+
+    const clicks = nextHashChange();
+    entry('Minimum age').click();
+    entry('Changes').click();
+    await clicks;
+    expect(currentEntries()).toEqual(['Changes']);
+
+    // only Back's own event is left to move the lit entry
+    const back = nextHashChange();
+    window.history.back();
+    await back;
+    await nextTick();
+    expect(currentEntries()).toEqual(['Minimum age']);
+  });
+});
+
 describe('login page', () => {
   it.each([
     ['/login', ['Continue with Google', 'Continue with GitHub']],

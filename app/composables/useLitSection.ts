@@ -5,12 +5,20 @@ import { litSection } from '~/lib/litSection';
 // top, under the Header
 const READING_LINE = 88;
 
+// the section id in a location hash; a malformed escape stays as it is
+const hashId = (hash: string) => {
+  try {
+    return decodeURIComponent(hash.slice(1));
+  } catch {
+    return hash.slice(1);
+  }
+};
+
 // Tracks which of the section headings with these ids the reader is in, on the
 // client only. A jump (jumpTo on an index click, or a #section in the address
-// on load) lights the chosen section until the reader scrolls. Stores nothing.
+// on load or after Back and Forward) lights the chosen section until the
+// reader scrolls. Stores nothing.
 export const useLitSection = (ids: MaybeRefOrGetter<string[]>) => {
-  const route = useRoute();
-
   // the lit heading's id, or null for none
   const litId = ref<string | null>(null);
 
@@ -69,6 +77,11 @@ export const useLitSection = (ids: MaybeRefOrGetter<string[]>) => {
     update();
   };
 
+  // Back and Forward between two sections at the end of the page don't
+  // scroll, so the new hash is the only sign of the jump. Any hash that isn't
+  // a section, or none, hands back to the normal rule
+  const onHashChange = () => jumpTo(hashId(window.location.hash));
+
   // the observer catches headings moved without a scroll too, as when the
   // fold opens or the window resizes
   const observe = () => {
@@ -91,16 +104,18 @@ export const useLitSection = (ids: MaybeRefOrGetter<string[]>) => {
   );
 
   onMounted(() => {
-    // the router has already decoded the hash
-    if (route.hash) jumpTo(route.hash.slice(1));
+    // a section in the address on load is a jump too
+    onHashChange();
     observe();
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('hashchange', onHashChange);
   });
 
   onBeforeUnmount(() => {
     observer?.disconnect();
     cancelAnimationFrame(frame);
     window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('hashchange', onHashChange);
   });
 
   return { litId: readonly(litId), jumpTo };
