@@ -12,22 +12,24 @@ vi.mock('vue-sonner', async (importOriginal) => ({
 }));
 
 const LINK = makeLink({
+  id: 'link-1',
   slug: 'repo',
   clicks: 1204,
   // midday, so the date holds in whatever time zone the tests run
   createdAt: new Date('2026-10-02T12:00:00.000Z')
 });
 
-const mountCard = async () => {
+const mountCard = async (route = '/links') => {
   const wrapper = await mountSuspended(
     // the root layout provides this in the app
     { render: () => h(TooltipProvider, () => h(LinksCard, { link: LINK })) },
-    { attachTo: document.body }
+    { route, attachTo: document.body }
   );
 
   const openMenu = async () => {
+    // by its role, since its label follows the locale
     await wrapper
-      .find('button[aria-label="Link actions"]')
+      .find('button[aria-haspopup="menu"]')
       .trigger('keydown', { key: 'Enter' });
   };
 
@@ -87,16 +89,50 @@ describe('LinksCard', () => {
     expect(menu?.style.getPropertyValue('--link-hue')).toBe('var(--hue-gold)');
   });
 
-  it('lists Copy first and Delete last in the menu', async () => {
+  it('lists Copy, Statistics and Edit, then Delete, in the menu', async () => {
     const { openMenu, menuItems } = await mountCard();
 
     await openMenu();
 
     expect(menuItems().map((item) => item.textContent?.trim())).toEqual([
       'Copy',
+      'Statistics',
       'Edit',
       'Delete'
     ]);
+  });
+
+  it("links Statistics and the Clicks value to the Link's Statistics", async () => {
+    const { wrapper, openMenu, menuItems } = await mountCard();
+
+    await openMenu();
+
+    const statistics = menuItems().find(
+      (item) => item.textContent?.trim() === 'Statistics'
+    );
+    const clicks = wrapper.find(
+      'a[aria-label="Statistics for /repo: 1,204 Clicks"]'
+    );
+
+    expect(statistics?.getAttribute('href')).toBe('/links/link-1');
+    expect(clicks.text()).toBe('1,204');
+    expect(clicks.attributes('href')).toBe('/links/link-1');
+  });
+
+  it('links to the Spanish Statistics from the Spanish card', async () => {
+    const { wrapper, openMenu, menuItems } = await mountCard('/es/links');
+
+    await openMenu();
+
+    const statistics = menuItems().find(
+      (item) => item.textContent?.trim() === 'Estadísticas'
+    );
+    const clicks = wrapper.find(
+      'a[aria-label="Estadísticas de /repo: 1204 clics"]'
+    );
+
+    expect(statistics?.getAttribute('href')).toBe('/es/links/link-1');
+    expect(clicks.attributes('href')).toBe('/es/links/link-1');
   });
 
   it('copies the full short url', async () => {

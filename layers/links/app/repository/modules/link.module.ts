@@ -1,3 +1,4 @@
+import type { Click } from '#layers/links/shared/domain/click.type';
 import type { Link, LinkInput } from '#layers/links/shared/domain/link.type';
 
 import ApiModule from '#layers/base/app/repository/api.module';
@@ -10,6 +11,20 @@ class LinkModule extends ApiModule {
     return this.call<Link[]>({
       method: 'GET',
       url: this.ROUTE.Links()
+    });
+  }
+
+  async get(id: string) {
+    return this.call<Link>({
+      method: 'GET',
+      url: this.ROUTE.LinkById(id)
+    });
+  }
+
+  async getClicks(id: string) {
+    return this.call<Click[]>({
+      method: 'GET',
+      url: this.ROUTE.LinkClicks(id)
     });
   }
 

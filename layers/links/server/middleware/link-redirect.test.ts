@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LINK_SLUG_MAX } from '#layers/links/shared/domain/link.constant';
 import { links } from '#layers/links/server/infrastructure/schema';
-import LinkRepository from '#layers/links/server/infrastructure/link.repository';
+import ClickRepository from '#layers/links/server/infrastructure/click.repository';
 import { setupTestServer } from '~~/server/testing/server';
 
 const server = await setupTestServer();
@@ -104,14 +104,13 @@ describe('link redirect middleware', () => {
     expect(await findClicks('cached')).toBe(2);
   });
 
-  it('still redirects when counting the click fails', async () => {
+  it('still redirects when recording the click fails', async () => {
     await insertLink('click-fails');
 
-    const error = new Error('increment failed');
-    vi.spyOn(
-      LinkRepository.prototype,
-      'incrementClicksBySlug'
-    ).mockRejectedValueOnce(error);
+    const error = new Error('record failed');
+    vi.spyOn(ClickRepository.prototype, 'recordBySlug').mockRejectedValueOnce(
+      error
+    );
     const consoleError = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
@@ -121,7 +120,7 @@ describe('link redirect middleware', () => {
 
     expect(response.status).toBe(302);
     expect(consoleError).toHaveBeenCalledWith(
-      'Failed to increment link clicks',
+      'Failed to record link click',
       error
     );
   });

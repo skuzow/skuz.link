@@ -15,6 +15,15 @@ class LinkService {
     return this.repository.findAllByUserId(ownerId);
   }
 
+  // also throws for another User's Link, so a Link's existence never leaks
+  async findOwned(ownerId: string, id: string): Promise<Link> {
+    const link = await this.repository.findOwnedById(id, ownerId);
+
+    if (!link) throw new LinkNotFoundError();
+
+    return link;
+  }
+
   async create(ownerId: string, input: LinkInput): Promise<Link> {
     const link = await this.repository.create(ownerId, input);
 
@@ -44,14 +53,6 @@ class LinkService {
     const ownedLinks = await this.repository.findAllByUserId(ownerId);
 
     await this.redirectCache.purge(ownedLinks.map((link) => link.slug));
-  }
-
-  private async findOwned(ownerId: string, id: string): Promise<Link> {
-    const link = await this.repository.findOwnedById(id, ownerId);
-
-    if (!link) throw new LinkNotFoundError();
-
-    return link;
   }
 }
 

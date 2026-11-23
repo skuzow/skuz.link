@@ -1,5 +1,6 @@
 import { LinkSlugSchema } from '#layers/links/shared/domain/link.schema';
 import { useRedirectService } from '#layers/links/server/container';
+import { readClickDetails } from '#layers/links/server/click-details';
 
 const REDIRECT_METHODS: ReadonlySet<string> = new Set(['GET', 'HEAD']);
 const CLIENT_CACHE_CONTROL = 'no-store';
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
   const redirectService = await useRedirectService(event);
   const redirectUrl = await redirectService.resolve(result.data, {
     // HEAD only asks whether the Short URL exists
-    isExistenceCheck: event.method === 'HEAD'
+    click: event.method === 'HEAD' ? null : readClickDetails(event)
   });
   if (!redirectUrl) return;
 

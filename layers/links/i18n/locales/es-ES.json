@@ -39,7 +39,22 @@
     "card": {
       "label": "Link",
       "clicks": "Clics",
-      "created": "Creado"
+      "created": "Creado",
+      "statistics": "Estadísticas de /{slug}: {clicks} clic | Estadísticas de /{slug}: {clicks} clics"
+    },
+    "statistics": {
+      "title": "Estadísticas",
+      "back": "Links",
+      "meta": {
+        "title": "Estadísticas de skuz.link/{slug}"
+      },
+      "clicks": {
+        "title": "Clics",
+        "time": "Hora",
+        "where": "Dónde",
+        "unknown": "Desconocido",
+        "empty": "No hay clics en este periodo"
+      }
     }
   },
   "alert": {

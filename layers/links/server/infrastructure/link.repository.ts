@@ -1,5 +1,5 @@
 import type { Link, LinkInput } from '#layers/links/shared/domain/link.type';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { Database } from '#layers/base/server/platform/db';
 import { isUniqueConstraintError } from '#layers/base/server/platform/errors';
 import { links } from './schema';
@@ -71,15 +71,6 @@ class LinkRepository {
       .limit(1);
 
     return link?.redirectUrl ?? null;
-  }
-
-  async incrementClicksBySlug(slug: string): Promise<void> {
-    await this.db
-      .update(links)
-      .set({
-        clicks: sql`${links.clicks} + 1`
-      })
-      .where(eq(links.slug, slug));
   }
 
   private async withUniqueSlug<T>(operation: () => Promise<T>): Promise<T> {

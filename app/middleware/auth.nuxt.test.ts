@@ -8,6 +8,10 @@ describe('auth middleware', () => {
     expect(await navigate('/links')).toBe('/login');
   });
 
+  it("sends guests from a Link's Statistics to the login page", async () => {
+    expect(await navigate('/links/link-1')).toBe('/login');
+  });
+
   it('keeps the locale when sending guests to the login page', async () => {
     expect(await navigate('/es/links')).toBe('/es/login');
   });
