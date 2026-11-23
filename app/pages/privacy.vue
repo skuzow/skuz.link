@@ -15,7 +15,7 @@ seoMeta({
 <template>
   <LegalDocument
     :title="$t('legal.privacy.title')"
-    updated="2026-10-30"
+    updated="2026-11-23"
     :bodies="{ en: PrivacyEn, es: PrivacyEs }"
   />
 </template>

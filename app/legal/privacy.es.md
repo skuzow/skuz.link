@@ -12,7 +12,15 @@ Cloudflare atiende cada petición que llega a skuz.link. Para servirla, recibe t
 
 ### Quien abre una URL corta
 
-Al abrir una URL corta, además, se suma uno al contador de clics de su enlace. No guardo nada sobre ti junto al enlace.
+Al abrir una URL corta, además, se suma uno al contador de clics de su enlace, y guardo estos detalles del clic:
+
+- la hora;
+- el país, la región y la ciudad en los que Cloudflare sitúa la petición;
+- el navegador, el sistema operativo y el tipo de dispositivo;
+- si lo hizo un bot, y el nombre del bot;
+- el host del sitio del que vienes, como `news.ycombinator.com`, nunca su dirección completa.
+
+Nunca guardo con un clic tu dirección IP ni tu user agent completo. El user agent es el texto con el que tu navegador se describe. El propietario del enlace ve los detalles de cada clic, que se borran a los 12 meses.
 
 El sitio al que redirige la URL corta tiene sus propias normas de privacidad.
 
@@ -23,7 +31,7 @@ Cuando inicias sesión con Google o con GitHub, guardo:
 - tu nombre, tu correo electrónico y la dirección de tu avatar, que recibo de Google o de GitHub. Tu navegador carga el avatar desde sus servidores;
 - tus cuentas conectadas: el identificador de tu cuenta en Google o en GitHub y los tokens que te emiten al iniciar sesión;
 - tus sesiones: el navegador (user agent), la dirección IP, y cuándo se crearon y cuándo caducan;
-- tus enlaces: el slug, la dirección a la que redirigen y su número de clics.
+- tus enlaces: el slug, la dirección a la que redirigen y su número de clics. Cuando eliminas un enlace, sus clics se van con él.
 
 La dirección IP de cada sesión la tomo de la cabecera `CF-Connecting-IP`, en la que Cloudflare pone tu dirección real. Guardo las direcciones IPv4 completas y las IPv6 acortadas a su red /64. La uso solo para investigar abusos y para mantener seguras las cuentas, por ejemplo para averiguar desde dónde se usó tu cuenta si alguien entró en ella. Se borra junto con su sesión: cuando cierras sesión, cuando la revocas o, como tarde, 30 días después de que caduque.
 
@@ -42,6 +50,7 @@ Si me escribes a [contact@skuz.link](mailto:contact@skuz.link) o a [abuse@skuz.l
 | Atender las peticiones, registros y trazas     | Interés legítimo: ofrecer el sitio, mantenerlo seguro y corregir errores (art. 6.1.f RGPD)                            |
 | Cuenta, cuentas conectadas, sesiones y enlaces | Contrato: prestarte el servicio conforme a los Términos de uso (art. 6.1.b RGPD)                                      |
 | Direcciones IP de las sesiones                 | Interés legítimo: investigar abusos y mantener seguras las cuentas (art. 6.1.f RGPD)                                  |
+| Detalles de los clics                          | Interés legítimo: mostrar a los propietarios cómo se usan sus enlaces (art. 6.1.f RGPD)                               |
 | Gestión de abusos y bloqueos                   | Interés legítimo: mantener skuz.link libre de abusos (art. 6.1.f RGPD)                                                |
 | Correos electrónicos                           | Interés legítimo en responderte (art. 6.1.f RGPD); en las solicitudes de derechos, obligación legal (art. 6.1.c RGPD) |
 
@@ -68,8 +77,9 @@ Puedes borrarlas cuando quieras desde los ajustes de tu navegador. Si borras las
 | Cloudflare, Inc.          | Encargado del tratamiento: alojamiento, base de datos, registros y trazas, y reenvío del correo          | EE. UU. y global | Marco de Privacidad de Datos UE-EE. UU. |
 | Google LLC y GitHub, Inc. | Responsables independientes del inicio de sesión y de servir tu avatar, solo si inicias sesión con ellos | EE. UU.          | Marco de Privacidad de Datos UE-EE. UU. |
 | Proton AG                 | Encargado del tratamiento: el buzón de `contact@skuz.link` y `abuse@skuz.link`                           | Suiza            | Decisión de adecuación de la UE         |
+| El propietario del enlace | Ve los detalles de los clics de sus propios enlaces                                                      | Donde esté       | —                                       |
 
-Nunca vendo tus datos, ni los uso para publicidad, ni hago analítica con ellos.
+Nunca vendo tus datos ni los uso para publicidad. Las únicas estadísticas son las que cada propietario ve de sus propios enlaces.
 
 ## 6. Cuánto tiempo los conservo
 
@@ -78,6 +88,7 @@ Nunca vendo tus datos, ni los uso para publicidad, ni hago analítica con ellos.
 | Registros y trazas de las peticiones en Cloudflare                             | Hasta 7 días                                                                                          |
 | Datos de la cuenta (usuario, cuentas conectadas, enlaces)                      | Hasta que eliminas tu cuenta y, después, hasta 30 días en las copias de seguridad de la base de datos |
 | Sesiones, con su dirección IP                                                  | Hasta que cierras sesión o la revocas y, como tarde, 30 días después de que caduquen                  |
+| Detalles de los clics                                                          | 12 meses, o hasta que se elimine su enlace si es antes                                                |
 | Registro del bloqueo (nombre, correo electrónico, motivo y cuentas conectadas) | Mientras skuz.link siga funcionando                                                                   |
 | Correos a `contact@skuz.link`                                                  | Hasta que los atiendo                                                                                 |
 | Denuncias de abuso a `abuse@skuz.link`                                         | 1 año                                                                                                 |
@@ -93,13 +104,15 @@ En los Ajustes puedes ejercer algunos tú mismo:
 - editar tu nombre;
 - revocar tus sesiones;
 - desconectar una cuenta conectada;
-- eliminar tu cuenta, lo que borra también tus enlaces y tus sesiones.
+- eliminar tu cuenta, lo que borra también tus enlaces, sus clics y tus sesiones.
 
 Para todo lo demás, escríbeme a [contact@skuz.link](mailto:contact@skuz.link) desde el correo electrónico de tu cuenta. Si no puedes, te pediré que demuestres de otro modo que la cuenta es tuya. Te responderé en el plazo de un mes.
 
 Tu correo electrónico es el de tu cuenta de Google o de GitHub. Si necesitas corregirlo, escríbeme.
 
 Si te he bloqueado y pides la supresión de tus datos, borro todo salvo el registro del bloqueo, que necesito para que no vuelvas a registrarte.
+
+Los detalles de los clics no contienen nada que identifique a un visitante, así que no puedo encontrar, mostrar ni borrar los clics de una persona cuando me lo pida (art. 11 RGPD).
 
 Si crees que no he atendido bien tu solicitud, puedes reclamar ante la Agencia Española de Protección de Datos en [aepd.es](https://www.aepd.es).
 

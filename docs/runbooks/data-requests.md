@@ -21,7 +21,7 @@ Requests arrive at `contact@skuz.link`, which forwards to the Proton inbox. Note
    ```
 
 2. Answer only when the request comes from the account's email address, which is `user.email`. Otherwise, verify the person another way before you act or send any data. For example, send them a one-time code, ask them to sign in to skuz.link and set their name in Settings to that code, and check `user.name` with the query above.
-3. If no User has that address, tell the person that skuz.link holds no account for it. Their own email is the only other data you hold about them.
+3. If no User has that address, tell the person that skuz.link holds no account for it. Their own email is the only other data you can tie to them: Clicks hold nothing that identifies a Visitor (GDPR art. 11).
 
 The answer is free, and goes to the account's email address.
 
@@ -94,6 +94,7 @@ What the export leaves out, and why:
 - **Session tokens.** Each one would let anyone who reads it sign in as the User.
 - **Sessions created by admin impersonation.** They carry your IP address, not the User's.
 - **Cloudflare's request logs and traces.** They aren't tied to a User and are gone within 7 days.
+- **Clicks.** They describe the Visitors who opened the User's Links, not the User. The export keeps each Link's Click count.
 
 ## 3. Rectification
 
@@ -108,7 +109,7 @@ What the export leaves out, and why:
 
 ## 4. Erasure
 
-Point the User to **Delete account** in Settings. It deletes the User, their Connected accounts, Sessions and Links, and purges the Links' cached Redirects.
+Point the User to **Delete account** in Settings. It deletes the User, their Connected accounts, Sessions and Links, with the Links' Clicks, and purges the Links' cached Redirects.
 
 If they can't do it themselves, delete the account on their behalf through better-auth's deletion. Don't delete the rows with SQL or with the admin plugin's `remove-user` endpoint: neither runs the `auth:user:deleting` hook, so the Links' cached Redirects would keep serving for up to 60 seconds. Your own User needs the admin role (see the moderation runbook). Signed in to skuz.link, run this in the browser console:
 
@@ -135,10 +136,11 @@ SELECT
   (SELECT count(*) FROM user WHERE id = '<user-id>') AS users,
   (SELECT count(*) FROM account WHERE user_id = '<user-id>') AS accounts,
   (SELECT count(*) FROM session WHERE user_id = '<user-id>') AS sessions,
-  (SELECT count(*) FROM links WHERE user_id = '<user-id>') AS links;
+  (SELECT count(*) FROM links WHERE user_id = '<user-id>') AS links,
+  (SELECT count(*) FROM clicks WHERE link_id NOT IN (SELECT id FROM links)) AS orphaned_clicks;
 ```
 
-Expect four zeros. Tell the User that the data stays up to 30 days in D1's Time Travel backups, then is gone.
+Expect five zeros. The last count covers every User: a Click left without its Link means the cascade from `links` to `clicks` failed, so find out why before you answer. Tell the User that the data stays up to 30 days in D1's Time Travel backups, then is gone.
 
 ## 5. Erasure for a banned User
 
@@ -161,6 +163,7 @@ Handle these case by case, and answer in writing either way.
 
 - **Restriction** (GDPR art. 18): while you check a disputed fact, such as a wrong email, don't change or delete the data in question unless the User agrees. Note the restriction in the reply, and lift it when the check is done.
 - **Objection** (GDPR art. 21) applies to processing under legitimate interest: request logs, Session IP addresses, abuse handling and Bans. Stop unless you have a compelling reason that outweighs the User's interests, such as an open abuse investigation or a Ban. For Session IP addresses, the User can also revoke their Sessions in Settings, which deletes the addresses at once.
+- **A Visitor's objection** to their Click details can't be matched to any Click: a Click holds nothing that identifies a Visitor, such as an IP address (GDPR art. 11). Tell them so, and that every Click is deleted 12 months after it happened.
 
 ## 7. Other requests
 

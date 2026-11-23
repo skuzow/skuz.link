@@ -16,7 +16,7 @@ The [Privacy policy](/privacy) explains what data I keep about your account and 
 
 - You are responsible for the links you create.
 - Short URLs are public: anyone who has one, or guesses it, can open it. Don't shorten private addresses.
-- Only you see how many clicks each of your links has.
+- Only you see your links' statistics. You may use them only to see how your links are used, never to work out who opened them.
 
 ## 5. What isn't allowed
 
