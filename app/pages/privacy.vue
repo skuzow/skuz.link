@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import PrivacyEn from '@/legal/privacy.en.md';
-import PrivacyEs from '@/legal/privacy.es.md';
+import PrivacyEn, {
+  sections as privacyEnSections
+} from '@/legal/privacy.en.md';
+import PrivacyEs, {
+  sections as privacyEsSections
+} from '@/legal/privacy.es.md';
 
 defineI18nRoute({ paths: { es: '/privacidad' } });
 
@@ -16,6 +20,9 @@ seoMeta({
   <LegalDocument
     :title="$t('legal.privacy.title')"
     updated="2026-10-30"
-    :bodies="{ en: PrivacyEn, es: PrivacyEs }"
+    :content="{
+      en: { body: PrivacyEn, sections: privacyEnSections },
+      es: { body: PrivacyEs, sections: privacyEsSections }
+    }"
   />
 </template>

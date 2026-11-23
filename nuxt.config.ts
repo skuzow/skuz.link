@@ -1,4 +1,5 @@
 import Markdown from 'unplugin-vue-markdown/vite';
+import type { LegalSection } from './app/types/legal';
 import { generateRuntimeConfig } from './layers/base/server/platform/runtimeConfig';
 
 const sectionNumber = /^(\d+)\.\s*/;
@@ -70,11 +71,18 @@ export default defineNuxtConfig({
         markdownItSetup: (md) => {
           // anchor ids, so a single section can be linked
           md.core.ruler.push('heading_ids', (state) => {
+            // the numbered sections in order, for the "On this page" index.
+            // The plugin exports each frontmatter key, so pages import them
+            // as `sections` and the index renders on the server
+            const sections: LegalSection[] = [];
+            state.env.frontmatter = { ...state.env.frontmatter, sections };
+
             state.tokens.forEach((token, index) => {
               const inline = state.tokens[index + 1];
               if (token.type !== 'heading_open' || !inline) return;
 
-              token.attrSet('id', slugifyHeading(inline.content));
+              const id = slugifyHeading(inline.content);
+              token.attrSet('id', id);
 
               // "## 2. What I process" gets its number as a label, "/ 02"
               const number = sectionNumber.exec(inline.content)?.[1];
@@ -82,9 +90,16 @@ export default defineNuxtConfig({
               if (token.tag !== 'h2' || !number || !text) return;
 
               text.content = text.content.replace(sectionNumber, '');
+              const paddedNumber = number.padStart(2, '0');
+
+              // the title as the heading shows it, typographer quotes included
+              const title = (inline.children ?? [])
+                .map((child) => child.content)
+                .join('');
+              sections.push({ number: paddedNumber, title, id });
 
               const label = new state.Token('html_inline', '', 0);
-              label.content = `<span><span aria-hidden="true">/</span> ${number.padStart(2, '0')}</span>`;
+              label.content = `<span><span aria-hidden="true">/</span> ${paddedNumber}</span>`;
               inline.children?.unshift(label);
             });
           });

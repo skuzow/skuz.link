@@ -71,16 +71,20 @@ _Avoid_: block, suspension
 
 ### Legal
 
-The texts that say who runs skuz.link, how it handles personal data, and what Users agree to.
+The Legal documents that say who runs skuz.link, how it handles personal data, and what Users agree to.
+
+**Legal document**:
+The Legal notice, the Privacy policy or the Terms of use. The Spanish version prevails over any translation.
+_Avoid_: legal page, legal text
 
 **Legal notice**:
-The page that says who runs skuz.link and how to contact them.
+The Legal document that says who runs skuz.link and how to contact them.
 _Avoid_: imprint, impressum
 
 **Privacy policy**:
-The page that explains which personal data skuz.link processes, why, for how long, and people's rights over it, cookies included.
+The Legal document that explains which personal data skuz.link processes, why, for how long, and people's rights over it, cookies included.
 _Avoid_: privacy notice, cookie policy
 
 **Terms of use**:
-The rules a User accepts by signing in: what Links may point to, and what happens to Links and Users that break them.
+The Legal document that sets the rules a User accepts by signing in: what Links may point to, and what happens to Links and Users that break them.
 _Avoid_: terms of service, ToS, terms and conditions

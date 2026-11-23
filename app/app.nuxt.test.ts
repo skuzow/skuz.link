@@ -41,10 +41,46 @@ const headings = () =>
 
 const mainText = () => document.body.querySelector('main')?.textContent ?? '';
 
+// a link in the page's text, past the switcher and the index
 const mainLink = (label: string) =>
   [...(document.body.querySelector('main')?.querySelectorAll('a') ?? [])]
-    .find((element) => element.textContent?.trim() === label)
+    .find(
+      (element) =>
+        !element.closest('nav') && element.textContent?.trim() === label
+    )
     ?.getAttribute('href');
+
+const landmarkName = (element: Element) =>
+  element.getAttribute('aria-label') ??
+  document
+    .getElementById(element.getAttribute('aria-labelledby') ?? '')
+    ?.textContent?.trim();
+
+// a navigation landmark, found by its name like a screen reader
+const navigation = (name: string) => {
+  const index = [...document.body.querySelectorAll('nav')].find(
+    (element) => landmarkName(element) === name
+  );
+  if (!index) throw new Error(`Missing navigation ${name}`);
+
+  return index;
+};
+
+// the switcher's links as their label, where they go and whether it's the current page
+const switcherLinks = (name: string) =>
+  [...navigation(name).querySelectorAll('a')].map((link) => [
+    link.textContent?.trim(),
+    link.getAttribute('href'),
+    link.getAttribute('aria-current')
+  ]);
+
+// each entry as its number, its title and where it links
+const pageIndexEntries = (name: string) =>
+  [...navigation(name).querySelectorAll('ol > li > a')].map((link) => [
+    link.firstElementChild?.textContent?.trim(),
+    link.lastChild?.textContent?.trim(),
+    link.getAttribute('href')
+  ]);
 
 beforeEach(() => {
   // better-auth calls fetch on an absolute URL, which registerEndpoint misses
@@ -298,6 +334,45 @@ describe('terms of use', () => {
     expect(langMenuLink('EN')).toBe('/terms');
   });
 
+  it('indexes the Spanish sections under a Spanish name', async () => {
+    await mountApp('/es/terminos');
+
+    expect(pageIndexEntries('En esta página')).toEqual([
+      [
+        '01',
+        'Qué es skuz.link y quién lo gestiona',
+        '#que-es-skuz-link-y-quien-lo-gestiona'
+      ],
+      ['02', 'Aceptación de estos términos', '#aceptacion-de-estos-terminos'],
+      ['03', 'Tu cuenta', '#tu-cuenta'],
+      ['04', 'Tus enlaces', '#tus-enlaces'],
+      ['05', 'Qué no está permitido', '#que-no-esta-permitido'],
+      [
+        '06',
+        'Qué pasa si un enlace incumple estos términos',
+        '#que-pasa-si-un-enlace-incumple-estos-terminos'
+      ],
+      ['07', 'Cómo denunciar un abuso', '#como-denunciar-un-abuso'],
+      ['08', 'Cuánto duran los enlaces', '#cuanto-duran-los-enlaces'],
+      ['09', 'Sin garantías', '#sin-garantias'],
+      ['10', 'Cambios', '#cambios'],
+      ['11', 'Ley y tribunales', '#ley-y-tribunales']
+    ]);
+  });
+
+  it('titles an index entry the way its heading reads', async () => {
+    await mountApp('/terms');
+
+    const heading = document.getElementById('what-isn-t-allowed');
+
+    expect(heading?.textContent).toBe('/ 05What isn’t allowed');
+    expect(pageIndexEntries('On this page')[4]).toEqual([
+      '05',
+      'What isn’t allowed',
+      '#what-isn-t-allowed'
+    ]);
+  });
+
   it('links the Legal notice and the Privacy policy in the same locale', async () => {
     await mountApp('/terms');
     expect(mainLink('Legal notice')).toBe('/legal-notice');
@@ -376,6 +451,22 @@ describe('privacy policy', () => {
     expect(langMenuLink('EN')).toBe('/privacy');
   });
 
+  it('indexes every numbered section on first render, with no subsection', async () => {
+    await mountApp('/privacy');
+
+    expect(pageIndexEntries('On this page')).toEqual([
+      ['01', 'Who I am', '#who-i-am'],
+      ['02', 'What I process and why', '#what-i-process-and-why'],
+      ['03', 'Legal bases', '#legal-bases'],
+      ['04', 'Cookies and browser storage', '#cookies-and-browser-storage'],
+      ['05', 'Who else receives data', '#who-else-receives-data'],
+      ['06', 'How long I keep it', '#how-long-i-keep-it'],
+      ['07', 'Your rights', '#your-rights'],
+      ['08', 'Minimum age', '#minimum-age'],
+      ['09', 'Changes', '#changes']
+    ]);
+  });
+
   it('links the Legal notice and the Terms of use in the same locale', async () => {
     await mountApp('/privacy');
     expect(mainLink('Legal notice')).toBe('/legal-notice');
@@ -385,6 +476,132 @@ describe('privacy policy', () => {
     await mountApp('/es/privacidad');
     expect(mainLink('Aviso legal')).toBe('/es/aviso-legal');
     expect(mainLink('Términos de uso')).toBe('/es/terminos');
+  });
+});
+
+describe('legal documents switcher', () => {
+  // each Legal document as its title and its path, in the footer's order
+  type Documents = [title: string, path: string][];
+
+  const english: Documents = [
+    ['Legal notice', '/legal-notice'],
+    ['Privacy policy', '/privacy'],
+    ['Terms of use', '/terms']
+  ];
+  const spanish: Documents = [
+    ['Aviso legal', '/es/aviso-legal'],
+    ['Política de privacidad', '/es/privacidad'],
+    ['Términos de uso', '/es/terminos']
+  ];
+
+  it.each([
+    ...english.map(([open, route]) => ({
+      route,
+      name: 'Legal documents',
+      documents: english,
+      open
+    })),
+    ...spanish.map(([open, route]) => ({
+      route,
+      name: 'Documentos legales',
+      documents: spanish,
+      open
+    }))
+  ])(
+    'links the three Legal documents and marks the open one at $route',
+    async ({ route, name, documents, open }) => {
+      await mountApp(route);
+
+      expect(switcherLinks(name)).toEqual(
+        documents.map(([title, path]) => [
+          title,
+          path,
+          title === open ? 'page' : null
+        ])
+      );
+    }
+  );
+});
+
+describe('legal document index fold', () => {
+  // the phone row: a disclosure whose summary reads as the index's name
+  const indexFold = (name: string) =>
+    [...navigation(name).querySelectorAll('details')].find(
+      (element) =>
+        element.querySelector('summary')?.textContent?.trim() === name
+    );
+
+  it.each([
+    ['/privacy', 'On this page'],
+    ['/es/privacidad', 'En esta página']
+  ])(
+    'folds the index of %s into a closed %s disclosure',
+    async (route, name) => {
+      await mountApp(route);
+
+      const fold = indexFold(name);
+
+      expect(fold).toBeDefined();
+      expect(fold?.open).toBe(false);
+    }
+  );
+});
+
+describe('legal document lit index entry', () => {
+  const indexLinks = () => [
+    ...navigation('On this page').querySelectorAll<HTMLAnchorElement>(
+      'ol > li > a'
+    )
+  ];
+
+  const entryTitle = (link: Element) => link.lastChild?.textContent?.trim();
+
+  const entry = (title: string) => {
+    const link = indexLinks().find((element) => entryTitle(element) === title);
+    if (!link) throw new Error(`Missing index entry ${title}`);
+
+    return link;
+  };
+
+  const currentEntries = () =>
+    indexLinks()
+      .filter((link) => link.getAttribute('aria-current') === 'true')
+      .map(entryTitle);
+
+  // happy-dom sends the hashchange events queued so far together, after a timer
+  const nextHashChange = () =>
+    new Promise((resolve) =>
+      window.addEventListener('hashchange', resolve, { once: true })
+    );
+
+  afterEach(() => {
+    // the next test starts with no section in the address
+    window.history.replaceState(null, '', window.location.pathname);
+  });
+
+  it('lights the section in the address on load', async () => {
+    await mountApp('/privacy#minimum-age');
+
+    expect(currentEntries()).toEqual(['Minimum age']);
+  });
+
+  // happy-dom lays nothing out, so every page sits at its end, like jumps to
+  // the last two sections of the Privacy policy on a desktop screen
+  it('follows Back between two jumps at the end of the page', async () => {
+    await mountApp('/privacy');
+
+    const clicks = nextHashChange();
+    entry('Minimum age').click();
+    entry('Changes').click();
+    await clicks;
+    expect(currentEntries()).toEqual(['Changes']);
+
+    // only Back's own event is left to move the lit entry
+    const back = nextHashChange();
+    window.history.back();
+    await back;
+    await nextTick();
+    expect(currentEntries()).toEqual(['Minimum age']);
   });
 });
 

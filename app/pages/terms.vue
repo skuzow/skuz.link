@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import TermsEn from '@/legal/terms.en.md';
-import TermsEs from '@/legal/terms.es.md';
+import TermsEn, { sections as termsEnSections } from '@/legal/terms.en.md';
+import TermsEs, { sections as termsEsSections } from '@/legal/terms.es.md';
 
 defineI18nRoute({ paths: { es: '/terminos' } });
 
@@ -16,6 +16,9 @@ seoMeta({
   <LegalDocument
     :title="$t('legal.terms.title')"
     updated="2026-10-30"
-    :bodies="{ en: TermsEn, es: TermsEs }"
+    :content="{
+      en: { body: TermsEn, sections: termsEnSections },
+      es: { body: TermsEs, sections: termsEsSections }
+    }"
   />
 </template>
