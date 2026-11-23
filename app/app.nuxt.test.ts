@@ -46,6 +46,27 @@ const mainLink = (label: string) =>
     .find((element) => element.textContent?.trim() === label)
     ?.getAttribute('href');
 
+// the "On this page" index, found by its landmark name like a screen reader
+const pageIndex = (name: string) => {
+  const index = [...document.body.querySelectorAll('nav')].find(
+    (element) =>
+      document
+        .getElementById(element.getAttribute('aria-labelledby') ?? '')
+        ?.textContent?.trim() === name
+  );
+  if (!index) throw new Error(`Missing navigation ${name}`);
+
+  return index;
+};
+
+// each entry as its number, its title and where it links
+const pageIndexEntries = (name: string) =>
+  [...pageIndex(name).querySelectorAll('ol > li > a')].map((link) => [
+    link.firstElementChild?.textContent?.trim(),
+    link.lastChild?.textContent?.trim(),
+    link.getAttribute('href')
+  ]);
+
 beforeEach(() => {
   // better-auth calls fetch on an absolute URL, which registerEndpoint misses
   vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
@@ -298,6 +319,45 @@ describe('terms of use', () => {
     expect(langMenuLink('EN')).toBe('/terms');
   });
 
+  it('indexes the Spanish sections under a Spanish name', async () => {
+    await mountApp('/es/terminos');
+
+    expect(pageIndexEntries('En esta página')).toEqual([
+      [
+        '01',
+        'Qué es skuz.link y quién lo gestiona',
+        '#que-es-skuz-link-y-quien-lo-gestiona'
+      ],
+      ['02', 'Aceptación de estos términos', '#aceptacion-de-estos-terminos'],
+      ['03', 'Tu cuenta', '#tu-cuenta'],
+      ['04', 'Tus enlaces', '#tus-enlaces'],
+      ['05', 'Qué no está permitido', '#que-no-esta-permitido'],
+      [
+        '06',
+        'Qué pasa si un enlace incumple estos términos',
+        '#que-pasa-si-un-enlace-incumple-estos-terminos'
+      ],
+      ['07', 'Cómo denunciar un abuso', '#como-denunciar-un-abuso'],
+      ['08', 'Cuánto duran los enlaces', '#cuanto-duran-los-enlaces'],
+      ['09', 'Sin garantías', '#sin-garantias'],
+      ['10', 'Cambios', '#cambios'],
+      ['11', 'Ley y tribunales', '#ley-y-tribunales']
+    ]);
+  });
+
+  it('titles an index entry the way its heading reads', async () => {
+    await mountApp('/terms');
+
+    const heading = document.getElementById('what-isn-t-allowed');
+
+    expect(heading?.textContent).toBe('/ 05What isn’t allowed');
+    expect(pageIndexEntries('On this page')[4]).toEqual([
+      '05',
+      'What isn’t allowed',
+      '#what-isn-t-allowed'
+    ]);
+  });
+
   it('links the Legal notice and the Privacy policy in the same locale', async () => {
     await mountApp('/terms');
     expect(mainLink('Legal notice')).toBe('/legal-notice');
@@ -374,6 +434,22 @@ describe('privacy policy', () => {
     await openLangMenu('Alternar idioma');
 
     expect(langMenuLink('EN')).toBe('/privacy');
+  });
+
+  it('indexes every numbered section on first render, with no subsection', async () => {
+    await mountApp('/privacy');
+
+    expect(pageIndexEntries('On this page')).toEqual([
+      ['01', 'Who I am', '#who-i-am'],
+      ['02', 'What I process and why', '#what-i-process-and-why'],
+      ['03', 'Legal bases', '#legal-bases'],
+      ['04', 'Cookies and browser storage', '#cookies-and-browser-storage'],
+      ['05', 'Who else receives data', '#who-else-receives-data'],
+      ['06', 'How long I keep it', '#how-long-i-keep-it'],
+      ['07', 'Your rights', '#your-rights'],
+      ['08', 'Minimum age', '#minimum-age'],
+      ['09', 'Changes', '#changes']
+    ]);
   });
 
   it('links the Legal notice and the Terms of use in the same locale', async () => {

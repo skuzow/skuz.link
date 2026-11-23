@@ -46,6 +46,7 @@
   },
   "legal": {
     "updated": "Última actualización: {date}",
+    "index": "En esta página",
     "legalNotice": {
       "title": "Aviso legal",
       "description": "Quién gestiona skuz.link y cómo contactarme."

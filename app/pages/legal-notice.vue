@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import LegalNoticeEn from '@/legal/legal-notice.en.md';
-import LegalNoticeEs from '@/legal/legal-notice.es.md';
+import LegalNoticeEn, {
+  sections as legalNoticeEnSections
+} from '@/legal/legal-notice.en.md';
+import LegalNoticeEs, {
+  sections as legalNoticeEsSections
+} from '@/legal/legal-notice.es.md';
 
 defineI18nRoute({ paths: { es: '/aviso-legal' } });
 
@@ -16,6 +20,9 @@ seoMeta({
   <LegalDocument
     :title="$t('legal.legalNotice.title')"
     updated="2026-10-30"
-    :bodies="{ en: LegalNoticeEn, es: LegalNoticeEs }"
+    :content="{
+      en: { body: LegalNoticeEn, sections: legalNoticeEnSections },
+      es: { body: LegalNoticeEs, sections: legalNoticeEsSections }
+    }"
   />
 </template>
