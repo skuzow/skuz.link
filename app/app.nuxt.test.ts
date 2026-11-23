@@ -41,27 +41,42 @@ const headings = () =>
 
 const mainText = () => document.body.querySelector('main')?.textContent ?? '';
 
+// a link in the page's text, past the switcher and the index
 const mainLink = (label: string) =>
   [...(document.body.querySelector('main')?.querySelectorAll('a') ?? [])]
-    .find((element) => element.textContent?.trim() === label)
+    .find(
+      (element) =>
+        !element.closest('nav') && element.textContent?.trim() === label
+    )
     ?.getAttribute('href');
 
-// the "On this page" index, found by its landmark name like a screen reader
-const pageIndex = (name: string) => {
+const landmarkName = (element: Element) =>
+  element.getAttribute('aria-label') ??
+  document
+    .getElementById(element.getAttribute('aria-labelledby') ?? '')
+    ?.textContent?.trim();
+
+// a navigation landmark, found by its name like a screen reader
+const navigation = (name: string) => {
   const index = [...document.body.querySelectorAll('nav')].find(
-    (element) =>
-      document
-        .getElementById(element.getAttribute('aria-labelledby') ?? '')
-        ?.textContent?.trim() === name
+    (element) => landmarkName(element) === name
   );
   if (!index) throw new Error(`Missing navigation ${name}`);
 
   return index;
 };
 
+// the switcher's links as their label, where they go and whether it's the current page
+const switcherLinks = (name: string) =>
+  [...navigation(name).querySelectorAll('a')].map((link) => [
+    link.textContent?.trim(),
+    link.getAttribute('href'),
+    link.getAttribute('aria-current')
+  ]);
+
 // each entry as its number, its title and where it links
 const pageIndexEntries = (name: string) =>
-  [...pageIndex(name).querySelectorAll('ol > li > a')].map((link) => [
+  [...navigation(name).querySelectorAll('ol > li > a')].map((link) => [
     link.firstElementChild?.textContent?.trim(),
     link.lastChild?.textContent?.trim(),
     link.getAttribute('href')
@@ -462,6 +477,50 @@ describe('privacy policy', () => {
     expect(mainLink('Aviso legal')).toBe('/es/aviso-legal');
     expect(mainLink('Términos de uso')).toBe('/es/terminos');
   });
+});
+
+describe('legal documents switcher', () => {
+  // each Legal document as its title and its path, in the footer's order
+  type Documents = [title: string, path: string][];
+
+  const english: Documents = [
+    ['Legal notice', '/legal-notice'],
+    ['Privacy policy', '/privacy'],
+    ['Terms of use', '/terms']
+  ];
+  const spanish: Documents = [
+    ['Aviso legal', '/es/aviso-legal'],
+    ['Política de privacidad', '/es/privacidad'],
+    ['Términos de uso', '/es/terminos']
+  ];
+
+  it.each([
+    ...english.map(([open, route]) => ({
+      route,
+      name: 'Legal documents',
+      documents: english,
+      open
+    })),
+    ...spanish.map(([open, route]) => ({
+      route,
+      name: 'Documentos legales',
+      documents: spanish,
+      open
+    }))
+  ])(
+    'links the three Legal documents and marks the open one at $route',
+    async ({ route, name, documents, open }) => {
+      await mountApp(route);
+
+      expect(switcherLinks(name)).toEqual(
+        documents.map(([title, path]) => [
+          title,
+          path,
+          title === open ? 'page' : null
+        ])
+      );
+    }
+  );
 });
 
 describe('login page', () => {

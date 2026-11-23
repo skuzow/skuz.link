@@ -14,10 +14,63 @@ const { title, updated, content } = defineProps<Props>();
 
 const { locale } = useI18n();
 
+const route = useRoute();
+const localePath = useLocalePath();
+
 const indexLabelId = useId();
+
+// in the footer's order
+const documents = computed(() =>
+  [
+    { to: '/legal-notice', title: 'legal.legalNotice.title' },
+    { to: '/privacy', title: 'legal.privacy.title' },
+    { to: '/terms', title: 'legal.terms.title' }
+  ].map(({ to, title }) => ({
+    to,
+    title,
+    current: route.path === localePath(to)
+  }))
+);
 </script>
 
 <template>
+  <nav :aria-label="$t('legal.documents')" class="mb-12">
+    <!-- below 360px "PRIVACIDAD" is wider than a third of the screen, so the
+         links stack; from sm the row is only as wide as its labels -->
+    <ul
+      class="grid grid-cols-3 border max-[360px]:grid-cols-1 sm:inline-grid sm:grid-cols-[repeat(3,auto)]"
+    >
+      <li
+        v-for="document in documents"
+        :key="document.to"
+        class="flex not-first:border-l max-[360px]:not-first:border-t max-[360px]:not-first:border-l-0"
+      >
+        <NuxtLinkLocale
+          :to="document.to"
+          :aria-current="document.current ? 'page' : undefined"
+          :class="[
+            'type-chip focus-visible:outline-ring flex min-h-11 flex-1 items-center justify-center gap-2 px-3 py-2 text-center leading-3.5 transition-colors duration-120 focus-visible:relative focus-visible:z-1 focus-visible:outline-2 focus-visible:outline-offset-2 max-[360px]:justify-start max-[360px]:text-left sm:px-4',
+            document.current
+              ? 'bg-card text-foreground'
+              : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+          ]"
+        >
+          <!-- the lit LED glows in dark only, like every LED -->
+          <span
+            aria-hidden="true"
+            :class="[
+              'led',
+              document.current
+                ? 'text-signal'
+                : 'text-border-strong shadow-none!'
+            ]"
+          />
+          {{ $t(document.title) }}
+        </NuxtLinkLocale>
+      </li>
+    </ul>
+  </nav>
+
   <!-- left-aligned: the text holds to measure and the rest of the row stays empty.
        From lg the index takes the left column; the markup keeps the title first -->
   <article

@@ -45,6 +45,7 @@
     "home": "Back home"
   },
   "legal": {
+    "documents": "Legal documents",
     "updated": "Last updated: {date}",
     "translation": "This is a translation. If it differs from the Spanish version, the Spanish one prevails.",
     "index": "On this page",

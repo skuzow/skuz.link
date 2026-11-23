@@ -45,6 +45,7 @@
     "home": "Volver al inicio"
   },
   "legal": {
+    "documents": "Documentos legales",
     "updated": "Última actualización: {date}",
     "index": "En esta página",
     "legalNotice": {
