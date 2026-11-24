@@ -1,3 +1,6 @@
+import type { z } from 'zod';
+import type { ClickRangeSchema, ClicksQuerySchema } from './click.schema';
+
 // what a Click keeps: never an IP address or the full user agent (ADR-0007)
 export interface Click {
   id: number;
@@ -21,3 +24,26 @@ export type ClickClient = Pick<
   Click,
   'browser' | 'os' | 'device' | 'bot' | 'botName'
 >;
+
+export type ClickRange = z.infer<typeof ClickRangeSchema>;
+
+export type ClicksQuery = z.infer<typeof ClicksQuerySchema>;
+
+// XX stands for every Click with no known country
+export interface CountryClicks {
+  country: string;
+  clicks: number;
+}
+
+// what a Link's Statistics show for a range
+export interface LinkStatistics {
+  rangeClicks: number;
+  // the Link's Click count, which ignores the range: "Lifetime Clicks"
+  clickCount: number;
+  // leaves out Unknown
+  countries: number;
+  // the most common Referrer host, never Direct; null with no Referrer at all
+  topReferrer: string | null;
+  // most Clicks first, then by code, and Unknown last
+  countryClicks: CountryClicks[];
+}

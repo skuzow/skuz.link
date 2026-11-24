@@ -2,7 +2,7 @@ import type {
   Click,
   ClickDetails
 } from '#layers/links/shared/domain/click.type';
-import { and, desc, eq, gte, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, isNotNull, sql } from 'drizzle-orm';
 import type { Database } from '#layers/base/server/platform/db';
 import { CLICKS_PAGE_SIZE } from '#layers/links/shared/domain/click.constant';
 import { clicks, links } from './schema';
@@ -24,6 +24,9 @@ const clickColumns = {
   bot: clicks.bot,
   botName: clicks.botName
 };
+
+const inRange = (linkId: string, since: Date) =>
+  and(eq(clicks.linkId, linkId), gte(clicks.createdAt, since));
 
 class ClickRepository {
   constructor(private db: Database) {}
@@ -65,9 +68,35 @@ class ClickRepository {
     return this.db
       .select(clickColumns)
       .from(clicks)
-      .where(and(eq(clicks.linkId, linkId), gte(clicks.createdAt, since)))
+      .where(inRange(linkId, since))
       .orderBy(desc(clicks.createdAt), desc(clicks.id))
       .limit(CLICKS_PAGE_SIZE);
+  }
+
+  // by the country as Cloudflare sent it, so XX, T1 and none stay apart
+  async countByCountry(
+    linkId: string,
+    since: Date
+  ): Promise<{ country: string | null; clicks: number }[]> {
+    return this.db
+      .select({ country: clicks.country, clicks: count() })
+      .from(clicks)
+      .where(inRange(linkId, since))
+      .groupBy(clicks.country);
+  }
+
+  // Direct Clicks have no host, so they never count; a tie goes to the
+  // first host alphabetically
+  async findTopReferrer(linkId: string, since: Date): Promise<string | null> {
+    const [top] = await this.db
+      .select({ referrer: clicks.referrer })
+      .from(clicks)
+      .where(and(inRange(linkId, since), isNotNull(clicks.referrer)))
+      .groupBy(clicks.referrer)
+      .orderBy(desc(count()), asc(clicks.referrer))
+      .limit(1);
+
+    return top?.referrer ?? null;
   }
 }
 

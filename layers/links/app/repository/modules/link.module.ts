@@ -1,4 +1,8 @@
-import type { Click } from '#layers/links/shared/domain/click.type';
+import type {
+  Click,
+  ClicksQuery,
+  LinkStatistics
+} from '#layers/links/shared/domain/click.type';
 import type { Link, LinkInput } from '#layers/links/shared/domain/link.type';
 
 import ApiModule from '#layers/base/app/repository/api.module';
@@ -21,10 +25,19 @@ class LinkModule extends ApiModule {
     });
   }
 
-  async getClicks(id: string) {
+  async getStatistics(id: string, query: ClicksQuery) {
+    return this.call<LinkStatistics>({
+      method: 'GET',
+      url: this.ROUTE.LinkStatistics(id),
+      query
+    });
+  }
+
+  async getClicks(id: string, query: ClicksQuery) {
     return this.call<Click[]>({
       method: 'GET',
-      url: this.ROUTE.LinkClicks(id)
+      url: this.ROUTE.LinkClicks(id),
+      query
     });
   }
 

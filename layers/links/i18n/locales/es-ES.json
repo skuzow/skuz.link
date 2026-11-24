@@ -48,6 +48,25 @@
       "meta": {
         "title": "Estadísticas de skuz.link/{slug}"
       },
+      "figures": {
+        "rangeClicks": "Clics · {range}",
+        "lifetimeClicks": "Clics totales",
+        "countries": "Países",
+        "topReferrer": "Referente principal"
+      },
+      "range": {
+        "label": "Periodo",
+        "24h": "24 h",
+        "7d": "7 días",
+        "30d": "30 días",
+        "12m": "12 meses",
+        "short": {
+          "24h": "24 h",
+          "7d": "7 d",
+          "30d": "30 d",
+          "12m": "12 m"
+        }
+      },
       "clicks": {
         "title": "Clics",
         "time": "Hora",
@@ -63,7 +82,8 @@
           "mobile": "Móvil",
           "tablet": "Tableta"
         },
-        "empty": "No hay clics en este periodo"
+        "empty": "No hay clics en este periodo",
+        "shown": "{shown} de {total}"
       }
     }
   },

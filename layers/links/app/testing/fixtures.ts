@@ -1,4 +1,7 @@
-import type { Click } from '#layers/links/shared/domain/click.type';
+import type {
+  Click,
+  LinkStatistics
+} from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 
 export const makeLink = (overrides: Partial<Link> = {}): Link => ({
@@ -24,5 +27,16 @@ export const makeClick = (overrides: Partial<Click> = {}): Click => ({
   device: null,
   bot: false,
   botName: null,
+  ...overrides
+});
+
+export const makeStatistics = (
+  overrides: Partial<LinkStatistics> = {}
+): LinkStatistics => ({
+  rangeClicks: 0,
+  clickCount: 0,
+  countries: 0,
+  topReferrer: null,
+  countryClicks: [],
   ...overrides
 });

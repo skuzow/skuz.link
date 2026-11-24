@@ -1,4 +1,7 @@
-import type { Click } from '#layers/links/shared/domain/click.type';
+import type {
+  Click,
+  LinkStatistics
+} from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -35,26 +38,42 @@ const getLink = async (id: string, headers = alice.headers) => {
   return (await response.json()) as Link;
 };
 
-const listClicks = async (id: string, headers = alice.headers) => {
-  const response = await server.fetch(`/api/links/${id}/clicks`, { headers });
+const listClicks = async (id: string, headers = alice.headers, query = '') => {
+  const response = await server.fetch(`/api/links/${id}/clicks${query}`, {
+    headers
+  });
   expect(response.status).toBe(200);
 
   return (await response.json()) as Click[];
 };
 
+const getStatistics = async (id: string, query = '') => {
+  const response = await server.fetch(`/api/links/${id}/statistics${query}`, {
+    headers: alice.headers
+  });
+  expect(response.status).toBe(200);
+
+  return (await response.json()) as LinkStatistics;
+};
+
+type ClickSeed = Partial<typeof clicks.$inferInsert> & { age: number };
+
 // one statement per row, because D1 caps the parameters of a statement
 const seedClicks = async (
   linkId: string,
-  seeds: { city: string; age: number }[],
+  seeds: ClickSeed[],
   now = Date.now()
 ) => {
-  const [first, ...rest] = seeds.map(({ city, age }) =>
+  const [first, ...rest] = seeds.map(({ age, ...values }) =>
     server.db
       .insert(clicks)
-      .values({ linkId, city, createdAt: new Date(now - age) })
+      .values({ ...values, linkId, createdAt: new Date(now - age) })
   );
   if (first) await server.db.batch([first, ...rest]);
 };
+
+const setClickCount = (linkId: string, count: number) =>
+  server.db.update(links).set({ clicks: count }).where(eq(links.id, linkId));
 
 const countStoredClicks = async (linkId: string) =>
   (await server.db.select().from(clicks).where(eq(clicks.linkId, linkId)))
@@ -418,23 +437,138 @@ describe('GET /api/links/:id/clicks', () => {
       ...Array.from({ length: 48 }, (_, index) => `n${index + 3}`)
     ]);
   });
+});
 
-  it('keeps Clicks of the last 30 days and leaves out older ones', async () => {
-    const link = await server.createLink(alice.headers, 'month');
+describe('ranges', () => {
+  const HOUR_MS = 60 * MINUTE_MS;
+
+  // either side of where each range starts
+  const AGES: ClickSeed[] = [
+    { city: '23 hours', age: 23 * HOUR_MS },
+    { city: '25 hours', age: 25 * HOUR_MS },
+    { city: '6 days', age: 6 * DAY_MS },
+    { city: '8 days', age: 8 * DAY_MS },
+    { city: '29 days', age: 29 * DAY_MS },
+    { city: '31 days', age: 31 * DAY_MS },
+    { city: '364 days', age: 364 * DAY_MS },
+    { city: '366 days', age: 366 * DAY_MS }
+  ];
+
+  const MONTH = ['23 hours', '25 hours', '6 days', '8 days', '29 days'];
+
+  it.each([
+    ['24 hours', '?range=24h', ['23 hours']],
+    ['7 days', '?range=7d', ['23 hours', '25 hours', '6 days']],
+    ['30 days', '?range=30d', MONTH],
+    ['12 months', '?range=12m', [...MONTH, '31 days', '364 days']],
+    ['30 days when no range is given', '', MONTH]
+  ])('%s counts and lists the same Clicks', async (_, query, cities) => {
+    const link = await server.createLink(alice.headers, 'ranges');
+    await seedClicks(link.id, AGES);
+    await setClickCount(link.id, 9);
+
+    expect(
+      (await listClicks(link.id, alice.headers, query)).map(
+        (click) => click.city
+      )
+    ).toEqual(cities);
+    expect(await getStatistics(link.id, query)).toMatchObject({
+      rangeClicks: cities.length,
+      clickCount: 9
+    });
+  });
+
+  it.each(['/clicks', '/statistics'])(
+    'GET /api/links/:id%s returns 400 with the issues for a bad range',
+    async (suffix) => {
+      const link = await server.createLink(alice.headers, 'bad-range');
+
+      const response = await server.fetch(
+        `/api/links/${link.id}${suffix}?range=1y`,
+        { headers: alice.headers }
+      );
+
+      expect(response.status).toBe(400);
+
+      const body = await response.json();
+      expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
+      expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
+        ['range']
+      ]);
+    }
+  );
+});
+
+describe('GET /api/links/:id/statistics', () => {
+  it('counts the Countries without Unknown, and joins XX, T1 and no country as one Unknown', async () => {
+    const link = await server.createLink(alice.headers, 'countries');
 
     await seedClicks(link.id, [
-      { city: 'inside', age: 29 * DAY_MS },
-      { city: 'outside', age: 31 * DAY_MS }
+      { country: 'FR', age: MINUTE_MS },
+      { country: 'ES', age: MINUTE_MS },
+      { country: 'ES', age: MINUTE_MS },
+      { country: 'XX', age: MINUTE_MS },
+      { country: 'T1', age: MINUTE_MS },
+      { country: null, age: MINUTE_MS },
+      { country: 'DE', age: MINUTE_MS }
     ]);
 
-    expect((await listClicks(link.id)).map((click) => click.city)).toEqual([
-      'inside'
+    expect(await getStatistics(link.id)).toMatchObject({
+      rangeClicks: 7,
+      countries: 3,
+      // most Clicks first, then by code, and Unknown last whatever its count
+      countryClicks: [
+        { country: 'ES', clicks: 2 },
+        { country: 'DE', clicks: 1 },
+        { country: 'FR', clicks: 1 },
+        { country: 'XX', clicks: 3 }
+      ]
+    });
+  });
+
+  it.each([
+    [
+      'the most common host, never Direct',
+      [null, null, null, 'google.com', 'google.com', 't.co'],
+      'google.com'
+    ],
+    [
+      'the first host alphabetically on a tie',
+      ['t.co', 'bing.com', 't.co', 'bing.com'],
+      'bing.com'
+    ],
+    ['null with no Referrer at all', [null, null], null]
+  ])('gives Top referrer as %s', async (_, referrers, topReferrer) => {
+    const link = await server.createLink(alice.headers, 'referrers');
+
+    await seedClicks(
+      link.id,
+      referrers.map((referrer) => ({ referrer, age: MINUTE_MS }))
+    );
+
+    expect((await getStatistics(link.id)).topReferrer).toBe(topReferrer);
+  });
+
+  it('gives zeros for a range with no Clicks, and keeps the Click count', async () => {
+    const link = await server.createLink(alice.headers, 'quiet');
+    await seedClicks(link.id, [
+      { country: 'ES', referrer: 'google.com', age: 2 * DAY_MS }
     ]);
+    await setClickCount(link.id, 4);
+
+    expect(await getStatistics(link.id, '?range=24h')).toEqual({
+      rangeClicks: 0,
+      clickCount: 4,
+      countries: 0,
+      topReferrer: null,
+      countryClicks: []
+    });
+    expect(await listClicks(link.id, alice.headers, '?range=24h')).toEqual([]);
   });
 });
 
 describe('access', () => {
-  it.each(['', '/clicks'])(
+  it.each(['', '/clicks', '/statistics'])(
     'GET /api/links/:id%s returns 401 without a session',
     async (suffix) => {
       const link = await server.createLink(alice.headers, 'signed-out');
@@ -445,7 +579,7 @@ describe('access', () => {
     }
   );
 
-  it.each(['', '/clicks'])(
+  it.each(['', '/clicks', '/statistics'])(
     "GET /api/links/:id%s returns 404 for another User's Link",
     async (suffix) => {
       const link = await server.createLink(bob.headers, 'bobs-link');
@@ -462,7 +596,7 @@ describe('access', () => {
     }
   );
 
-  it.each(['', '/clicks'])(
+  it.each(['', '/clicks', '/statistics'])(
     'GET /api/links/:id%s returns 404 for an unknown id',
     async (suffix) => {
       const response = await server.fetch(`/api/links/missing${suffix}`, {

@@ -46,5 +46,7 @@ const hueStyle = computed(() => linkHueStyle(props.link.slug));
       </div>
       <LinksSlugMark :slug="link.slug" class="size-[33px] sm:size-[55px]" />
     </div>
+    <!-- the readout, under a hairline -->
+    <slot />
   </UiCard>
 </template>

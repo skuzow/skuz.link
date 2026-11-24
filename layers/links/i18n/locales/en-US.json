@@ -48,6 +48,25 @@
       "meta": {
         "title": "Statistics for skuz.link/{slug}"
       },
+      "figures": {
+        "rangeClicks": "Clicks · {range}",
+        "lifetimeClicks": "Lifetime Clicks",
+        "countries": "Countries",
+        "topReferrer": "Top referrer"
+      },
+      "range": {
+        "label": "Time range",
+        "24h": "24h",
+        "7d": "7 days",
+        "30d": "30 days",
+        "12m": "12 months",
+        "short": {
+          "24h": "24h",
+          "7d": "7d",
+          "30d": "30d",
+          "12m": "12m"
+        }
+      },
       "clicks": {
         "title": "Clicks",
         "time": "Time",
@@ -63,7 +82,8 @@
           "mobile": "Mobile",
           "tablet": "Tablet"
         },
-        "empty": "No Clicks in this range"
+        "empty": "No Clicks in this range",
+        "shown": "{shown} of {total}"
       }
     }
   },

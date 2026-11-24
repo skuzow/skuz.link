@@ -1,13 +1,21 @@
 <script lang="ts" setup>
-import type { Click } from '#layers/links/shared/domain/click.type';
+import type {
+  Click,
+  ClickRange,
+  LinkStatistics
+} from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
 import ArrowLeftIcon from '~icons/pixelarticons/arrow-left';
 
 defineProps<{
   link: Link;
+  statistics: LinkStatistics;
   clicks: Click[];
+  loading: boolean;
 }>();
+
+const range = defineModel<ClickRange>('range', { required: true });
 </script>
 
 <template>
@@ -19,8 +27,22 @@ defineProps<{
       </NuxtLinkLocale>
     </UiButton>
 
-    <LinksStatisticsSummary :link="link" />
+    <LinksStatisticsSummary :link="link">
+      <LinksStatisticsReadout
+        :statistics="statistics"
+        :range="range"
+        :loading="loading"
+      />
+    </LinksStatisticsSummary>
 
-    <LinksStatisticsClickList :clicks="clicks" />
+    <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+      <LinksStatisticsRangeSwitcher v-model="range" />
+    </div>
+
+    <LinksStatisticsClickList
+      :clicks="clicks"
+      :total="statistics.rangeClicks"
+      :loading="loading"
+    />
   </div>
 </template>
