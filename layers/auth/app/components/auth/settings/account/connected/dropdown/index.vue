@@ -25,7 +25,9 @@ const availableProviders: ComputedRef<AuthProvider[]> = computed(() =>
         {{ $t('auth.settings.account.connected.connect') }}
       </UiButton>
     </UiDropdownMenuTrigger>
+    <!-- above its Button, from the foot at the bottom of the panel -->
     <UiDropdownMenuContent
+      side="top"
       align="start"
       class="min-w-(--reka-dropdown-menu-trigger-width)"
     >

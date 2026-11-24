@@ -6,6 +6,7 @@
     "continueWith": "Continue with {provider}",
     "settings": {
       "title": "Settings",
+      "retry": "Try again",
       "profile": {
         "title": "Profile",
         "button": "Update profile"
@@ -13,14 +14,16 @@
       "sessions": {
         "title": "Sessions",
         "button": "Revoke",
-        "current": "Current"
+        "current": "Current",
+        "failure": "Something went wrong with your sessions"
       },
       "account": {
         "connected": {
           "title": "Connected accounts",
           "credential": "Credentials",
           "disconnect": "Disconnect",
-          "connect": "Connect account"
+          "connect": "Connect account",
+          "failure": "Something went wrong with your connected accounts"
         },
         "delete": {
           "title": "Delete account",
