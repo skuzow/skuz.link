@@ -53,6 +53,8 @@
         "time": "Time",
         "where": "Where",
         "unknown": "Unknown",
+        "from": "From",
+        "direct": "Direct",
         "client": "Client",
         "bot": "Bot",
         "other": "Other",

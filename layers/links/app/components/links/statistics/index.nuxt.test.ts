@@ -60,6 +60,9 @@ const clients = () =>
       .join(' ')
   );
 
+// the From cell's text, the third of each row
+const froms = () => rows().map((row) => row.children[2]?.textContent?.trim());
+
 const backLink = () =>
   [...document.body.querySelectorAll('a')].find(
     (element) => element.textContent?.trim() === 'Links'
@@ -125,7 +128,7 @@ describe('Statistics page', () => {
 
     await mountPage();
 
-    expect(headers()).toEqual(['Time', 'Where', 'Client']);
+    expect(headers()).toEqual(['Time', 'Where', 'From', 'Client']);
     expect(rows()).toHaveLength(2);
 
     const [madrid, paris] = rows();
@@ -193,6 +196,17 @@ describe('Statistics page', () => {
     ]);
   });
 
+  it("reads each Click's Referrer host, or Direct", async () => {
+    getClicks.mockReturnValue([
+      makeClick({ id: 2, referrer: 'news.ycombinator.com' }),
+      makeClick({ id: 1, referrer: null })
+    ]);
+
+    await mountPage();
+
+    expect(froms()).toEqual(['news.ycombinator.com', 'Direct']);
+  });
+
   it('says so when no Click came in the last 30 days', async () => {
     const wrapper = await mountPage();
 
@@ -205,6 +219,7 @@ describe('Statistics page', () => {
       makeClick({
         id: 3,
         country: 'ES',
+        referrer: 'google.com',
         browser: 'Safari',
         os: 'iOS',
         device: 'Mobile'
@@ -224,8 +239,9 @@ describe('Statistics page', () => {
     const wrapper = await mountPage('/es/links/link-1');
 
     expect(wrapper.text()).toContain('Estadísticas');
-    expect(headers()).toEqual(['Hora', 'Dónde', 'Cliente']);
+    expect(headers()).toEqual(['Hora', 'Dónde', 'Desde', 'Cliente']);
     expect(rows()[1]?.textContent).toContain('Desconocido');
+    expect(froms()).toEqual(['google.com', 'Directo', 'Directo']);
     expect(clients()).toEqual([
       'Safari · iOS · Móvil',
       'Otro · Otro · Escritorio',

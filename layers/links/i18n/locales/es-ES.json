@@ -53,6 +53,8 @@
         "time": "Hora",
         "where": "Dónde",
         "unknown": "Desconocido",
+        "from": "Desde",
+        "direct": "Directo",
         "client": "Cliente",
         "bot": "Bot",
         "other": "Otro",

@@ -334,6 +334,44 @@ describe('recording a Click', () => {
   });
 
   it.each([
+    ['a www host', 'https://www.Google.com/search?q=x', 'google.com'],
+    ['another subdomain', 'https://l.facebook.com/', 'l.facebook.com'],
+    [
+      'a deeper subdomain',
+      'http://news.ycombinator.com/item?id=1',
+      'news.ycombinator.com'
+    ],
+    ['a host with a trailing dot', 'https://www.google.com./', 'google.com'],
+    ['skuz.link itself', 'https://skuz.link/links', 'skuz.link'],
+    ['an app', 'android-app://com.google.android.gm/', null],
+    ['no Referer', null, null],
+    ['a broken Referer', 'https://', null],
+    ['a Referer that is not a URL', 'not a url', null]
+  ])('keeps the Referrer host of %s', async (_, referer, referrer) => {
+    const link = await server.createLink(alice.headers, 'from');
+
+    await server.fetch('/from', {
+      headers: referer === null ? {} : { Referer: referer }
+    });
+    await server.flush();
+
+    expect(await listClicks(link.id)).toMatchObject([{ referrer }]);
+  });
+
+  it('cuts a Referrer host to a fixed length', async () => {
+    const link = await server.createLink(alice.headers, 'from');
+    const host = `${'a'.repeat(60)}.${'b'.repeat(60)}.${'c'.repeat(60)}.com`;
+
+    await server.fetch('/from', {
+      headers: { Referer: `https://${host}/` }
+    });
+    await server.flush();
+
+    const [click] = await listClicks(link.id);
+    expect(click?.referrer).toBe(host.slice(0, 128));
+  });
+
+  it.each([
     ['XX', { country: 'XX' }, 'XX'],
     ['T1', { country: 'T1' }, 'T1'],
     ['no cf', undefined, null]

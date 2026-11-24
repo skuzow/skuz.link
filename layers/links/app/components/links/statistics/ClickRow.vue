@@ -26,7 +26,7 @@ const name = computed(() => countryName(country.value, locale.value));
     >
       <LinksStatisticsClickTime :date="click.createdAt" />
     </td>
-    <!-- below md, Where fills the first line so Client starts the second -->
+    <!-- below md, Where fills the first line so From starts the second -->
     <td
       class="truncate px-3 py-2.5 max-md:block max-md:min-w-0 max-md:grow max-md:basis-[calc(100%-8rem-0.75rem)] max-md:p-0"
     >
@@ -43,6 +43,16 @@ const name = computed(() => countryName(country.value, locale.value));
         <!-- one line, so no space slips in before the comma -->
         <!-- prettier-ignore -->
         <span v-else class="truncate">{{ click.city ?? name }}<span v-if="click.region" class="text-muted-foreground">, {{ click.region }}</span></span>
+      </span>
+    </td>
+    <td
+      class="truncate px-3 py-2.5 max-md:block max-md:max-w-[45%] max-md:flex-none max-md:p-0"
+    >
+      <span v-if="click.referrer" class="font-mono text-[13px]/[21px]">
+        {{ click.referrer }}
+      </span>
+      <span v-else class="text-faint-foreground">
+        {{ $t('links.statistics.clicks.direct') }}
       </span>
     </td>
     <td
