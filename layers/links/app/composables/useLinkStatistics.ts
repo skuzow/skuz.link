@@ -1,4 +1,5 @@
 import type {
+  Click,
   ClickListFilter,
   ClickRange,
   ClicksPage
@@ -10,11 +11,15 @@ import {
   CLICK_RANGE_MS,
   CLICKS_PAGE_SIZE
 } from '#layers/links/shared/domain/click.constant';
-import { encodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import {
   ClickCountrySchema,
   ClickRangeSchema
 } from '#layers/links/shared/domain/click.schema';
+
+// newest first, by time and then by id, as the server lists them
+const byNewest = (a: Click, b: Click) =>
+  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() ||
+  b.id - a.id;
 
 // a range the page doesn't know reads as the default
 const readRange = (value: unknown): ClickRange => {
@@ -214,8 +219,14 @@ export const useLinkStatistics = async (id: string) => {
       const page = await linkApi.getClicks(id, { ...shownFilter, cursor });
       if (version !== listVersion) return;
 
+      // a Click saved late may already have come in through a refresh, and
+      // sit below the page in time
+      const shownIds = new Set(clicks.value.map((click) => click.id));
       clicksData.data.value = {
-        clicks: [...clicks.value, ...page.clicks],
+        clicks: [
+          ...clicks.value,
+          ...page.clicks.filter((click) => !shownIds.has(click.id))
+        ].sort(byNewest),
         cursor: page.cursor
       };
     } catch (error) {
@@ -227,32 +238,28 @@ export const useLinkStatistics = async (id: string) => {
     }
   };
 
-  // the newest Click shown, so a refresh asks only for newer ones; none
-  // while the list is empty, so the first page comes whole
-  const newestShown = () => {
-    const newest = clicks.value[0];
-
-    return newest
-      ? encodeClickCursor({
-          createdAt: new Date(newest.createdAt),
-          id: newest.id
-        })
+  // the id of the last saved Click shown, so a refresh asks only for the
+  // Clicks saved after it: a Click's time is taken before its row is saved,
+  // so one saved late can be older than the newest Click shown. None while
+  // the list is empty, so the first page comes whole
+  const lastSavedShown = () =>
+    clicks.value.length > 0
+      ? Math.max(...clicks.value.map((click) => click.id))
       : undefined;
-  };
 
   // one at a time, so two refreshes never bring the same Clicks in
   let isRefreshing = false;
 
-  // fresh figures, and the new Clicks on top while the Clicks that left the
-  // range go. A 404 shows the not-found ErrorPage; any other failure shows
-  // nothing, and the next refresh tries again
+  // fresh figures, and the new Clicks in their place by time while the
+  // Clicks that left the range go. A 404 shows the not-found ErrorPage; any
+  // other failure shows nothing, and the next refresh tries again
   const refresh = async () => {
     if (isRefreshing) return;
 
     isRefreshing = true;
     const version = listVersion;
     const filterShown = shownFilter;
-    const after = newestShown();
+    const after = lastSavedShown();
     // taken as the requests leave, as close as the browser's clock gets to
     // the start the server counts from
     const start = Date.now() - CLICK_RANGE_MS[filterShown.range];
@@ -299,7 +306,7 @@ export const useLinkStatistics = async (id: string) => {
         // every Click past Load more's cursor is older still, so the cursor
         // goes with them, and a Load more in flight lands nothing
         clicksData.data.value = {
-          clicks: [...newer.clicks, ...inRange],
+          clicks: [...newer.clicks, ...inRange].sort(byNewest),
           cursor: hasLeftRange ? null : (clicksData.data.value?.cursor ?? null)
         };
         freshIds.value = new Set(newer.clicks.map((click) => click.id));

@@ -14,6 +14,12 @@ const ClickCursorSchema = z
   .string()
   .refine((value) => decodeClickCursor(value) !== null);
 
+// a Click's id as the query carries it: a positive integer, no leading zero
+const ClickIdSchema = z
+  .string()
+  .regex(/^[1-9]\d{0,14}$/)
+  .transform(Number);
+
 // the query of a Link's statistics and of its Click list
 export const ClicksQuerySchema = z.object({
   range: ClickRangeSchema.default(CLICK_RANGE_DEFAULT),
@@ -23,6 +29,7 @@ export const ClicksQuerySchema = z.object({
   country: ClickCountrySchema.optional(),
   // the server's cursor of the next page, sent back as it came
   cursor: ClickCursorSchema.optional(),
-  // the newest Click shown, so only the Clicks newer than it come back
-  after: ClickCursorSchema.optional()
+  // the id of the last saved Click shown, so only the Clicks saved after it
+  // come back
+  after: ClickIdSchema.optional()
 });

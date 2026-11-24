@@ -82,21 +82,21 @@ class StatisticsService {
     };
   }
 
-  // the Clicks older than cursor, the next page, or newer than after, a
-  // poll; both are already checked by the query schema
+  // the Clicks older than cursor, the next page, or saved after the Click
+  // with the id after, a poll; both are already checked by the query schema
   async listClicks(
     ownerId: string,
     id: string,
     { range, bots, country }: ClickListFilter,
-    { cursor, after }: { cursor?: string; after?: string }
+    { cursor, after }: { cursor?: string; after?: number }
   ): Promise<ClicksPage> {
     const link = await this.linkService.findOwned(ownerId, id);
 
     const { clicks, hasMore } = await this.clickRepository.findPage(
       { linkId: link.id, since: rangeStart(range), bots, country },
       {
-        before: cursor ? decodeClickCursor(cursor) : null,
-        after: after ? decodeClickCursor(after) : null
+        cursor: cursor ? decodeClickCursor(cursor) : null,
+        after: after ?? null
       }
     );
     const last = clicks.at(-1);

@@ -6,7 +6,6 @@ import type {
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { encodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import { clicks, links } from '#layers/links/server/infrastructure/schema';
 import { setupTestServer } from '~~/server/testing/server';
 
@@ -558,11 +557,8 @@ describe('paging', () => {
 });
 
 describe('after', () => {
-  // what the page sends: the newest Click it shows
-  const afterClick = (click: Click) =>
-    encodeURIComponent(
-      encodeClickCursor({ createdAt: new Date(click.createdAt), id: click.id })
-    );
+  // what the page sends: the last saved Click it shows
+  const afterClick = (click: Click) => String(click.id);
 
   const findShown = async (linkId: string, query = '?bots=true') => {
     const shown = (await listClicks(linkId, alice.headers, query)).find(
@@ -573,7 +569,7 @@ describe('after', () => {
     return shown;
   };
 
-  it('lists only the Clicks newer than after, within the range, bots and country', async () => {
+  it('lists only the Clicks saved after the shown one, within the range, bots and country', async () => {
     const link = await server.createLink(alice.headers, 'polled');
     const now = Date.now();
 
@@ -607,7 +603,30 @@ describe('after', () => {
     expect(await cities('?country=ES')).toEqual(['es-new', 'same-ms']);
   });
 
-  it('leaves out Clicks older than the range, even when newer than after', async () => {
+  it('lists a Click saved after the shown one, though it happened before it', async () => {
+    const link = await server.createLink(alice.headers, 'polled-late');
+    const now = Date.now();
+
+    await seedClicks(
+      link.id,
+      [
+        { city: 'older', age: 20 * MINUTE_MS },
+        { city: 'shown', age: 10 * MINUTE_MS },
+        // its Redirect started first, but its row came second
+        { city: 'late', age: 11 * MINUTE_MS }
+      ],
+      now
+    );
+    const after = afterClick(await findShown(link.id));
+
+    expect(
+      (await listClicks(link.id, alice.headers, `?after=${after}`)).map(
+        (click) => click.city
+      )
+    ).toEqual(['late']);
+  });
+
+  it('leaves out Clicks older than the range, even when saved after the shown one', async () => {
     const link = await server.createLink(alice.headers, 'polled-range');
     const now = Date.now();
 
@@ -629,7 +648,7 @@ describe('after', () => {
     ).toEqual(['new']);
   });
 
-  it('lists the newest 50 when more are newer than after', async () => {
+  it('lists the newest 50 when more were saved after the shown one', async () => {
     const link = await server.createLink(alice.headers, 'polled-full');
     const now = Date.now();
 
@@ -655,7 +674,7 @@ describe('after', () => {
     ).toEqual(Array.from({ length: 50 }, (_, index) => `n${index}`));
   });
 
-  it.each(['nope', btoa('12-x'), btoa('-1-2'), '', btoa('1.5-2')])(
+  it.each(['nope', '12-x', '-1', '0', '', '1.5', '01', btoa('12-3')])(
     'returns 400 with the issues for the bad after %j',
     async (after) => {
       const link = await server.createLink(alice.headers, 'bad-after');

@@ -8,7 +8,6 @@ import type {
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
-import { decodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import {
   makeClick,
   makeClicksPage,
@@ -1060,13 +1059,9 @@ describe('Statistics page', () => {
   describe('live', () => {
     const NOW = new Date('2026-11-23T12:00:00.000Z');
 
-    // the after each call to the Click list sent, as the Click it names
+    // the Click id each call to the Click list sent as after
     const aftersAsked = () =>
-      getClicks.mock.calls.map(([event]) => {
-        const after = getQuery(event).after;
-
-        return typeof after === 'string' ? decodeClickCursor(after) : after;
-      });
+      getClicks.mock.calls.map(([event]) => getQuery(event).after);
 
     const cities = () =>
       rows().map((row) => row.children[1]?.textContent?.trim());
@@ -1150,11 +1145,8 @@ describe('Statistics page', () => {
         expect.stringContaining('Madrid'),
         expect.stringContaining('Lisbon')
       ]);
-      // newer than the newest Click shown, within the same filter
-      expect(aftersAsked()).toEqual([
-        undefined,
-        { createdAt: new Date('2026-11-23T11:00:00.000Z'), id: 12 }
-      ]);
+      // saved after the last saved Click shown, within the same filter
+      expect(aftersAsked()).toEqual([undefined, '12']);
       expect(getQuery(getClicks.mock.calls[1]![0])).toMatchObject({
         range: '7d',
         bots: 'true',
@@ -1163,6 +1155,77 @@ describe('Statistics page', () => {
       expect(rangesAsked(getStatistics)).toEqual(['7d', '7d']);
       expect(botsAsked(getStatistics)).toEqual(['true', 'true']);
       expect(figures()[0]).toEqual(['Clicks · 7 days', '4']);
+    });
+
+    it('puts a Click saved late in its place by time, and asks for the Clicks saved after it', async () => {
+      await mountPage();
+
+      // its Redirect came before Madrid's, but its row was saved after
+      getClicks.mockImplementation((event) =>
+        getQuery(event).after === '12'
+          ? makeClicksPage([
+              makeClick({
+                id: 13,
+                createdAt: new Date('2026-11-23T10:30:00.000Z'),
+                city: 'Porto'
+              })
+            ])
+          : makeClicksPage()
+      );
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+      await flushPromises();
+
+      expect(cities()).toEqual([
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Porto'),
+        expect.stringContaining('Lisbon')
+      ]);
+
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(getClicks).toHaveBeenCalledTimes(3));
+
+      expect(aftersAsked()).toEqual([undefined, '12', '13']);
+    });
+
+    it('shows a Click saved late once and in its place, when Load more brings it again', async () => {
+      await mountPage();
+
+      // older than every Click shown, so the next page holds it too
+      const vigo = makeClick({
+        id: 13,
+        createdAt: new Date('2026-11-18T12:00:00.000Z'),
+        city: 'Vigo'
+      });
+      getClicks.mockImplementation((event) => {
+        const { after, cursor } = getQuery(event);
+
+        if (after) return makeClicksPage(after === '12' ? [vigo] : []);
+        if (cursor === 'page-2') {
+          return makeClicksPage([
+            makeClick({
+              id: 10,
+              createdAt: new Date('2026-11-19T00:00:00.000Z'),
+              city: 'Paris'
+            }),
+            vigo
+          ]);
+        }
+
+        return makeClicksPage();
+      });
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+
+      await loadMore();
+
+      expect(cursorsAsked().at(-1)).toBe('page-2');
+      expect(cities()).toEqual([
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Lisbon'),
+        expect.stringContaining('Paris'),
+        expect.stringContaining('Vigo')
+      ]);
     });
 
     it('pauses while the tab is hidden, and asks at once when it shows', async () => {
@@ -1243,11 +1306,7 @@ describe('Statistics page', () => {
 
       expect(cities()[0]).toContain('Newest');
       expect(cities()[49]).toContain('New 48');
-      expect(aftersAsked()).toEqual([
-        undefined,
-        { createdAt: new Date('2026-11-23T11:00:00.000Z'), id: 12 },
-        undefined
-      ]);
+      expect(aftersAsked()).toEqual([undefined, '12', undefined]);
       expect(cursorsAsked()).toEqual([undefined, undefined, undefined]);
 
       // Load more goes on from the new first page

@@ -58,11 +58,11 @@ const inScope = ({ linkId, since, bots }: ClickScope) =>
     bots ? undefined : eq(clicks.bot, false)
   );
 
-// the Clicks before a cursor, or after it, by time and then by id
-const beyond = (cursor: ClickCursor, compare: typeof lt | typeof gt) =>
+// the Clicks before a cursor, by time and then by id
+const before = (cursor: ClickCursor) =>
   or(
-    compare(clicks.createdAt, cursor.createdAt),
-    and(eq(clicks.createdAt, cursor.createdAt), compare(clicks.id, cursor.id))
+    lt(clicks.createdAt, cursor.createdAt),
+    and(eq(clicks.createdAt, cursor.createdAt), lt(clicks.id, cursor.id))
   );
 
 // one country's Clicks; Unknown takes XX, T1 and no country, as the counts do
@@ -109,12 +109,16 @@ class ClickRepository {
   }
 
   // newest first, by time and then by id, so Clicks in the same millisecond
-  // keep one order; only the Clicks older than before and newer than after.
+  // keep one order; only the Clicks older than cursor, and only the Clicks
+  // saved after the Click with the id after. A Click's time is taken before
+  // its row is written in the background, so a Click can be saved after a
+  // newer one; its id, a SQLite rowid, still follows the order of the saves,
+  // since SQLite gives an id out again only once the table's newest row goes.
   // With a country, only that country's Clicks. One Click past the page
   // tells whether another page follows
   async findPage(
     { country, ...scope }: ClickScope & { country?: string },
-    { before, after }: { before: ClickCursor | null; after: ClickCursor | null }
+    { cursor, after }: { cursor: ClickCursor | null; after: number | null }
   ): Promise<{ clicks: Click[]; hasMore: boolean }> {
     const rows = await this.db
       .select(clickColumns)
@@ -123,8 +127,8 @@ class ClickRepository {
         and(
           inScope(scope),
           country ? inCountry(country) : undefined,
-          before ? beyond(before, lt) : undefined,
-          after ? beyond(after, gt) : undefined
+          cursor ? before(cursor) : undefined,
+          after === null ? undefined : gt(clicks.id, after)
         )
       )
       .orderBy(desc(clicks.createdAt), desc(clicks.id))

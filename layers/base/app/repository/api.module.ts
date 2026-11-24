@@ -4,7 +4,7 @@ interface HttpRequest {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: object;
-  query?: Record<string, string | boolean>;
+  query?: Record<string, string | number | boolean>;
 }
 
 abstract class ApiModule {
