@@ -19,6 +19,7 @@ export const useLinkStatistics = async (id: string) => {
 
   const range = shallowRef(readRange(route.query.range));
   const isLoading = shallowRef(false);
+  const isLoadingMore = shallowRef(false);
 
   const [linkData, statisticsData, clicksData] = await Promise.all([
     useAsyncData(`links:${id}`, () => linkApi.get(id)),
@@ -46,7 +47,8 @@ export const useLinkStatistics = async (id: string) => {
 
   const link = computed(() => linkData.data.value!);
   const statistics = computed(() => statisticsData.data.value!);
-  const clicks = computed(() => clicksData.data.value ?? []);
+  const clicks = computed(() => clicksData.data.value?.clicks ?? []);
+  const hasMore = computed(() => !!clicksData.data.value?.cursor);
 
   // the default stays out of the address, and a change replaces the current
   // entry, so Back still returns to the Links page
@@ -62,6 +64,9 @@ export const useLinkStatistics = async (id: string) => {
   // lands when several are in flight
   let shownRange = range.value;
   let latest = 0;
+  // bumped whenever the list starts again from its first page, so a page
+  // that was in flight for the old list never lands on the new one
+  let listVersion = 0;
 
   const setRange = async (next: ClickRange) => {
     if (next === range.value) return;
@@ -80,6 +85,7 @@ export const useLinkStatistics = async (id: string) => {
 
       statisticsData.data.value = nextStatistics;
       clicksData.data.value = nextClicks;
+      listVersion++;
       shownRange = next;
     } catch {
       if (request !== latest) return;
@@ -95,5 +101,40 @@ export const useLinkStatistics = async (id: string) => {
     await writeRange(next);
   };
 
-  return { link, statistics, clicks, range, isLoading, setRange };
+  // the next page goes under the Clicks shown; on failure they stay
+  const loadMore = async () => {
+    const cursor = clicksData.data.value?.cursor;
+    if (!cursor || isLoadingMore.value) return;
+
+    const version = listVersion;
+    isLoadingMore.value = true;
+
+    try {
+      const page = await linkApi.getClicks(id, { range: shownRange, cursor });
+      if (version !== listVersion) return;
+
+      clicksData.data.value = {
+        clicks: [...clicks.value, ...page.clicks],
+        cursor: page.cursor
+      };
+    } catch {
+      if (version !== listVersion) return;
+
+      toast.error($t('toast.links.error'));
+    } finally {
+      isLoadingMore.value = false;
+    }
+  };
+
+  return {
+    link,
+    statistics,
+    clicks,
+    hasMore,
+    range,
+    isLoading,
+    isLoadingMore,
+    setRange,
+    loadMore
+  };
 };

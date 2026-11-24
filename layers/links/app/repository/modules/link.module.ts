@@ -1,5 +1,5 @@
 import type {
-  Click,
+  ClicksPage,
   ClicksQuery,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
@@ -34,7 +34,7 @@ class LinkModule extends ApiModule {
   }
 
   async getClicks(id: string, query: ClicksQuery) {
-    return this.call<Click[]>({
+    return this.call<ClicksPage>({
       method: 'GET',
       url: this.ROUTE.LinkClicks(id),
       query

@@ -1,11 +1,15 @@
 import type {
-  Click,
   ClickRange,
+  ClicksPage,
   CountryClicks,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { CLICK_RANGE_MS } from '#layers/links/shared/domain/click.constant';
+import {
+  decodeClickCursor,
+  encodeClickCursor
+} from '#layers/links/shared/domain/click.cursor';
 import {
   UNKNOWN_COUNTRY,
   toCountryKey
@@ -75,14 +79,26 @@ class StatisticsService {
     };
   }
 
+  // cursor is one this route gave out, already checked by the query schema
   async listClicks(
     ownerId: string,
     id: string,
-    range: ClickRange
-  ): Promise<Click[]> {
+    range: ClickRange,
+    cursor?: string
+  ): Promise<ClicksPage> {
     const link = await this.linkService.findOwned(ownerId, id);
 
-    return this.clickRepository.findNewest(link.id, rangeStart(range));
+    const { clicks, hasMore } = await this.clickRepository.findPage(
+      link.id,
+      rangeStart(range),
+      cursor ? decodeClickCursor(cursor) : null
+    );
+    const last = clicks.at(-1);
+
+    return {
+      clicks,
+      cursor: hasMore && last ? encodeClickCursor(last) : null
+    };
   }
 }
 

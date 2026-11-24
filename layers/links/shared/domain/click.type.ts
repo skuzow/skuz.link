@@ -29,6 +29,16 @@ export type ClickRange = z.infer<typeof ClickRangeSchema>;
 
 export type ClicksQuery = z.infer<typeof ClicksQuerySchema>;
 
+// where the next page of a Click list starts: the last Click shown, by time
+// and id
+export type ClickCursor = Pick<Click, 'createdAt' | 'id'>;
+
+// a page of a Link's Clicks, newest first; cursor is null on the last page
+export interface ClicksPage {
+  clicks: Click[];
+  cursor: string | null;
+}
+
 // XX stands for every Click with no known country
 export interface CountryClicks {
   country: string;

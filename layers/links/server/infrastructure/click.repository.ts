@@ -1,8 +1,20 @@
 import type {
   Click,
+  ClickCursor,
   ClickDetails
 } from '#layers/links/shared/domain/click.type';
-import { and, asc, count, desc, eq, gte, isNotNull, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  isNotNull,
+  lt,
+  or,
+  sql
+} from 'drizzle-orm';
 import type { Database } from '#layers/base/server/platform/db';
 import { CLICKS_PAGE_SIZE } from '#layers/links/shared/domain/click.constant';
 import { clicks, links } from './schema';
@@ -63,14 +75,37 @@ class ClickRepository {
   }
 
   // newest first, by time and then by id, so Clicks in the same millisecond
-  // keep one order
-  async findNewest(linkId: string, since: Date): Promise<Click[]> {
-    return this.db
+  // keep one order; after a cursor, only the Clicks older than it. One Click
+  // past the page tells whether another page follows
+  async findPage(
+    linkId: string,
+    since: Date,
+    cursor: ClickCursor | null
+  ): Promise<{ clicks: Click[]; hasMore: boolean }> {
+    const rows = await this.db
       .select(clickColumns)
       .from(clicks)
-      .where(inRange(linkId, since))
+      .where(
+        and(
+          inRange(linkId, since),
+          cursor
+            ? or(
+                lt(clicks.createdAt, cursor.createdAt),
+                and(
+                  eq(clicks.createdAt, cursor.createdAt),
+                  lt(clicks.id, cursor.id)
+                )
+              )
+            : undefined
+        )
+      )
       .orderBy(desc(clicks.createdAt), desc(clicks.id))
-      .limit(CLICKS_PAGE_SIZE);
+      .limit(CLICKS_PAGE_SIZE + 1);
+
+    return {
+      clicks: rows.slice(0, CLICKS_PAGE_SIZE),
+      hasMore: rows.length > CLICKS_PAGE_SIZE
+    };
   }
 
   // by the country as Cloudflare sent it, so XX, T1 and none stay apart

@@ -1,5 +1,6 @@
 import type {
   Click,
+  ClicksPage,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
@@ -40,3 +41,8 @@ export const makeStatistics = (
   countryClicks: [],
   ...overrides
 });
+
+export const makeClicksPage = (
+  clicks: Click[] = [],
+  cursor: string | null = null
+): ClicksPage => ({ clicks, cursor });

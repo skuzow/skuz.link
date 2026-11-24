@@ -1,12 +1,18 @@
 <script lang="ts" setup>
 import type { Click } from '#layers/links/shared/domain/click.type';
+import ChevronDownIcon from '~icons/pixelarticons/chevron-down';
 
 defineProps<{
   clicks: Click[];
   // the Clicks in the range, of which these are the first
   total: number;
+  // whether another page follows the Clicks shown
+  hasMore: boolean;
   loading: boolean;
+  loadingMore: boolean;
 }>();
+
+defineEmits<{ loadMore: [] }>();
 
 const HEADER_CLASS =
   'type-chip text-faint-foreground border-border-strong border-b px-3 py-2.5 text-left leading-4 first:pl-4 last:pr-4';
@@ -92,5 +98,19 @@ const HEADER_CLASS =
         </template>
       </tbody>
     </table>
+
+    <div
+      v-if="!loading && hasMore"
+      class="flex items-center gap-3 border-t px-4 py-3"
+    >
+      <UiButton
+        variant="outline"
+        :aria-busy="loadingMore"
+        @click="$emit('loadMore')"
+      >
+        <ChevronDownIcon />
+        {{ $t('links.statistics.clicks.loadMore') }}
+      </UiButton>
+    </div>
   </UiCard>
 </template>

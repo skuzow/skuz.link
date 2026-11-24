@@ -12,8 +12,12 @@ defineProps<{
   link: Link;
   statistics: LinkStatistics;
   clicks: Click[];
+  hasMore: boolean;
   loading: boolean;
+  loadingMore: boolean;
 }>();
+
+defineEmits<{ loadMore: [] }>();
 
 const range = defineModel<ClickRange>('range', { required: true });
 </script>
@@ -42,7 +46,10 @@ const range = defineModel<ClickRange>('range', { required: true });
     <LinksStatisticsClickList
       :clicks="clicks"
       :total="statistics.rangeClicks"
+      :has-more="hasMore"
       :loading="loading"
+      :loading-more="loadingMore"
+      @load-more="$emit('loadMore')"
     />
   </div>
 </template>

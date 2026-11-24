@@ -83,7 +83,8 @@
           "tablet": "Tableta"
         },
         "empty": "No hay clics en este periodo",
-        "shown": "{shown} de {total}"
+        "shown": "{shown} de {total}",
+        "loadMore": "Cargar más"
       }
     }
   },

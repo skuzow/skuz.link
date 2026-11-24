@@ -4,8 +4,17 @@ definePageMeta({ middleware: 'auth' });
 const route = useRoute();
 const { t: $t } = useI18n();
 
-const { link, statistics, clicks, range, isLoading, setRange } =
-  await useLinkStatistics(String(route.params.id));
+const {
+  link,
+  statistics,
+  clicks,
+  hasMore,
+  range,
+  isLoading,
+  isLoadingMore,
+  setRange,
+  loadMore
+} = await useLinkStatistics(String(route.params.id));
 
 seoMeta({
   title: $t('links.statistics.meta.title', { slug: link.value.slug })
@@ -17,8 +26,11 @@ seoMeta({
     :link="link"
     :statistics="statistics"
     :clicks="clicks"
+    :has-more="hasMore"
     :loading="isLoading"
+    :loading-more="isLoadingMore"
     :range="range"
     @update:range="setRange"
+    @load-more="loadMore"
   />
 </template>

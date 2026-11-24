@@ -1,5 +1,5 @@
 import type {
-  Click,
+  ClicksPage,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
@@ -38,14 +38,21 @@ const getLink = async (id: string, headers = alice.headers) => {
   return (await response.json()) as Link;
 };
 
-const listClicks = async (id: string, headers = alice.headers, query = '') => {
+const listClicksPage = async (
+  id: string,
+  headers = alice.headers,
+  query = ''
+) => {
   const response = await server.fetch(`/api/links/${id}/clicks${query}`, {
     headers
   });
   expect(response.status).toBe(200);
 
-  return (await response.json()) as Click[];
+  return (await response.json()) as ClicksPage;
 };
+
+const listClicks = async (id: string, headers = alice.headers, query = '') =>
+  (await listClicksPage(id, headers, query)).clicks;
 
 const getStatistics = async (id: string, query = '') => {
   const response = await server.fetch(`/api/links/${id}/statistics${query}`, {
@@ -437,6 +444,111 @@ describe('GET /api/links/:id/clicks', () => {
       ...Array.from({ length: 48 }, (_, index) => `n${index + 3}`)
     ]);
   });
+});
+
+describe('paging', () => {
+  it('pages 120 Clicks as 50, 50 and 20, newest first, with no cursor at the end', async () => {
+    const link = await server.createLink(alice.headers, 'paged');
+    const now = Date.now();
+
+    // pairs of Clicks share a millisecond, so the id keeps their order
+    await seedClicks(
+      link.id,
+      Array.from({ length: 120 }, (_, index) => ({
+        city: `c${index}`,
+        age: (Math.floor(index / 2) + 1) * MINUTE_MS
+      })),
+      now
+    );
+
+    const first = await listClicksPage(link.id);
+    const second = await listClicksPage(
+      link.id,
+      alice.headers,
+      `?cursor=${encodeURIComponent(first.cursor!)}`
+    );
+    const third = await listClicksPage(
+      link.id,
+      alice.headers,
+      `?cursor=${encodeURIComponent(second.cursor!)}`
+    );
+
+    expect([first, second, third].map((page) => page.clicks.length)).toEqual([
+      50, 50, 20
+    ]);
+    expect(third.cursor).toBeNull();
+
+    // within a millisecond the later row, c1 after c0, comes first
+    const expected = Array.from({ length: 60 }, (_, pair) => [
+      `c${pair * 2 + 1}`,
+      `c${pair * 2}`
+    ]).flat();
+    expect(
+      [first, second, third].flatMap((page) =>
+        page.clicks.map((click) => click.city)
+      )
+    ).toEqual(expected);
+  });
+
+  it('keeps the range while paging', async () => {
+    const link = await server.createLink(alice.headers, 'paged-range');
+
+    await seedClicks(link.id, [
+      ...Array.from({ length: 60 }, (_, index) => ({
+        city: `in${index}`,
+        age: (index + 1) * MINUTE_MS
+      })),
+      ...Array.from({ length: 10 }, (_, index) => ({
+        city: `out${index}`,
+        age: (index + 25) * 60 * MINUTE_MS
+      }))
+    ]);
+
+    const first = await listClicksPage(link.id, alice.headers, '?range=24h');
+    const second = await listClicksPage(
+      link.id,
+      alice.headers,
+      `?range=24h&cursor=${encodeURIComponent(first.cursor!)}`
+    );
+
+    expect(second.clicks.map((click) => click.city)).toEqual(
+      Array.from({ length: 10 }, (_, index) => `in${index + 50}`)
+    );
+    expect(second.cursor).toBeNull();
+  });
+
+  it('answers no cursor when the last page is exactly full', async () => {
+    const link = await server.createLink(alice.headers, 'paged-full');
+
+    await seedClicks(
+      link.id,
+      Array.from({ length: 50 }, (_, index) => ({
+        age: (index + 1) * MINUTE_MS
+      }))
+    );
+
+    expect((await listClicksPage(link.id)).cursor).toBeNull();
+  });
+
+  it.each(['nope', btoa('12-x'), btoa('-1-2'), '', btoa('1.5-2')])(
+    'returns 400 with the issues for the bad cursor %j',
+    async (cursor) => {
+      const link = await server.createLink(alice.headers, 'bad-cursor');
+
+      const response = await server.fetch(
+        `/api/links/${link.id}/clicks?cursor=${encodeURIComponent(cursor)}`,
+        { headers: alice.headers }
+      );
+
+      expect(response.status).toBe(400);
+
+      const body = await response.json();
+      expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
+      expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
+        ['cursor']
+      ]);
+    }
+  );
 });
 
 describe('ranges', () => {

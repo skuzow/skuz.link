@@ -4,12 +4,13 @@ import { getQuery, type H3Event } from 'h3';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { toast } from 'vue-sonner';
 import type {
-  Click,
+  ClicksPage,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import {
   makeClick,
+  makeClicksPage,
   makeLink,
   makeStatistics
 } from '#layers/links/app/testing/fixtures';
@@ -28,7 +29,7 @@ const getLink = vi.fn((): Link =>
     redirectUrl: 'https://example.com/repo'
   })
 );
-const getClicks = vi.fn((_event: H3Event): Click[] => []);
+const getClicks = vi.fn((_event: H3Event): ClicksPage => makeClicksPage());
 const getStatistics = vi.fn((_event: H3Event): LinkStatistics =>
   makeStatistics()
 );
@@ -116,6 +117,25 @@ const chooseRange = async (name: string) => {
   await flushPromises();
 };
 
+const loadMoreButton = () =>
+  [...document.body.querySelectorAll('button')].find(
+    (button) => button.textContent?.trim() === 'Load more'
+  );
+
+// until the next page has landed, or failed
+const loadMore = async () => {
+  loadMoreButton()?.click();
+  await nextTick();
+  await vi.waitFor(() =>
+    expect(loadMoreButton()?.getAttribute('aria-busy')).not.toBe('true')
+  );
+  await flushPromises();
+};
+
+// the cursor each call to the Click list sent
+const cursorsAsked = () =>
+  getClicks.mock.calls.map(([event]) => getQuery(event).cursor);
+
 const currentQuery = () => useRouter().currentRoute.value.query;
 
 const backLink = () =>
@@ -132,7 +152,7 @@ beforeEach(() => {
   });
   clearNuxtData();
   useState('auth:session').value = { token: 'session-token' };
-  getClicks.mockReset().mockReturnValue([]);
+  getClicks.mockReset().mockReturnValue(makeClicksPage());
   getStatistics.mockReset().mockReturnValue(makeStatistics());
 });
 
@@ -165,22 +185,24 @@ describe('Statistics page', () => {
   });
 
   it('lists each Click with its time and place, newest first', async () => {
-    getClicks.mockReturnValue([
-      makeClick({
-        id: 2,
-        createdAt: new Date('2026-11-19T12:29:00.000Z'),
-        country: 'ES',
-        region: 'Community of Madrid',
-        city: 'Madrid'
-      }),
-      makeClick({
-        id: 1,
-        createdAt: new Date('2025-12-30T12:00:00.000Z'),
-        country: 'FR',
-        region: 'Île-de-France',
-        city: 'Paris'
-      })
-    ]);
+    getClicks.mockReturnValue(
+      makeClicksPage([
+        makeClick({
+          id: 2,
+          createdAt: new Date('2026-11-19T12:29:00.000Z'),
+          country: 'ES',
+          region: 'Community of Madrid',
+          city: 'Madrid'
+        }),
+        makeClick({
+          id: 1,
+          createdAt: new Date('2025-12-30T12:00:00.000Z'),
+          country: 'FR',
+          region: 'Île-de-France',
+          city: 'Paris'
+        })
+      ])
+    );
 
     await mountPage();
 
@@ -209,11 +231,13 @@ describe('Statistics page', () => {
   });
 
   it('reads XX, T1 and a missing country as Unknown', async () => {
-    getClicks.mockReturnValue([
-      makeClick({ id: 3, country: 'XX', region: null, city: null }),
-      makeClick({ id: 2, country: 'T1', region: null, city: null }),
-      makeClick({ id: 1, country: null, region: null, city: null })
-    ]);
+    getClicks.mockReturnValue(
+      makeClicksPage([
+        makeClick({ id: 3, country: 'XX', region: null, city: null }),
+        makeClick({ id: 2, country: 'T1', region: null, city: null }),
+        makeClick({ id: 1, country: null, region: null, city: null })
+      ])
+    );
 
     await mountPage();
 
@@ -225,22 +249,24 @@ describe('Statistics page', () => {
   });
 
   it("reads each Click's client, and marks Bots", async () => {
-    getClicks.mockReturnValue([
-      makeClick({
-        id: 4,
-        browser: 'Chrome',
-        os: 'macOS',
-        device: 'Desktop'
-      }),
-      makeClick({
-        id: 3,
-        browser: 'Other',
-        os: 'Other',
-        device: 'Other'
-      }),
-      makeClick({ id: 2, bot: true, botName: 'Slackbot-LinkExpanding' }),
-      makeClick({ id: 1, bot: true, botName: null })
-    ]);
+    getClicks.mockReturnValue(
+      makeClicksPage([
+        makeClick({
+          id: 4,
+          browser: 'Chrome',
+          os: 'macOS',
+          device: 'Desktop'
+        }),
+        makeClick({
+          id: 3,
+          browser: 'Other',
+          os: 'Other',
+          device: 'Other'
+        }),
+        makeClick({ id: 2, bot: true, botName: 'Slackbot-LinkExpanding' }),
+        makeClick({ id: 1, bot: true, botName: null })
+      ])
+    );
 
     await mountPage();
 
@@ -253,10 +279,12 @@ describe('Statistics page', () => {
   });
 
   it("reads each Click's Referrer host, or Direct", async () => {
-    getClicks.mockReturnValue([
-      makeClick({ id: 2, referrer: 'news.ycombinator.com' }),
-      makeClick({ id: 1, referrer: null })
-    ]);
+    getClicks.mockReturnValue(
+      makeClicksPage([
+        makeClick({ id: 2, referrer: 'news.ycombinator.com' }),
+        makeClick({ id: 1, referrer: null })
+      ])
+    );
 
     await mountPage();
 
@@ -284,7 +312,9 @@ describe('Statistics page', () => {
   });
 
   it('counts the Clicks shown out of the Clicks in the range', async () => {
-    getClicks.mockReturnValue([makeClick({ id: 2 }), makeClick({ id: 1 })]);
+    getClicks.mockReturnValue(
+      makeClicksPage([makeClick({ id: 2 }), makeClick({ id: 1 })])
+    );
     getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 1180 }));
 
     const wrapper = await mountPage();
@@ -307,7 +337,9 @@ describe('Statistics page', () => {
     expect(wrapper.text()).toContain('No Clicks in this range');
     expect(wrapper.text()).not.toContain('0 of 0');
 
-    getClicks.mockReturnValue([makeClick({ id: 1, city: 'Madrid' })]);
+    getClicks.mockReturnValue(
+      makeClicksPage([makeClick({ id: 1, city: 'Madrid' })])
+    );
     getStatistics.mockReturnValue(
       makeStatistics({ rangeClicks: 1, clickCount: 5, countries: 1 })
     );
@@ -347,7 +379,9 @@ describe('Statistics page', () => {
       await mountPage();
       const historyLength = window.history.length;
 
-      getClicks.mockReturnValue([makeClick({ id: 1, city: 'Lisbon' })]);
+      getClicks.mockReturnValue(
+        makeClicksPage([makeClick({ id: 1, city: 'Lisbon' })])
+      );
       getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 1 }));
       await chooseRange('24h');
 
@@ -368,7 +402,9 @@ describe('Statistics page', () => {
     });
 
     it('shows the toast and keeps what it showed when a new range fails', async () => {
-      getClicks.mockReturnValue([makeClick({ id: 1, city: 'Madrid' })]);
+      getClicks.mockReturnValue(
+        makeClicksPage([makeClick({ id: 1, city: 'Madrid' })])
+      );
       getStatistics.mockReturnValue(
         makeStatistics({ rangeClicks: 1, clickCount: 1, countries: 1 })
       );
@@ -390,27 +426,99 @@ describe('Statistics page', () => {
     });
   });
 
+  describe('Load more', () => {
+    beforeEach(() => {
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 3 }));
+      getClicks.mockImplementation((event) =>
+        getQuery(event).cursor === 'page-2'
+          ? makeClicksPage([makeClick({ id: 1, city: 'Porto' })])
+          : makeClicksPage(
+              [
+                makeClick({ id: 3, city: 'Madrid' }),
+                makeClick({ id: 2, city: 'Lisbon' })
+              ],
+              'page-2'
+            )
+      );
+    });
+
+    it('appends the next Clicks, and goes away at the end', async () => {
+      const wrapper = await mountPage('/links/link-1?range=7d');
+
+      expect(rows()).toHaveLength(2);
+      expect(wrapper.text()).toContain('2 of 3');
+
+      await loadMore();
+
+      expect(rows().map((row) => row.children[1]?.textContent)).toEqual([
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Lisbon'),
+        expect.stringContaining('Porto')
+      ]);
+      expect(wrapper.text()).toContain('3 of 3');
+      expect(cursorsAsked()).toEqual([undefined, 'page-2']);
+      expect(rangesAsked(getClicks)).toEqual(['7d', '7d']);
+      expect(loadMoreButton()).toBeUndefined();
+    });
+
+    it('shows no Load more when the first page is the last', async () => {
+      getClicks.mockReset().mockReturnValue(makeClicksPage([makeClick()]));
+      await mountPage();
+
+      expect(rows()).toHaveLength(1);
+      expect(loadMoreButton()).toBeUndefined();
+    });
+
+    it('shows the toast and keeps the rows when Load more fails', async () => {
+      await mountPage();
+
+      // every time, because $fetch tries a failed GET twice
+      getClicks.mockImplementation(() => {
+        throw createError({ statusCode: 500 });
+      });
+      await loadMore();
+
+      expect(toast.error).toHaveBeenCalledWith(
+        'Something went wrong with your links'
+      );
+      expect(rows()).toHaveLength(2);
+      expect(loadMoreButton()).toBeDefined();
+    });
+
+    it('starts again from the first page after a new range', async () => {
+      await mountPage();
+      await loadMore();
+      await chooseRange('7 days');
+
+      expect(rows()).toHaveLength(2);
+      expect(cursorsAsked()).toEqual([undefined, 'page-2', undefined]);
+      expect(loadMoreButton()).toBeDefined();
+    });
+  });
+
   it('reads in Spanish', async () => {
-    getClicks.mockReturnValue([
-      makeClick({
-        id: 3,
-        country: 'ES',
-        referrer: 'google.com',
-        browser: 'Safari',
-        os: 'iOS',
-        device: 'Mobile'
-      }),
-      makeClick({
-        id: 2,
-        country: 'XX',
-        region: null,
-        city: null,
-        browser: 'Other',
-        os: 'Other',
-        device: 'Desktop'
-      }),
-      makeClick({ id: 1, bot: true, botName: null })
-    ]);
+    getClicks.mockReturnValue(
+      makeClicksPage([
+        makeClick({
+          id: 3,
+          country: 'ES',
+          referrer: 'google.com',
+          browser: 'Safari',
+          os: 'iOS',
+          device: 'Mobile'
+        }),
+        makeClick({
+          id: 2,
+          country: 'XX',
+          region: null,
+          city: null,
+          browser: 'Other',
+          os: 'Other',
+          device: 'Desktop'
+        }),
+        makeClick({ id: 1, bot: true, botName: null })
+      ])
+    );
     getStatistics.mockReturnValue(
       makeStatistics({ rangeClicks: 1204, clickCount: 3456, countries: 2 })
     );
