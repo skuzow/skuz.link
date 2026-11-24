@@ -7,6 +7,7 @@ import { toast } from 'vue-sonner';
 
 import {
   CLICK_RANGE_DEFAULT,
+  CLICK_RANGE_MS,
   CLICKS_PAGE_SIZE
 } from '#layers/links/shared/domain/click.constant';
 import { encodeClickCursor } from '#layers/links/shared/domain/click.cursor';
@@ -242,9 +243,9 @@ export const useLinkStatistics = async (id: string) => {
   // one at a time, so two refreshes never bring the same Clicks in
   let isRefreshing = false;
 
-  // fresh figures, and the new Clicks on top while Load more's cursor stays.
-  // A 404 shows the not-found ErrorPage; any other failure shows nothing,
-  // and the next refresh tries again
+  // fresh figures, and the new Clicks on top while the Clicks that left the
+  // range go. A 404 shows the not-found ErrorPage; any other failure shows
+  // nothing, and the next refresh tries again
   const refresh = async () => {
     if (isRefreshing) return;
 
@@ -252,6 +253,9 @@ export const useLinkStatistics = async (id: string) => {
     const version = listVersion;
     const filterShown = shownFilter;
     const after = newestShown();
+    // taken as the requests leave, as close as the browser's clock gets to
+    // the start the server counts from
+    const start = Date.now() - CLICK_RANGE_MS[filterShown.range];
 
     try {
       const [nextStatistics, newer] = await Promise.all([
@@ -285,11 +289,21 @@ export const useLinkStatistics = async (id: string) => {
         // a Load more in flight belongs to the old list
         listVersion++;
       } else {
+        // the server counts only the Clicks since the range's start, so the
+        // rows older than it go
+        const inRange = clicks.value.filter(
+          (click) => new Date(click.createdAt).getTime() >= start
+        );
+        const hasLeftRange = inRange.length < clicks.value.length;
+
+        // every Click past Load more's cursor is older still, so the cursor
+        // goes with them, and a Load more in flight lands nothing
         clicksData.data.value = {
-          clicks: [...newer.clicks, ...clicks.value],
-          cursor: clicksData.data.value?.cursor ?? null
+          clicks: [...newer.clicks, ...inRange],
+          cursor: hasLeftRange ? null : (clicksData.data.value?.cursor ?? null)
         };
         freshIds.value = new Set(newer.clicks.map((click) => click.id));
+        if (hasLeftRange) listVersion++;
       }
       refreshes.value++;
     } catch (error) {

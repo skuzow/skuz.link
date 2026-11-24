@@ -1315,6 +1315,59 @@ describe('Statistics page', () => {
         expect.stringContaining('Paris')
       ]);
     });
+
+    it('drops the Clicks that leave the range, and Load more with them', async () => {
+      getClicks.mockImplementation((event) => {
+        if (getQuery(event).after) {
+          return makeClicksPage([
+            makeClick({
+              id: 13,
+              createdAt: new Date('2026-11-23T13:00:00.000Z'),
+              city: 'Porto'
+            })
+          ]);
+        }
+
+        return makeClicksPage(
+          [
+            makeClick({
+              id: 12,
+              createdAt: new Date('2026-11-23T11:00:00.000Z'),
+              city: 'Madrid'
+            }),
+            makeClick({
+              id: 11,
+              createdAt: new Date('2026-11-22T13:00:00.000Z'),
+              city: 'Lisbon'
+            })
+          ],
+          'page-2'
+        );
+      });
+      await mountPage('/links/link-1?range=24h');
+
+      expect(cities()).toEqual([
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Lisbon')
+      ]);
+      expect(loadMoreButton()).toBeDefined();
+
+      // the tick lands at 13:00:30, so Lisbon's Click is 24 hours and 30
+      // seconds old
+      vi.setSystemTime(new Date('2026-11-23T13:00:00.000Z'));
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() =>
+        expect(cities()[0]).toEqual(expect.stringContaining('Porto'))
+      );
+      await flushPromises();
+
+      expect(cities()).toEqual([
+        expect.stringContaining('Porto'),
+        expect.stringContaining('Madrid')
+      ]);
+      // every Click below Lisbon's is older still
+      expect(loadMoreButton()).toBeUndefined();
+    });
   });
 
   it('reads in Spanish', async () => {
