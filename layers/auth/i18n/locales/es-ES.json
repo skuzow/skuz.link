@@ -6,6 +6,7 @@
     "continueWith": "Continuar con {provider}",
     "settings": {
       "title": "Ajustes",
+      "retry": "Reintentar",
       "profile": {
         "title": "Perfil",
         "button": "Actualizar perfil"
@@ -13,14 +14,16 @@
       "sessions": {
         "title": "Sesiones",
         "button": "Revocar",
-        "current": "Actual"
+        "current": "Actual",
+        "failure": "Ha ocurrido un error con tus sesiones"
       },
       "account": {
         "connected": {
           "title": "Cuentas conectadas",
           "credential": "Credenciales",
           "disconnect": "Desconectar",
-          "connect": "Conectar cuenta"
+          "connect": "Conectar cuenta",
+          "failure": "Ha ocurrido un error con tus cuentas conectadas"
         },
         "delete": {
           "title": "Eliminar cuenta",

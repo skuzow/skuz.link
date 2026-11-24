@@ -41,16 +41,14 @@ const deleteAccount = async () => {
 </script>
 
 <template>
-  <UiAccordionItem value="delete-account">
-    <UiAccordionTrigger>
-      {{ $t('auth.settings.account.delete.title') }}
-    </UiAccordionTrigger>
-    <UiAccordionContent
-      class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"
+  <AuthSettingsPanel :title="$t('auth.settings.account.delete.title')">
+    <div
+      class="type-small text-muted-foreground flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p>{{ $t('auth.settings.account.delete.description') }}</p>
 
       <UiButton
+        class="shrink-0"
         variant="destructive"
         :loading="isLoadingDeleteAccount"
         @click="deleteAccount"
@@ -58,6 +56,6 @@ const deleteAccount = async () => {
         <UserXIcon />
         {{ $t('auth.settings.account.delete.title') }}
       </UiButton>
-    </UiAccordionContent>
-  </UiAccordionItem>
+    </div>
+  </AuthSettingsPanel>
 </template>
