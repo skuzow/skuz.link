@@ -51,6 +51,15 @@ const headers = () =>
 
 const rows = () => [...document.body.querySelectorAll('tbody tr')];
 
+// the Client cell's words, with the Bot badge as its own word
+const clients = () =>
+  rows().map((row) =>
+    [...(row.lastElementChild?.querySelectorAll('*') ?? [])]
+      .filter((element) => !element.children.length)
+      .map((element) => element.textContent?.trim())
+      .join(' ')
+  );
+
 const backLink = () =>
   [...document.body.querySelectorAll('a')].find(
     (element) => element.textContent?.trim() === 'Links'
@@ -116,7 +125,7 @@ describe('Statistics page', () => {
 
     await mountPage();
 
-    expect(headers()).toEqual(['Time', 'Where']);
+    expect(headers()).toEqual(['Time', 'Where', 'Client']);
     expect(rows()).toHaveLength(2);
 
     const [madrid, paris] = rows();
@@ -149,10 +158,38 @@ describe('Statistics page', () => {
 
     await mountPage();
 
-    expect(rows().map((row) => row.lastElementChild?.textContent)).toEqual([
+    expect(rows().map((row) => row.children[1]?.textContent?.trim())).toEqual([
       '--Unknown',
       '--Unknown',
       '--Unknown'
+    ]);
+  });
+
+  it("reads each Click's client, and marks Bots", async () => {
+    getClicks.mockReturnValue([
+      makeClick({
+        id: 4,
+        browser: 'Chrome',
+        os: 'macOS',
+        device: 'Desktop'
+      }),
+      makeClick({
+        id: 3,
+        browser: 'Other',
+        os: 'Other',
+        device: 'Other'
+      }),
+      makeClick({ id: 2, bot: true, botName: 'Slackbot-LinkExpanding' }),
+      makeClick({ id: 1, bot: true, botName: null })
+    ]);
+
+    await mountPage();
+
+    expect(clients()).toEqual([
+      'Chrome · macOS · Desktop',
+      'Other · Other · Other',
+      'Slackbot-LinkExpanding Bot',
+      'Unknown Bot'
     ]);
   });
 
@@ -165,15 +202,35 @@ describe('Statistics page', () => {
 
   it('reads in Spanish', async () => {
     getClicks.mockReturnValue([
-      makeClick({ id: 2, country: 'ES' }),
-      makeClick({ id: 1, country: 'XX', region: null, city: null })
+      makeClick({
+        id: 3,
+        country: 'ES',
+        browser: 'Safari',
+        os: 'iOS',
+        device: 'Mobile'
+      }),
+      makeClick({
+        id: 2,
+        country: 'XX',
+        region: null,
+        city: null,
+        browser: 'Other',
+        os: 'Other',
+        device: 'Desktop'
+      }),
+      makeClick({ id: 1, bot: true, botName: null })
     ]);
 
     const wrapper = await mountPage('/es/links/link-1');
 
     expect(wrapper.text()).toContain('Estadísticas');
-    expect(headers()).toEqual(['Hora', 'Dónde']);
+    expect(headers()).toEqual(['Hora', 'Dónde', 'Cliente']);
     expect(rows()[1]?.textContent).toContain('Desconocido');
+    expect(clients()).toEqual([
+      'Safari · iOS · Móvil',
+      'Otro · Otro · Escritorio',
+      'Desconocido Bot'
+    ]);
     expect(backLink()?.getAttribute('href')).toBe('/es/links');
   });
 

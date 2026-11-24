@@ -7,3 +7,6 @@ export const CLICKS_RANGE_MS: number = 30 * DAY_MS;
 
 // every text a Click keeps is cut to this, so a forged header can't bloat a row
 export const CLICK_TEXT_MAX: number = 128;
+
+// what the client reader reads when it doesn't know a browser, system or device
+export const CLICK_OTHER: string = 'Other';

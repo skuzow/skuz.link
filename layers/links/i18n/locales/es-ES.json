@@ -53,6 +53,14 @@
         "time": "Hora",
         "where": "Dónde",
         "unknown": "Desconocido",
+        "client": "Cliente",
+        "bot": "Bot",
+        "other": "Otro",
+        "device": {
+          "desktop": "Escritorio",
+          "mobile": "Móvil",
+          "tablet": "Tableta"
+        },
         "empty": "No hay clics en este periodo"
       }
     }

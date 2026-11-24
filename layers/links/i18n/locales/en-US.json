@@ -53,6 +53,14 @@
         "time": "Time",
         "where": "Where",
         "unknown": "Unknown",
+        "client": "Client",
+        "bot": "Bot",
+        "other": "Other",
+        "device": {
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "tablet": "Tablet"
+        },
         "empty": "No Clicks in this range"
       }
     }

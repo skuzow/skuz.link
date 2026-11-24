@@ -33,6 +33,7 @@ const HEADER_CLASS =
       <colgroup>
         <col class="md:w-44" />
         <col />
+        <col class="md:w-[30%]" />
       </colgroup>
       <thead class="max-md:sr-only">
         <tr>
@@ -41,6 +42,9 @@ const HEADER_CLASS =
           </th>
           <th scope="col" :class="HEADER_CLASS">
             {{ $t('links.statistics.clicks.where') }}
+          </th>
+          <th scope="col" :class="HEADER_CLASS">
+            {{ $t('links.statistics.clicks.client') }}
           </th>
         </tr>
       </thead>

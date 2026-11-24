@@ -15,3 +15,9 @@ export interface Click {
 
 // what the Redirect learns about a Click, before the Link it belongs to
 export type ClickDetails = Omit<Click, 'id'>;
+
+// what the user agent says about the client, before it is dropped
+export type ClickClient = Pick<
+  Click,
+  'browser' | 'os' | 'device' | 'bot' | 'botName'
+>;

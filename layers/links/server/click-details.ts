@@ -1,6 +1,7 @@
 import type { EventHandlerRequest, H3Event } from 'h3';
 import type { ClickDetails } from '#layers/links/shared/domain/click.type';
 import { CLICK_TEXT_MAX } from '#layers/links/shared/domain/click.constant';
+import { readClickClient } from '#layers/links/server/click-client';
 
 // the request's Cloudflare properties, which Nitro puts on the event context
 interface CloudflarePlace {
@@ -13,7 +14,8 @@ const readClickText = (value: unknown): string | null =>
   typeof value === 'string' && value ? value.slice(0, CLICK_TEXT_MAX) : null;
 
 // only the place: no coordinates, postal code, timezone or network (ADR-0007),
-// and never the IP address from CF-Connecting-IP or X-Forwarded-For
+// and never the IP address from CF-Connecting-IP or X-Forwarded-For; the
+// client comes from the user agent, which is then dropped
 export const readClickDetails = (
   event: H3Event<EventHandlerRequest>
 ): ClickDetails => {
@@ -25,10 +27,6 @@ export const readClickDetails = (
     region: readClickText(cf.region),
     city: readClickText(cf.city),
     referrer: null,
-    browser: null,
-    os: null,
-    device: null,
-    bot: false,
-    botName: null
+    ...readClickClient(getRequestHeader(event, 'user-agent'))
   };
 };

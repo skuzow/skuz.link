@@ -26,8 +26,9 @@ const name = computed(() => countryName(country.value, locale.value));
     >
       <LinksStatisticsClickTime :date="click.createdAt" />
     </td>
+    <!-- below md, Where fills the first line so Client starts the second -->
     <td
-      class="truncate px-3 py-2.5 pr-4 max-md:block max-md:min-w-0 max-md:flex-1 max-md:p-0"
+      class="truncate px-3 py-2.5 max-md:block max-md:min-w-0 max-md:grow max-md:basis-[calc(100%-8rem-0.75rem)] max-md:p-0"
     >
       <span class="flex min-w-0 items-center gap-2">
         <span
@@ -43,6 +44,11 @@ const name = computed(() => countryName(country.value, locale.value));
         <!-- prettier-ignore -->
         <span v-else class="truncate">{{ click.city ?? name }}<span v-if="click.region" class="text-muted-foreground">, {{ click.region }}</span></span>
       </span>
+    </td>
+    <td
+      class="truncate px-3 py-2.5 pr-4 max-md:block max-md:min-w-0 max-md:flex-1 max-md:p-0"
+    >
+      <LinksStatisticsClickClient :click="click" />
     </td>
   </tr>
 </template>

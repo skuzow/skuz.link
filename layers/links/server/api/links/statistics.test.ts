@@ -162,6 +162,177 @@ describe('recording a Click', () => {
     }
   });
 
+  // one Short URL per Click, so each case reads its own Click
+  const clickWith = async (userAgent: string | null) => {
+    const link = await server.createLink(alice.headers, 'client');
+
+    await server.fetch('/client', {
+      headers: userAgent === null ? {} : { 'User-Agent': userAgent }
+    });
+    await server.flush();
+
+    const [click] = await listClicks(link.id);
+    return click;
+  };
+
+  it.each([
+    [
+      'Slack',
+      'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
+      'Slackbot-LinkExpanding'
+    ],
+    ['WhatsApp', 'WhatsApp/2.23.20.0 A', 'WhatsApp'],
+    [
+      'Discord',
+      'Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)',
+      'Discordbot'
+    ],
+    ['X', 'Twitterbot/1.0', 'Twitterbot'],
+    [
+      'Facebook',
+      'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
+      'facebookexternalhit'
+    ],
+    [
+      'LinkedIn',
+      'LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)',
+      'LinkedInBot'
+    ],
+    ['Telegram', 'TelegramBot (like TwitterBot)', 'TelegramBot'],
+    [
+      'Googlebot',
+      'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/131.0.6778.69 Safari/537.36',
+      'Googlebot'
+    ],
+    ['curl', 'curl/8.4.0', 'curl'],
+    ['python-requests', 'python-requests/2.31.0', 'python-requests'],
+    [
+      // isbot matches only http inside the comment
+      'Mastodon',
+      'Mastodon/4.2.1 (http.rb/5.1.1; +https://mastodon.social/)',
+      'Mastodon'
+    ],
+    [
+      // isbot matches only inside the URL
+      'Iframely',
+      'Iframely/1.3.1 (+https://iframely.com/docs/about)',
+      'Iframely'
+    ],
+    ['no user agent', null, null]
+  ])('reads %s as a Bot with its name', async (_, userAgent, botName) => {
+    expect(await clickWith(userAgent)).toMatchObject({
+      bot: true,
+      botName,
+      browser: null,
+      os: null,
+      device: null
+    });
+  });
+
+  it.each([
+    [
+      'Chrome on macOS',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      ['Chrome', 'macOS', 'Desktop']
+    ],
+    [
+      'Safari on an iPhone',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
+      ['Safari', 'iOS', 'Mobile']
+    ],
+    [
+      'Firefox on Windows',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
+      ['Firefox', 'Windows', 'Desktop']
+    ],
+    [
+      'Edge',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+      ['Edge', 'Windows', 'Desktop']
+    ],
+    [
+      'Samsung Internet on Android',
+      'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/27.0 Chrome/125.0.0.0 Mobile Safari/537.36',
+      ['Samsung Internet', 'Android', 'Mobile']
+    ],
+    [
+      'Opera on Linux',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/115.0.0.0',
+      ['Opera', 'Linux', 'Desktop']
+    ],
+    [
+      'Chrome on ChromeOS',
+      'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      ['Chrome', 'ChromeOS', 'Desktop']
+    ],
+    [
+      'Chrome on an Android tablet',
+      'Mozilla/5.0 (Linux; Android 13; SM-X700) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      ['Chrome', 'Android', 'Tablet']
+    ],
+    [
+      'Safari on an iPad',
+      'Mozilla/5.0 (iPad; CPU OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
+      ['Safari', 'iPadOS', 'Tablet']
+    ],
+    [
+      // an iPad that asks for the desktop site sends a Mac's user agent
+      'an iPad in desktop mode',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Safari/605.1.15',
+      ['Safari', 'macOS', 'Desktop']
+    ],
+    [
+      'an unknown browser',
+      'Mozilla/5.0 (X11; Linux x86_64) KHTML/5.27.0 (like Gecko) Konqueror/5.0',
+      ['Other', 'Linux', 'Desktop']
+    ],
+    [
+      'an unknown system',
+      'Lynx/2.9.0dev.12 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/3.7.8',
+      ['Other', 'Other', 'Other']
+    ]
+  ])('reads %s', async (_, userAgent, [browser, os, device]) => {
+    expect(await clickWith(userAgent)).toMatchObject({
+      bot: false,
+      botName: null,
+      browser,
+      os,
+      device
+    });
+  });
+
+  it('keeps no full user agent, and cuts a Bot name to a fixed length', async () => {
+    const link = await server.createLink(alice.headers, 'long');
+    const userAgent = `${'x'.repeat(300)}bot/1.0 (+https://example.com/bot)`;
+
+    await server.fetch('/long', { headers: { 'User-Agent': userAgent } });
+    await server.fetch('/long', {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+      }
+    });
+    await server.flush();
+
+    const [person, bot] = await listClicks(link.id);
+    expect(bot).toMatchObject({ bot: true });
+    expect(bot?.botName).toBe('x'.repeat(128));
+
+    const rows = JSON.stringify(
+      await server.db.select().from(clicks).where(eq(clicks.linkId, link.id))
+    );
+    for (const kept of [
+      'Mozilla',
+      'AppleWebKit',
+      '10_15_7',
+      '131.0',
+      '+https'
+    ]) {
+      expect(rows).not.toContain(kept);
+    }
+    expect(person).toMatchObject({ browser: 'Chrome' });
+  });
+
   it.each([
     ['XX', { country: 'XX' }, 'XX'],
     ['T1', { country: 'T1' }, 'T1'],
