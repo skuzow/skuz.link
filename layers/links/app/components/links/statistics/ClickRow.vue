@@ -8,6 +8,8 @@ import { countryName } from '#layers/links/app/lib/country';
 
 const props = defineProps<{
   click: Click;
+  // brought in by the last refresh, so it flashes once
+  fresh: boolean;
 }>();
 
 const { locale } = useI18n();
@@ -18,8 +20,13 @@ const name = computed(() => countryName(country.value, locale.value));
 </script>
 
 <template>
+  <!-- the cells flash in a table; below md the row is a flex box, so it
+       flashes whole and the gaps between its cells flash too -->
   <tr
-    class="border-b last:border-b-0 max-md:flex max-md:flex-wrap max-md:items-center max-md:gap-x-3 max-md:gap-y-0.5 max-md:px-4 max-md:py-3"
+    :class="[
+      'border-b last:border-b-0 max-md:flex max-md:flex-wrap max-md:items-center max-md:gap-x-3 max-md:gap-y-0.5 max-md:px-4 max-md:py-3',
+      fresh && 'max-md:animate-click-flash md:*:animate-click-flash'
+    ]"
   >
     <td
       class="text-muted-foreground truncate px-3 py-2.5 pl-4 font-mono text-[13px]/[21px] tabular-nums max-md:block max-md:w-32 max-md:flex-none max-md:p-0"

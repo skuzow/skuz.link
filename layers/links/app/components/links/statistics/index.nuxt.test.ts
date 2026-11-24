@@ -8,6 +8,7 @@ import type {
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
+import { decodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import {
   makeClick,
   makeClicksPage,
@@ -1056,6 +1057,266 @@ describe('Statistics page', () => {
     });
   });
 
+  describe('live', () => {
+    const NOW = new Date('2026-11-23T12:00:00.000Z');
+
+    // the after each call to the Click list sent, as the Click it names
+    const aftersAsked = () =>
+      getClicks.mock.calls.map(([event]) => {
+        const after = getQuery(event).after;
+
+        return typeof after === 'string' ? decodeClickCursor(after) : after;
+      });
+
+    const cities = () =>
+      rows().map((row) => row.children[1]?.textContent?.trim());
+
+    // the words at the end of the summary's strip, beside "Statistics"
+    const liveState = () =>
+      document.body
+        .querySelector('h1')
+        ?.closest('[data-slot="card"]')
+        ?.querySelector('[data-slot="card-header"]')
+        ?.lastElementChild?.textContent?.trim();
+
+    // as the browser does when the tab hides or shows
+    const setVisibility = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => state
+      });
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+
+    afterEach(() => {
+      // back to the browser's own value
+      Reflect.deleteProperty(document, 'visibilityState');
+    });
+
+    beforeEach(() => {
+      // the interval too, so 30 seconds pass at once
+      vi.useFakeTimers({
+        toFake: ['Date', 'setInterval', 'clearInterval'],
+        now: NOW
+      });
+      getClicks.mockImplementation((event) => {
+        const { after, cursor } = getQuery(event);
+
+        if (after) {
+          return makeClicksPage([
+            makeClick({
+              id: 13,
+              createdAt: new Date('2026-11-23T11:59:40.000Z'),
+              city: 'Porto'
+            })
+          ]);
+        }
+
+        if (cursor === 'page-2') {
+          return makeClicksPage([makeClick({ id: 10, city: 'Paris' })]);
+        }
+
+        return makeClicksPage(
+          [
+            makeClick({
+              id: 12,
+              createdAt: new Date('2026-11-23T11:00:00.000Z'),
+              city: 'Madrid'
+            }),
+            makeClick({ id: 11, city: 'Lisbon' })
+          ],
+          'page-2'
+        );
+      });
+    });
+
+    it('asks for newer Clicks and fresh figures every 30 seconds, and shows the Clicks on top', async () => {
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 3 }));
+      await mountPage('/links/link-1?range=7d&bots=true&country=ES');
+
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 4 }));
+      vi.advanceTimersByTime(29_999);
+      await flushPromises();
+
+      expect(getClicks).toHaveBeenCalledTimes(1);
+      expect(getStatistics).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(1);
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+      await flushPromises();
+
+      expect(cities()).toEqual([
+        expect.stringContaining('Porto'),
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Lisbon')
+      ]);
+      // newer than the newest Click shown, within the same filter
+      expect(aftersAsked()).toEqual([
+        undefined,
+        { createdAt: new Date('2026-11-23T11:00:00.000Z'), id: 12 }
+      ]);
+      expect(getQuery(getClicks.mock.calls[1]![0])).toMatchObject({
+        range: '7d',
+        bots: 'true',
+        country: 'ES'
+      });
+      expect(rangesAsked(getStatistics)).toEqual(['7d', '7d']);
+      expect(botsAsked(getStatistics)).toEqual(['true', 'true']);
+      expect(figures()[0]).toEqual(['Clicks · 7 days', '4']);
+    });
+
+    it('pauses while the tab is hidden, and asks at once when it shows', async () => {
+      const wrapper = await mountPage();
+
+      expect(liveState()).toBe('Live');
+
+      setVisibility('hidden');
+      await nextTick();
+
+      expect(liveState()).toBe('Paused');
+
+      vi.advanceTimersByTime(90_000);
+      await flushPromises();
+
+      expect(getClicks).toHaveBeenCalledTimes(1);
+      expect(getStatistics).toHaveBeenCalledTimes(1);
+
+      setVisibility('visible');
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+
+      expect(liveState()).toBe('Live');
+      expect(aftersAsked()).toHaveLength(2);
+      expect(getStatistics).toHaveBeenCalledTimes(2);
+      expect(wrapper.text()).toContain('Porto');
+
+      // and again 30 seconds later
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(getClicks).toHaveBeenCalledTimes(3));
+    });
+
+    it('reads in Spanish', async () => {
+      await mountPage('/es/links/link-1');
+
+      expect(liveState()).toBe('En directo');
+
+      setVisibility('hidden');
+      await nextTick();
+
+      expect(liveState()).toBe('En pausa');
+    });
+
+    it('loads the list again from the top when a full page of new Clicks arrives', async () => {
+      await mountPage();
+
+      // 50 newer Clicks may leave a gap below them, so the first page comes
+      // again, with a cursor of its own
+      const newer = Array.from({ length: 50 }, (_, index) =>
+        makeClick({
+          id: 100 - index,
+          createdAt: new Date(NOW.getTime() - (index + 2) * 1000),
+          city: `New ${index}`
+        })
+      );
+      getClicks.mockImplementation((event) => {
+        const { after, cursor } = getQuery(event);
+
+        if (after) return makeClicksPage(newer);
+        if (cursor === 'top-2') {
+          return makeClicksPage([makeClick({ id: 1, city: 'Oldest' })]);
+        }
+
+        return makeClicksPage(
+          [
+            makeClick({
+              id: 101,
+              createdAt: new Date(NOW.getTime() - 1000),
+              city: 'Newest'
+            }),
+            ...newer.slice(0, 49)
+          ],
+          'top-2'
+        );
+      });
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(rows()).toHaveLength(50));
+      await flushPromises();
+
+      expect(cities()[0]).toContain('Newest');
+      expect(cities()[49]).toContain('New 48');
+      expect(aftersAsked()).toEqual([
+        undefined,
+        { createdAt: new Date('2026-11-23T11:00:00.000Z'), id: 12 },
+        undefined
+      ]);
+      expect(cursorsAsked()).toEqual([undefined, undefined, undefined]);
+
+      // Load more goes on from the new first page
+      await loadMore();
+
+      expect(cursorsAsked().at(-1)).toBe('top-2');
+      expect(cities().at(-1)).toContain('Oldest');
+    });
+
+    it('shows nothing when a poll fails, and asks again on the next tick', async () => {
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 2 }));
+      await mountPage();
+
+      // every time, because $fetch tries a failed GET twice
+      getStatistics.mockImplementation(() => {
+        throw createError({ statusCode: 500 });
+      });
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(getStatistics).toHaveBeenCalledTimes(3));
+      await flushPromises();
+
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(useError().value).toBeUndefined();
+      expect(rows()).toHaveLength(2);
+      expect(figures()[0]).toEqual(['Clicks · 30 days', '2']);
+      expect(liveState()).toBe('Live');
+
+      getStatistics
+        .mockReset()
+        .mockReturnValue(makeStatistics({ rangeClicks: 3 }));
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+      await flushPromises();
+
+      expect(figures()[0]).toEqual(['Clicks · 30 days', '3']);
+    });
+
+    it('fails with a fatal 404 when the Link is deleted in another tab', async () => {
+      await mountPage();
+
+      const notFound = () => {
+        throw createError({ statusCode: 404, statusMessage: 'Link not found' });
+      };
+      getClicks.mockImplementation(notFound);
+      getStatistics.mockImplementation(notFound);
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(useError().value).toBeDefined());
+
+      expect(useError().value).toMatchObject({ status: 404, fatal: true });
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+
+    it("keeps Load more's place when new Clicks arrive", async () => {
+      await mountPage();
+
+      vi.advanceTimersByTime(30_000);
+      await vi.waitFor(() => expect(rows()).toHaveLength(3));
+      await loadMore();
+
+      expect(cursorsAsked()).toEqual([undefined, undefined, 'page-2']);
+      expect(cities()).toEqual([
+        expect.stringContaining('Porto'),
+        expect.stringContaining('Madrid'),
+        expect.stringContaining('Lisbon'),
+        expect.stringContaining('Paris')
+      ]);
+    });
+  });
+
   it('reads in Spanish', async () => {
     getClicks.mockReturnValue(
       makeClicksPage([
@@ -1115,6 +1376,28 @@ describe('Statistics page', () => {
       fatal: true
     });
   });
+
+  it.each([
+    ['a new range', () => chooseRange('7 days')],
+    ['Show bots', () => toggleBots()],
+    ['Load more', () => loadMore()]
+  ])(
+    'fails with a fatal 404 when %s finds the Link deleted',
+    async (_, act) => {
+      getClicks.mockReturnValue(makeClicksPage([makeClick()], 'page-2'));
+      await mountPage();
+
+      const notFound = () => {
+        throw createError({ statusCode: 404, statusMessage: 'Link not found' });
+      };
+      getClicks.mockImplementation(notFound);
+      getStatistics.mockImplementation(notFound);
+      await act();
+
+      expect(useError().value).toMatchObject({ status: 404, fatal: true });
+      expect(toast.error).not.toHaveBeenCalled();
+    }
+  );
 
   it('fails with a fatal error when the Clicks fail to load', async () => {
     // every time, because $fetch tries a failed GET twice

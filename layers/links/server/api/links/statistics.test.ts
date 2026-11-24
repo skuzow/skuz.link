@@ -1,10 +1,12 @@
 import type {
+  Click,
   ClicksPage,
   LinkStatistics
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { encodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import { clicks, links } from '#layers/links/server/infrastructure/schema';
 import { setupTestServer } from '~~/server/testing/server';
 
@@ -550,6 +552,125 @@ describe('paging', () => {
       expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
       expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
         ['cursor']
+      ]);
+    }
+  );
+});
+
+describe('after', () => {
+  // what the page sends: the newest Click it shows
+  const afterClick = (click: Click) =>
+    encodeURIComponent(
+      encodeClickCursor({ createdAt: new Date(click.createdAt), id: click.id })
+    );
+
+  const findShown = async (linkId: string, query = '?bots=true') => {
+    const shown = (await listClicks(linkId, alice.headers, query)).find(
+      (click) => click.city === 'shown'
+    );
+    if (!shown) throw new Error('Missing the shown Click');
+
+    return shown;
+  };
+
+  it('lists only the Clicks newer than after, within the range, bots and country', async () => {
+    const link = await server.createLink(alice.headers, 'polled');
+    const now = Date.now();
+
+    await seedClicks(
+      link.id,
+      [
+        { city: 'older', country: 'ES', age: 20 * MINUTE_MS },
+        { city: 'shown', country: 'ES', age: 10 * MINUTE_MS },
+        // the same millisecond, but a later row, so it is newer
+        { city: 'same-ms', country: 'ES', age: 10 * MINUTE_MS },
+        { city: 'fr-new', country: 'FR', age: 3 * MINUTE_MS },
+        { city: 'bot-new', country: 'ES', bot: true, age: 2 * MINUTE_MS },
+        { city: 'es-new', country: 'ES', age: MINUTE_MS }
+      ],
+      now
+    );
+    const after = afterClick(await findShown(link.id));
+
+    const cities = async (query: string) =>
+      (await listClicks(link.id, alice.headers, `${query}&after=${after}`)).map(
+        (click) => click.city
+      );
+
+    expect(await cities('?range=30d')).toEqual(['es-new', 'fr-new', 'same-ms']);
+    expect(await cities('?bots=true')).toEqual([
+      'es-new',
+      'bot-new',
+      'fr-new',
+      'same-ms'
+    ]);
+    expect(await cities('?country=ES')).toEqual(['es-new', 'same-ms']);
+  });
+
+  it('leaves out Clicks older than the range, even when newer than after', async () => {
+    const link = await server.createLink(alice.headers, 'polled-range');
+    const now = Date.now();
+
+    await seedClicks(
+      link.id,
+      [
+        { city: 'shown', age: 3 * DAY_MS },
+        { city: 'two-days', age: 2 * DAY_MS },
+        { city: 'new', age: MINUTE_MS }
+      ],
+      now
+    );
+    const after = afterClick(await findShown(link.id));
+
+    expect(
+      (
+        await listClicks(link.id, alice.headers, `?range=24h&after=${after}`)
+      ).map((click) => click.city)
+    ).toEqual(['new']);
+  });
+
+  it('lists the newest 50 when more are newer than after', async () => {
+    const link = await server.createLink(alice.headers, 'polled-full');
+    const now = Date.now();
+
+    await seedClicks(
+      link.id,
+      [
+        { city: 'shown', country: 'FR', age: 100 * MINUTE_MS },
+        ...Array.from({ length: 60 }, (_, index) => ({
+          city: `n${index}`,
+          country: 'ES',
+          age: (index + 1) * MINUTE_MS
+        }))
+      ],
+      now
+    );
+    // past the first page, so found by its country
+    const after = afterClick(await findShown(link.id, '?country=FR'));
+
+    expect(
+      (await listClicks(link.id, alice.headers, `?after=${after}`)).map(
+        (click) => click.city
+      )
+    ).toEqual(Array.from({ length: 50 }, (_, index) => `n${index}`));
+  });
+
+  it.each(['nope', btoa('12-x'), btoa('-1-2'), '', btoa('1.5-2')])(
+    'returns 400 with the issues for the bad after %j',
+    async (after) => {
+      const link = await server.createLink(alice.headers, 'bad-after');
+
+      const response = await server.fetch(
+        `/api/links/${link.id}/clicks?after=${encodeURIComponent(after)}`,
+        { headers: alice.headers }
+      );
+
+      expect(response.status).toBe(400);
+
+      const body = await response.json();
+      expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
+      expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
+        ['after']
       ]);
     }
   );

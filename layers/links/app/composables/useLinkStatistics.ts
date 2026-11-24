@@ -1,10 +1,15 @@
 import type {
   ClickListFilter,
-  ClickRange
+  ClickRange,
+  ClicksPage
 } from '#layers/links/shared/domain/click.type';
 import { toast } from 'vue-sonner';
 
-import { CLICK_RANGE_DEFAULT } from '#layers/links/shared/domain/click.constant';
+import {
+  CLICK_RANGE_DEFAULT,
+  CLICKS_PAGE_SIZE
+} from '#layers/links/shared/domain/click.constant';
+import { encodeClickCursor } from '#layers/links/shared/domain/click.cursor';
 import {
   ClickCountrySchema,
   ClickRangeSchema
@@ -27,11 +32,27 @@ const readCountry = (value: unknown): string | undefined => {
   return result.success ? result.data : undefined;
 };
 
+type FetchFailure = Error & { statusMessage?: string };
+
+const isNotFound = (error: unknown): error is FetchFailure =>
+  error instanceof Error && 'statusCode' in error && error.statusCode === 404;
+
 export const useLinkStatistics = async (id: string) => {
   const linkApi = useLinkApi();
   const route = useRoute();
   const router = useRouter();
   const { t: $t } = useI18n();
+
+  // fatal, so the not-found ErrorPage takes the page's place
+  const showNotFound = (error: FetchFailure) =>
+    showError({ status: 404, statusText: error.statusMessage, fatal: true });
+
+  // a 404 at any point, such as for a Link deleted in another tab, shows the
+  // not-found ErrorPage; anything else shows the toast
+  const showFailure = (error: unknown) => {
+    if (isNotFound(error)) showNotFound(error);
+    else toast.error($t('toast.links.error'));
+  };
 
   const range = shallowRef(readRange(route.query.range));
   const bots = shallowRef(readBots(route.query.bots));
@@ -40,6 +61,10 @@ export const useLinkStatistics = async (id: string) => {
   const isLoading = shallowRef(false);
   const isFiltering = shallowRef(false);
   const isLoadingMore = shallowRef(false);
+  // the Clicks the last refresh brought in, which flash on top
+  const freshIds = shallowRef<ReadonlySet<number>>(new Set());
+  // the refreshes that have landed, each of which blinks the Live LED
+  const refreshes = shallowRef(0);
 
   const filter = (): ClickListFilter => ({
     range: range.value,
@@ -111,6 +136,9 @@ export const useLinkStatistics = async (id: string) => {
     wantedFilter = next;
     range.value = next.range;
     bots.value = next.bots;
+    // the rows give way to Skeletons and mount again, so they must not
+    // flash a second time
+    freshIds.value = new Set();
     if (withStatistics) isLoading.value = true;
     else isFiltering.value = true;
 
@@ -128,14 +156,14 @@ export const useLinkStatistics = async (id: string) => {
       country.value = next.country;
       listVersion++;
       shownFilter = next;
-    } catch {
+    } catch (error) {
       if (request !== latest) return;
 
       // what was shown stays, so the controls go back to its filter
       wantedFilter = shownFilter;
       range.value = shownFilter.range;
       bots.value = shownFilter.bots;
-      toast.error($t('toast.links.error'));
+      showFailure(error);
       return;
     } finally {
       if (request === latest) {
@@ -189,12 +217,85 @@ export const useLinkStatistics = async (id: string) => {
         clicks: [...clicks.value, ...page.clicks],
         cursor: page.cursor
       };
-    } catch {
+    } catch (error) {
       if (version !== listVersion) return;
 
-      toast.error($t('toast.links.error'));
+      showFailure(error);
     } finally {
       isLoadingMore.value = false;
+    }
+  };
+
+  // the newest Click shown, so a refresh asks only for newer ones; none
+  // while the list is empty, so the first page comes whole
+  const newestShown = () => {
+    const newest = clicks.value[0];
+
+    return newest
+      ? encodeClickCursor({
+          createdAt: new Date(newest.createdAt),
+          id: newest.id
+        })
+      : undefined;
+  };
+
+  // one at a time, so two refreshes never bring the same Clicks in
+  let isRefreshing = false;
+
+  // fresh figures, and the new Clicks on top while Load more's cursor stays.
+  // A 404 shows the not-found ErrorPage; any other failure shows nothing,
+  // and the next refresh tries again
+  const refresh = async () => {
+    if (isRefreshing) return;
+
+    isRefreshing = true;
+    const version = listVersion;
+    const filterShown = shownFilter;
+    const after = newestShown();
+
+    try {
+      const [nextStatistics, newer] = await Promise.all([
+        linkApi.getStatistics(id, {
+          range: filterShown.range,
+          bots: filterShown.bots
+        }),
+        linkApi.getClicks(id, { ...filterShown, after })
+      ]);
+
+      // with no Click shown, newer is the first page whole; a full page may
+      // leave a gap below it, so the first page comes again, with a cursor
+      // of its own. Either takes the list's place
+      let firstPage: ClicksPage | null = null;
+      if (!after) firstPage = newer;
+      else if (newer.clicks.length >= CLICKS_PAGE_SIZE) {
+        firstPage = await linkApi.getClicks(id, filterShown);
+      }
+      if (version !== listVersion) return;
+
+      statisticsData.data.value = nextStatistics;
+      if (firstPage) {
+        const shownIds = new Set(clicks.value.map((click) => click.id));
+
+        clicksData.data.value = firstPage;
+        freshIds.value = new Set(
+          firstPage.clicks
+            .filter((click) => !shownIds.has(click.id))
+            .map((click) => click.id)
+        );
+        // a Load more in flight belongs to the old list
+        listVersion++;
+      } else {
+        clicksData.data.value = {
+          clicks: [...newer.clicks, ...clicks.value],
+          cursor: clicksData.data.value?.cursor ?? null
+        };
+        freshIds.value = new Set(newer.clicks.map((click) => click.id));
+      }
+      refreshes.value++;
+    } catch (error) {
+      if (isNotFound(error)) showNotFound(error);
+    } finally {
+      isRefreshing = false;
     }
   };
 
@@ -213,6 +314,9 @@ export const useLinkStatistics = async (id: string) => {
     setBots,
     pickCountry,
     clearCountry,
-    loadMore
+    loadMore,
+    refresh,
+    freshIds,
+    refreshes
   };
 };

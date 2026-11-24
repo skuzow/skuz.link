@@ -9,6 +9,11 @@ export const ClickRangeSchema = z.enum(CLICK_RANGES);
 // known country
 export const ClickCountrySchema = z.string().regex(/^[A-Z]{2}$/);
 
+// a Click as encodeClickCursor gave it out
+const ClickCursorSchema = z
+  .string()
+  .refine((value) => decodeClickCursor(value) !== null);
+
 // the query of a Link's statistics and of its Click list
 export const ClicksQuerySchema = z.object({
   range: ClickRangeSchema.default(CLICK_RANGE_DEFAULT),
@@ -17,8 +22,7 @@ export const ClicksQuerySchema = z.object({
   // only that country's Clicks, in the Click list
   country: ClickCountrySchema.optional(),
   // the server's cursor of the next page, sent back as it came
-  cursor: z
-    .string()
-    .refine((value) => decodeClickCursor(value) !== null)
-    .optional()
+  cursor: ClickCursorSchema.optional(),
+  // the newest Click shown, so only the Clicks newer than it come back
+  after: ClickCursorSchema.optional()
 });

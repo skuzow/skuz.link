@@ -9,6 +9,7 @@ import {
   count,
   desc,
   eq,
+  gt,
   gte,
   inArray,
   isNotNull,
@@ -57,6 +58,13 @@ const inScope = ({ linkId, since, bots }: ClickScope) =>
     bots ? undefined : eq(clicks.bot, false)
   );
 
+// the Clicks before a cursor, or after it, by time and then by id
+const beyond = (cursor: ClickCursor, compare: typeof lt | typeof gt) =>
+  or(
+    compare(clicks.createdAt, cursor.createdAt),
+    and(eq(clicks.createdAt, cursor.createdAt), compare(clicks.id, cursor.id))
+  );
+
 // one country's Clicks; Unknown takes XX, T1 and no country, as the counts do
 const inCountry = (country: string) =>
   country === UNKNOWN_COUNTRY
@@ -101,12 +109,12 @@ class ClickRepository {
   }
 
   // newest first, by time and then by id, so Clicks in the same millisecond
-  // keep one order; after a cursor, only the Clicks older than it. With a
-  // country, only that country's Clicks. One Click past the page tells
-  // whether another page follows
+  // keep one order; only the Clicks older than before and newer than after.
+  // With a country, only that country's Clicks. One Click past the page
+  // tells whether another page follows
   async findPage(
     { country, ...scope }: ClickScope & { country?: string },
-    cursor: ClickCursor | null
+    { before, after }: { before: ClickCursor | null; after: ClickCursor | null }
   ): Promise<{ clicks: Click[]; hasMore: boolean }> {
     const rows = await this.db
       .select(clickColumns)
@@ -115,15 +123,8 @@ class ClickRepository {
         and(
           inScope(scope),
           country ? inCountry(country) : undefined,
-          cursor
-            ? or(
-                lt(clicks.createdAt, cursor.createdAt),
-                and(
-                  eq(clicks.createdAt, cursor.createdAt),
-                  lt(clicks.id, cursor.id)
-                )
-              )
-            : undefined
+          before ? beyond(before, lt) : undefined,
+          after ? beyond(after, gt) : undefined
         )
       )
       .orderBy(desc(clicks.createdAt), desc(clicks.id))

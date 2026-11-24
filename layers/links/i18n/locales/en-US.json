@@ -54,6 +54,10 @@
         "countries": "Countries",
         "topReferrer": "Top referrer"
       },
+      "live": {
+        "on": "Live",
+        "paused": "Paused"
+      },
       "bots": "Show bots",
       "range": {
         "label": "Time range",

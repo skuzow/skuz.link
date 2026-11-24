@@ -20,6 +20,12 @@ const props = defineProps<{
   loadingMore: boolean;
   // the country whose Clicks the list shows, if any
   country?: string;
+  // the Clicks the last refresh brought in, which flash on top
+  fresh: ReadonlySet<number>;
+  // the tab is hidden, so nothing refreshes
+  paused: boolean;
+  // the refreshes that have landed
+  refreshes: number;
 }>();
 
 defineEmits<{
@@ -50,7 +56,11 @@ const total = computed(() =>
       </NuxtLinkLocale>
     </UiButton>
 
-    <LinksStatisticsSummary :link="link">
+    <LinksStatisticsSummary
+      :link="link"
+      :paused="paused"
+      :refreshes="refreshes"
+    >
       <LinksStatisticsReadout
         :statistics="statistics"
         :range="range"
@@ -72,6 +82,7 @@ const total = computed(() =>
 
     <LinksStatisticsClickList
       :clicks="clicks"
+      :fresh="fresh"
       :total="total"
       :country="country"
       :has-more="hasMore"

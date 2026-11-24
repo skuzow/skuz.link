@@ -82,18 +82,22 @@ class StatisticsService {
     };
   }
 
-  // cursor is one this route gave out, already checked by the query schema
+  // the Clicks older than cursor, the next page, or newer than after, a
+  // poll; both are already checked by the query schema
   async listClicks(
     ownerId: string,
     id: string,
     { range, bots, country }: ClickListFilter,
-    cursor?: string
+    { cursor, after }: { cursor?: string; after?: string }
   ): Promise<ClicksPage> {
     const link = await this.linkService.findOwned(ownerId, id);
 
     const { clicks, hasMore } = await this.clickRepository.findPage(
       { linkId: link.id, since: rangeStart(range), bots, country },
-      cursor ? decodeClickCursor(cursor) : null
+      {
+        before: cursor ? decodeClickCursor(cursor) : null,
+        after: after ? decodeClickCursor(after) : null
+      }
     );
     const last = clicks.at(-1);
 

@@ -19,8 +19,14 @@ const {
   setBots,
   pickCountry,
   clearCountry,
-  loadMore
+  loadMore,
+  refresh,
+  freshIds,
+  refreshes
 } = await useLinkStatistics(String(route.params.id));
+
+// after the await, so the interval stops with the page
+const { isPaused } = useLiveRefresh(refresh);
 
 seoMeta({
   title: $t('links.statistics.meta.title', { slug: link.value.slug })
@@ -39,6 +45,9 @@ seoMeta({
     :range="range"
     :bots="bots"
     :country="country"
+    :fresh="freshIds"
+    :paused="isPaused"
+    :refreshes="refreshes"
     @update:range="setRange"
     @update:bots="setBots"
     @pick-country="pickCountry"

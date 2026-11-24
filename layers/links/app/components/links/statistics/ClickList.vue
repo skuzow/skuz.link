@@ -7,6 +7,8 @@ import CloseIcon from '~icons/pixelarticons/close';
 
 const props = defineProps<{
   clicks: Click[];
+  // the Clicks the last refresh brought in, which flash
+  fresh: ReadonlySet<number>;
   // the Clicks in the range, or the picked country's, of which these are
   // the first
   total: number;
@@ -133,6 +135,7 @@ const HEADER_CLASS =
             v-for="click in clicks"
             :key="click.id"
             :click="click"
+            :fresh="fresh.has(click.id)"
           />
         </template>
       </tbody>

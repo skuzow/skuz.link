@@ -54,6 +54,10 @@
         "countries": "Países",
         "topReferrer": "Referente principal"
       },
+      "live": {
+        "on": "En directo",
+        "paused": "En pausa"
+      },
       "bots": "Mostrar bots",
       "range": {
         "label": "Periodo",

@@ -6,6 +6,10 @@ import CopyIcon from '~icons/pixelarticons/copy';
 
 const props = defineProps<{
   link: Link;
+  // the tab is hidden, so nothing refreshes
+  paused: boolean;
+  // the refreshes that have landed
+  refreshes: number;
 }>();
 
 const { copyShortUrl } = useLinkCopy();
@@ -20,6 +24,7 @@ const hueStyle = computed(() => linkHueStyle(props.link.slug));
       <span class="type-eyebrow text-faint-foreground">
         {{ $t('links.statistics.title') }}
       </span>
+      <LinksStatisticsLive :paused="paused" :refreshes="refreshes" />
     </UiCardHeader>
     <div class="flex min-w-0 items-center gap-5 p-5">
       <div class="min-w-0 flex-1">
