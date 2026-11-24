@@ -45,6 +45,9 @@ const bots = defineModel<boolean>('bots', { required: true });
       <LinksStatisticsBotsToggle v-model="bots" />
     </div>
 
+    <!-- it keeps its last state while new figures load -->
+    <LinksStatisticsCountries :statistics="statistics" />
+
     <LinksStatisticsClickList
       :clicks="clicks"
       :total="statistics.rangeClicks"

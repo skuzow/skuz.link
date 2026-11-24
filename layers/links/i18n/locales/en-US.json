@@ -68,6 +68,17 @@
           "12m": "12m"
         }
       },
+      "countries": {
+        "title": "Clicks by country",
+        "count": "{count} countries | {count} country | {count} countries",
+        "map": "World map of Clicks by country. The country list holds the same numbers.",
+        "legend": "Map legend",
+        "none": "None",
+        "tip": "{country} · {clicks} Click | {country} · {clicks} Clicks",
+        "list": "Countries, most Clicks first",
+        "showAll": "Show all",
+        "showFewer": "Show fewer"
+      },
       "clicks": {
         "title": "Clicks",
         "time": "Time",

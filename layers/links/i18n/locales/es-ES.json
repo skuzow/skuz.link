@@ -68,6 +68,17 @@
           "12m": "12 m"
         }
       },
+      "countries": {
+        "title": "Clics por país",
+        "count": "{count} países | {count} país | {count} países",
+        "map": "Mapa del mundo con los clics por país. La lista de países tiene las mismas cifras.",
+        "legend": "Leyenda del mapa",
+        "none": "Ninguno",
+        "tip": "{country} · {clicks} clic | {country} · {clicks} clics",
+        "list": "Países, de más a menos clics",
+        "showAll": "Mostrar todos",
+        "showFewer": "Mostrar menos"
+      },
       "clicks": {
         "title": "Clics",
         "time": "Hora",

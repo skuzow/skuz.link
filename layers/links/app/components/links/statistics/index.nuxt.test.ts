@@ -100,6 +100,49 @@ const figures = () =>
     figure.querySelector('dd')?.textContent?.trim()
   ]);
 
+const map = () => document.body.querySelector('svg[role="img"]');
+
+// the texts in the strip of the panel that holds the map
+const mapStrip = () =>
+  [
+    ...([...document.body.querySelectorAll('h2')].find(
+      (heading) => heading.textContent?.trim() === 'Clicks by country'
+    )?.parentElement?.children ?? [])
+  ].map((element) => element.textContent?.trim());
+
+// moves the pointer onto a country's dots
+const point = async (country: string) => {
+  map()
+    ?.querySelector(`[data-country="${country}"]`)
+    ?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+  await nextTick();
+};
+
+const tooltip = () =>
+  document.body.querySelector('[role="tooltip"]')?.textContent?.trim();
+
+// "Countries, most Clicks first", in either language
+const countryList = () => document.body.querySelector('ol[aria-label]');
+
+// each row's words: code, name and Clicks
+const countryRows = () =>
+  [...(countryList()?.querySelectorAll('button') ?? [])].map((button) =>
+    [...button.children]
+      .map((element) => element.textContent?.trim())
+      .filter(Boolean)
+      .join(' ')
+  );
+
+const showAllButton = () =>
+  [...document.body.querySelectorAll('button')].find((button) =>
+    ['Show all', 'Show fewer'].includes(button.textContent?.trim() ?? '')
+  );
+
+const legend = () =>
+  [...document.body.querySelectorAll('[aria-label="Map legend"] li')].map(
+    (step) => step.textContent?.trim()
+  );
+
 // by accessible name, which stays whole when phones show the short label
 const rangeButton = (name: string) =>
   document.body.querySelector<HTMLButtonElement>(
@@ -353,7 +396,10 @@ describe('Statistics page', () => {
       ['Top referrer', '—']
     ]);
     expect(wrapper.find('table').exists()).toBe(false);
-    expect(wrapper.text()).toContain('No Clicks in this range');
+    // the country list and the Click list
+    expect(wrapper.text().match(/No Clicks in this range/g)).toHaveLength(2);
+    expect(mapStrip()).toEqual(['Clicks by country', '0 countries']);
+    expect(legend()).toEqual(['None']);
     expect(wrapper.text()).not.toContain('0 of 0');
 
     getClicks.mockReturnValue(
@@ -366,6 +412,178 @@ describe('Statistics page', () => {
 
     expect(rows()).toHaveLength(1);
     expect(figures()[0]).toEqual(['Clicks · 12 months', '1']);
+  });
+
+  describe('map', () => {
+    it('counts the countries in its strip', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 3,
+          countryClicks: [
+            { country: 'ES', clicks: 118 },
+            { country: 'US', clicks: 40 },
+            { country: 'FR', clicks: 2 },
+            { country: 'XX', clicks: 5 }
+          ]
+        })
+      );
+
+      await mountPage();
+
+      expect(mapStrip()).toEqual(['Clicks by country', '3 countries']);
+    });
+
+    it('shows the lower bound of each step in its legend, from the real counts', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 3,
+          countryClicks: [
+            { country: 'ES', clicks: 118 },
+            { country: 'US', clicks: 40 },
+            { country: 'FR', clicks: 2 },
+            // Unknown has no dot, so it never sets the top step
+            { country: 'XX', clicks: 500 }
+          ]
+        })
+      );
+
+      await mountPage();
+
+      // ceil(4 × ln(1 + n) / ln(1 + 118)) first reaches 2 at 3, 3 at 10 and
+      // 4 at 36
+      expect(legend()).toEqual(['None', '1+', '3+', '10+', '36+']);
+    });
+
+    it('shows only the steps that a count can reach', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 1,
+          countryClicks: [{ country: 'ES', clicks: 1 }]
+        })
+      );
+
+      await mountPage();
+
+      // with one Click at most, that Click lights the top step
+      expect(legend()).toEqual(['None', '1+']);
+    });
+
+    it("shows a country's name and Clicks while the pointer is on its dots", async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 2,
+          countryClicks: [
+            { country: 'ES', clicks: 118 },
+            { country: 'PT', clicks: 1 }
+          ]
+        })
+      );
+      await mountPage();
+
+      await point('ES');
+      expect(tooltip()).toBe('Spain · 118 Clicks');
+
+      await point('PT');
+      expect(tooltip()).toBe('Portugal · 1 Click');
+
+      // land with no Clicks does nothing
+      await point('FR');
+      expect(tooltip()).toBeUndefined();
+
+      await point('ES');
+      map()?.dispatchEvent(new PointerEvent('pointerleave'));
+      await nextTick();
+      expect(tooltip()).toBeUndefined();
+    });
+
+    it('lists each country with its Clicks, most first, and Unknown last', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 2,
+          countryClicks: [
+            { country: 'XX', clicks: 50 },
+            { country: 'ES', clicks: 1180 },
+            { country: 'DE', clicks: 3 }
+          ]
+        })
+      );
+      await mountPage();
+
+      expect(countryList()?.getAttribute('aria-label')).toBe(
+        'Countries, most Clicks first'
+      );
+      expect(countryRows()).toEqual([
+        'ES Spain 1,180',
+        'DE Germany 3',
+        '-- Unknown 50'
+      ]);
+    });
+
+    it('names countries in the language of the page', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 2,
+          countryClicks: [
+            { country: 'ES', clicks: 1180 },
+            { country: 'DE', clicks: 3 },
+            { country: 'XX', clicks: 1 }
+          ]
+        })
+      );
+      await mountPage('/es/links/link-1');
+
+      expect(countryRows()).toEqual([
+        'ES España 1180',
+        'DE Alemania 3',
+        '-- Desconocido 1'
+      ]);
+
+      await point('ES');
+      expect(tooltip()).toBe('España · 1180 clics');
+    });
+
+    it('folds the list after six countries until Show all', async () => {
+      const codes = ['ES', 'US', 'DE', 'FR', 'PT', 'IT', 'GB'];
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: codes.length,
+          countryClicks: codes.map((country, index) => ({
+            country,
+            clicks: 10 - index
+          }))
+        })
+      );
+      await mountPage();
+
+      expect(countryRows()).toHaveLength(7);
+      expect(showAllButton()?.textContent?.trim()).toBe('Show all');
+
+      showAllButton()?.click();
+      await nextTick();
+      expect(showAllButton()?.textContent?.trim()).toBe('Show fewer');
+
+      showAllButton()?.click();
+      await nextTick();
+      expect(showAllButton()?.textContent?.trim()).toBe('Show all');
+    });
+
+    it('has no Show all with six countries or fewer', async () => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          countries: 1,
+          countryClicks: [{ country: 'ES', clicks: 1 }]
+        })
+      );
+      await mountPage();
+
+      expect(showAllButton()).toBeUndefined();
+    });
+
+    it('points from the map to the country list', async () => {
+      await mountPage();
+
+      expect(map()?.getAttribute('aria-label')).toContain('country list');
+    });
   });
 
   describe('range', () => {
