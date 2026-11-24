@@ -10,13 +10,19 @@ import {
   desc,
   eq,
   gte,
+  inArray,
   isNotNull,
+  isNull,
   lt,
   or,
   sql
 } from 'drizzle-orm';
 import type { Database } from '#layers/base/server/platform/db';
 import { CLICKS_PAGE_SIZE } from '#layers/links/shared/domain/click.constant';
+import {
+  UNKNOWN_COUNTRY,
+  UNPLACED_COUNTRIES
+} from '#layers/links/shared/domain/click.country';
 import { clicks, links } from './schema';
 
 // a bound value as a selected column, for INSERT … SELECT
@@ -50,6 +56,15 @@ const inScope = ({ linkId, since, bots }: ClickScope) =>
     gte(clicks.createdAt, since),
     bots ? undefined : eq(clicks.bot, false)
   );
+
+// one country's Clicks; Unknown takes XX, T1 and no country, as the counts do
+const inCountry = (country: string) =>
+  country === UNKNOWN_COUNTRY
+    ? or(
+        inArray(clicks.country, [...UNPLACED_COUNTRIES]),
+        isNull(clicks.country)
+      )
+    : eq(clicks.country, country);
 
 class ClickRepository {
   constructor(private db: Database) {}
@@ -86,10 +101,11 @@ class ClickRepository {
   }
 
   // newest first, by time and then by id, so Clicks in the same millisecond
-  // keep one order; after a cursor, only the Clicks older than it. One Click
-  // past the page tells whether another page follows
+  // keep one order; after a cursor, only the Clicks older than it. With a
+  // country, only that country's Clicks. One Click past the page tells
+  // whether another page follows
   async findPage(
-    scope: ClickScope,
+    { country, ...scope }: ClickScope & { country?: string },
     cursor: ClickCursor | null
   ): Promise<{ clicks: Click[]; hasMore: boolean }> {
     const rows = await this.db
@@ -98,6 +114,7 @@ class ClickRepository {
       .where(
         and(
           inScope(scope),
+          country ? inCountry(country) : undefined,
           cursor
             ? or(
                 lt(clicks.createdAt, cursor.createdAt),

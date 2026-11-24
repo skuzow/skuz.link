@@ -95,6 +95,11 @@
           "tablet": "Tableta"
         },
         "empty": "No hay clics en este periodo",
+        "filter": {
+          "showing": "Mostrando clics de {country}",
+          "showingAll": "Mostrando clics de todos los países",
+          "clear": "Quitar el filtro: {country}"
+        },
         "shown": "{shown} de {total}",
         "loadMore": "Cargar más"
       }

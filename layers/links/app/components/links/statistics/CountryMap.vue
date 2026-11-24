@@ -13,7 +13,11 @@ const props = defineProps<{
   // Unknown has no dots, so it never shows here
   countryClicks: CountryClicks[];
   max: number;
+  // the country the Click list is filtered to, if any
+  picked?: string;
 }>();
+
+const emit = defineEmits<{ pick: [country: string] }>();
 
 const hovered = defineModel<string | null>('hovered', { required: true });
 
@@ -71,21 +75,31 @@ const tipStyle = computed(() => {
 });
 
 // a country's dots, and the gaps between them, answer for the country;
-// land with no Clicks does nothing
-const point = (event: PointerEvent) => {
+// land with no Clicks answers for none
+const litCountryAt = (event: Event): string | null => {
   const target = event.target instanceof Element ? event.target : null;
   const code = target?.closest('[data-country]')?.getAttribute('data-country');
+
+  return code && counts.value.get(code) ? code : null;
+};
+
+const point = (event: PointerEvent) => {
+  const code = litCountryAt(event);
   const box = mapElement.value?.getBoundingClientRect();
 
-  pointed.value =
-    code && counts.value.get(code)
-      ? {
-          code,
-          x: event.clientX - (box?.left ?? 0),
-          y: event.clientY - (box?.top ?? 0)
-        }
-      : null;
+  pointed.value = code
+    ? {
+        code,
+        x: event.clientX - (box?.left ?? 0),
+        y: event.clientY - (box?.top ?? 0)
+      }
+    : null;
   hovered.value = pointed.value?.code ?? null;
+};
+
+const pick = (event: MouseEvent) => {
+  const code = litCountryAt(event);
+  if (code) emit('pick', code);
 };
 
 const leave = () => {
@@ -107,18 +121,25 @@ const leave = () => {
       @pointerover="point"
       @pointermove="point"
       @pointerleave="leave"
+      @click="pick"
     >
       <path
         v-for="country in countries"
         :key="country.code"
         :data-country="country.code"
         :d="country.dots"
-        :fill-opacity="country.code === hovered ? 1 : country.opacity"
+        :fill-opacity="
+          country.code === hovered || country.code === picked
+            ? 1
+            : country.opacity
+        "
+        :opacity="picked && country.code !== picked ? 0.3 : undefined"
         stroke="transparent"
         stroke-width="0.25"
         :class="[
-          'transition-[fill,fill-opacity] duration-120',
-          country.code === hovered
+          'transition-[fill,fill-opacity,opacity] duration-120',
+          { 'cursor-pointer': country.opacity },
+          country.code === hovered || country.code === picked
             ? 'fill-foreground'
             : country.opacity
               ? 'fill-signal'

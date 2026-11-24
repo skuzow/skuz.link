@@ -32,6 +32,9 @@ export type ClicksQuery = z.infer<typeof ClicksQuerySchema>;
 // which of a Link's Clicks Statistics count and list
 export type ClickFilter = Pick<ClicksQuery, 'range' | 'bots'>;
 
+// which of those Clicks the Click list shows: one country's, or all
+export type ClickListFilter = Pick<ClicksQuery, 'range' | 'bots' | 'country'>;
+
 // where the next page of a Click list starts: the last Click shown, by time
 // and id
 export type ClickCursor = Pick<Click, 'createdAt' | 'id'>;

@@ -95,6 +95,11 @@
           "tablet": "Tablet"
         },
         "empty": "No Clicks in this range",
+        "filter": {
+          "showing": "Showing Clicks from {country}",
+          "showingAll": "Showing Clicks from every country",
+          "clear": "Clear the filter: {country}"
+        },
         "shown": "{shown} of {total}",
         "loadMore": "Load more"
       }

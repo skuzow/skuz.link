@@ -1,7 +1,7 @@
 export const UNKNOWN_COUNTRY: string = 'XX';
 
 // Cloudflare sends XX when it can't place a request and T1 for Tor
-const UNPLACED_COUNTRIES: ReadonlySet<string> = new Set([
+export const UNPLACED_COUNTRIES: ReadonlySet<string> = new Set([
   UNKNOWN_COUNTRY,
   'T1'
 ]);

@@ -803,6 +803,61 @@ describe('Bots', () => {
   );
 });
 
+describe('country', () => {
+  const seedCountries = (linkId: string) =>
+    seedClicks(linkId, [
+      { city: 'es-1', country: 'ES', age: MINUTE_MS },
+      { city: 'fr', country: 'FR', age: 2 * MINUTE_MS },
+      { city: 'xx', country: 'XX', age: 3 * MINUTE_MS },
+      { city: 'es-2', country: 'ES', age: 4 * MINUTE_MS },
+      { city: 't1', country: 'T1', age: 5 * MINUTE_MS },
+      { city: 'none', country: null, age: 6 * MINUTE_MS },
+      { city: 'es-old', country: 'ES', age: 40 * DAY_MS }
+    ]);
+
+  it("lists only Spain's Clicks with country=ES, within the range", async () => {
+    const link = await server.createLink(alice.headers, 'country-es');
+    await seedCountries(link.id);
+
+    expect(
+      (await listClicks(link.id, alice.headers, '?country=ES')).map(
+        (click) => click.city
+      )
+    ).toEqual(['es-1', 'es-2']);
+  });
+
+  it('lists every Unknown Click with country=XX: XX, T1 and no country', async () => {
+    const link = await server.createLink(alice.headers, 'country-xx');
+    await seedCountries(link.id);
+
+    expect(
+      (await listClicks(link.id, alice.headers, '?country=XX')).map(
+        (click) => click.city
+      )
+    ).toEqual(['xx', 't1', 'none']);
+  });
+
+  it.each(['es', 'ESP', 'E1'])(
+    'GET /api/links/:id/clicks returns 400 with the issues for country=%s',
+    async (country) => {
+      const link = await server.createLink(alice.headers, 'bad-country');
+
+      const response = await server.fetch(
+        `/api/links/${link.id}/clicks?country=${country}`,
+        { headers: alice.headers }
+      );
+
+      expect(response.status).toBe(400);
+
+      const body = await response.json();
+      expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
+      expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
+        ['country']
+      ]);
+    }
+  );
+});
+
 describe('access', () => {
   it.each(['', '/clicks', '/statistics'])(
     'GET /api/links/:id%s returns 401 without a session',

@@ -1,5 +1,6 @@
 import type {
   ClickFilter,
+  ClickListFilter,
   ClickRange,
   ClicksPage,
   CountryClicks,
@@ -85,13 +86,13 @@ class StatisticsService {
   async listClicks(
     ownerId: string,
     id: string,
-    { range, bots }: ClickFilter,
+    { range, bots, country }: ClickListFilter,
     cursor?: string
   ): Promise<ClicksPage> {
     const link = await this.linkService.findOwned(ownerId, id);
 
     const { clicks, hasMore } = await this.clickRepository.findPage(
-      { linkId: link.id, since: rangeStart(range), bots },
+      { linkId: link.id, since: rangeStart(range), bots, country },
       cursor ? decodeClickCursor(cursor) : null
     );
     const last = clicks.at(-1);

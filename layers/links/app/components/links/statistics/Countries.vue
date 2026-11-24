@@ -4,7 +4,11 @@ import { UNKNOWN_COUNTRY } from '#layers/links/shared/domain/click.country';
 
 const props = defineProps<{
   statistics: LinkStatistics;
+  // the country the Click list is filtered to, if any
+  picked?: string;
 }>();
+
+defineEmits<{ pick: [country: string] }>();
 
 // the country under the pointer, on the map or in the list
 const hovered = shallowRef<string | null>(null);
@@ -51,11 +55,15 @@ const max = computed(() =>
         v-model:hovered="hovered"
         :country-clicks="countryClicks"
         :max="max"
+        :picked="picked"
+        @pick="$emit('pick', $event)"
       />
       <LinksStatisticsCountryList
         v-model:hovered="hovered"
         :country-clicks="countryClicks"
         :max="max"
+        :picked="picked"
+        @pick="$emit('pick', $event)"
       />
     </div>
   </UiCard>

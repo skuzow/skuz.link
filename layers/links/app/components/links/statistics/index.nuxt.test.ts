@@ -744,6 +744,248 @@ describe('Statistics page', () => {
     });
   });
 
+  describe('country', () => {
+    // the country each call to the Click list asked for
+    const countriesAsked = () =>
+      getClicks.mock.calls.map(([event]) => getQuery(event).country);
+
+    const countryRow = (code: string) =>
+      [...(countryList()?.querySelectorAll('button') ?? [])].find(
+        (button) => button.children[1]?.textContent?.trim() === code
+      );
+
+    // the button beside the Click list's heading, in either language
+    const chip = () =>
+      document.body.querySelector<HTMLButtonElement>('h2 + button');
+
+    const announced = () =>
+      document.body.querySelector('[aria-live="polite"]')?.textContent?.trim();
+
+    // until the Clicks of the new filter have landed, or failed
+    const settle = async () => {
+      await nextTick();
+      await vi.waitFor(() =>
+        expect(document.body.querySelector('[aria-busy="true"]')).toBeNull()
+      );
+      await flushPromises();
+    };
+
+    const pickRow = async (code: string) => {
+      countryRow(code)?.click();
+      await settle();
+    };
+
+    const clickMap = async (code: string) => {
+      map()
+        ?.querySelector(`[data-country="${code}"]`)
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await settle();
+    };
+
+    beforeEach(() => {
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          rangeClicks: 120,
+          countries: 2,
+          countryClicks: [
+            { country: 'ES', clicks: 118 },
+            { country: 'PT', clicks: 1 },
+            { country: 'XX', clicks: 1 }
+          ]
+        })
+      );
+      getClicks.mockImplementation((event) =>
+        getQuery(event).country === 'ES'
+          ? makeClicksPage([makeClick({ id: 2, city: 'Madrid' })])
+          : makeClicksPage([
+              makeClick({ id: 2, city: 'Madrid' }),
+              makeClick({ id: 1, country: 'PT', city: 'Lisbon' })
+            ])
+      );
+    });
+
+    it('lists every country by default', async () => {
+      const wrapper = await mountPage();
+
+      expect(countriesAsked()).toEqual([undefined]);
+      expect(chip()).toBeNull();
+      expect(countryRow('ES')?.getAttribute('aria-pressed')).toBe('false');
+      expect(wrapper.text()).toContain('2 of 120');
+    });
+
+    it('reads the picked country from the address on load', async () => {
+      const wrapper = await mountPage('/links/link-1?range=7d&country=ES');
+
+      expect(countriesAsked()).toEqual(['ES']);
+      expect(rangesAsked(getClicks)).toEqual(['7d']);
+      expect(getQuery(getStatistics.mock.calls[0]![0]).country).toBeUndefined();
+      expect(countryRow('ES')?.getAttribute('aria-pressed')).toBe('true');
+      expect(chip()?.textContent?.trim()).toBe('Spain');
+      expect(wrapper.text()).toContain('1 of 118');
+    });
+
+    it('ignores a country it does not read', async () => {
+      await mountPage('/links/link-1?country=spain');
+
+      expect(countriesAsked()).toEqual([undefined]);
+      expect(chip()).toBeNull();
+    });
+
+    it('picks a country from the list, and clears it with a second pick', async () => {
+      const wrapper = await mountPage('/links/link-1?range=7d');
+      const historyLength = window.history.length;
+
+      await pickRow('ES');
+
+      expect(currentQuery()).toEqual({ range: '7d', country: 'ES' });
+      expect(window.history.length).toBe(historyLength);
+      expect(rows().map((row) => row.children[1]?.textContent)).toEqual([
+        expect.stringContaining('Madrid')
+      ]);
+      expect(countryRow('ES')?.getAttribute('aria-pressed')).toBe('true');
+      expect(countryRow('PT')?.getAttribute('aria-pressed')).toBe('false');
+      expect(wrapper.text()).toContain('1 of 118');
+      // only the Click list is fetched again
+      expect(getStatistics).toHaveBeenCalledTimes(1);
+      expect(countriesAsked()).toEqual([undefined, 'ES']);
+      expect(rangesAsked(getClicks)).toEqual(['7d', '7d']);
+
+      await pickRow('ES');
+
+      expect(currentQuery()).toEqual({ range: '7d' });
+      expect(window.history.length).toBe(historyLength);
+      expect(rows()).toHaveLength(2);
+      expect(countryRow('ES')?.getAttribute('aria-pressed')).toBe('false');
+      expect(chip()).toBeNull();
+      expect(countriesAsked()).toEqual([undefined, 'ES', undefined]);
+    });
+
+    it('picks Unknown from the list', async () => {
+      await mountPage();
+
+      await pickRow('--');
+
+      expect(currentQuery()).toEqual({ country: 'XX' });
+      expect(countriesAsked()).toEqual([undefined, 'XX']);
+      expect(chip()?.getAttribute('aria-label')).toBe(
+        'Clear the filter: Unknown'
+      );
+    });
+
+    it('picks a lit country on the map, and does nothing on land with no Clicks', async () => {
+      await mountPage();
+
+      await clickMap('FR');
+
+      expect(countriesAsked()).toEqual([undefined]);
+      expect(currentQuery()).toEqual({});
+
+      await clickMap('ES');
+
+      expect(countriesAsked()).toEqual([undefined, 'ES']);
+      expect(currentQuery()).toEqual({ country: 'ES' });
+
+      await clickMap('ES');
+
+      expect(countriesAsked()).toEqual([undefined, 'ES', undefined]);
+      expect(currentQuery()).toEqual({});
+    });
+
+    it('clears the filter with the chip, and announces each change', async () => {
+      await mountPage();
+
+      expect(announced()).toBe('');
+
+      await pickRow('ES');
+
+      expect(chip()?.getAttribute('aria-label')).toBe(
+        'Clear the filter: Spain'
+      );
+      expect(announced()).toBe('Showing Clicks from Spain');
+
+      chip()?.click();
+      await settle();
+
+      expect(chip()).toBeNull();
+      expect(currentQuery()).toEqual({});
+      expect(rows()).toHaveLength(2);
+      expect(announced()).toBe('Showing Clicks from every country');
+    });
+
+    it('keeps the country through a new range and Load more', async () => {
+      getClicks
+        .mockReset()
+        .mockReturnValue(makeClicksPage([makeClick()], 'page-2'));
+      await mountPage('/links/link-1?country=ES');
+
+      await chooseRange('7 days');
+      await loadMore();
+
+      expect(currentQuery()).toEqual({ range: '7d', country: 'ES' });
+      expect(countriesAsked()).toEqual(['ES', 'ES', 'ES']);
+    });
+
+    it('shows the new range when a country is picked before its figures land', async () => {
+      await mountPage();
+
+      getStatistics.mockReturnValue(
+        makeStatistics({
+          rangeClicks: 7,
+          countries: 1,
+          countryClicks: [{ country: 'ES', clicks: 7 }]
+        })
+      );
+      rangeButton('7 days')?.click();
+      await nextTick();
+      await pickRow('ES');
+
+      expect(figures()[0]).toEqual(['Clicks · 7 days', '7']);
+      expect(rangesAsked(getStatistics).at(-1)).toBe('7d');
+      expect(currentQuery()).toEqual({ range: '7d', country: 'ES' });
+    });
+
+    it('clears the filter with a second press before the first pick lands', async () => {
+      await mountPage();
+
+      countryRow('ES')?.click();
+      await nextTick();
+      await pickRow('ES');
+
+      expect(countriesAsked()).toEqual([undefined, 'ES', undefined]);
+      expect(currentQuery()).toEqual({});
+      expect(chip()).toBeNull();
+    });
+
+    it('shows the toast and keeps the rows when a pick fails', async () => {
+      await mountPage();
+
+      // every time, because $fetch tries a failed GET twice
+      getClicks.mockImplementation(() => {
+        throw createError({ statusCode: 500 });
+      });
+      await pickRow('ES');
+
+      expect(toast.error).toHaveBeenCalledWith(
+        'Something went wrong with your links'
+      );
+      expect(rows()).toHaveLength(2);
+      expect(countryRow('ES')?.getAttribute('aria-pressed')).toBe('false');
+      expect(chip()).toBeNull();
+      expect(currentQuery()).toEqual({});
+    });
+
+    it('reads in Spanish', async () => {
+      await mountPage('/es/links/link-1');
+
+      await pickRow('ES');
+
+      expect(chip()?.getAttribute('aria-label')).toBe(
+        'Quitar el filtro: España'
+      );
+      expect(announced()).toBe('Mostrando clics de España');
+    });
+  });
+
   describe('Load more', () => {
     beforeEach(() => {
       getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 3 }));

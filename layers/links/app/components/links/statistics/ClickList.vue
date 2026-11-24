@@ -1,18 +1,44 @@
 <script lang="ts" setup>
 import type { Click } from '#layers/links/shared/domain/click.type';
+import { UNKNOWN_COUNTRY } from '#layers/links/shared/domain/click.country';
+import { countryName } from '#layers/links/app/lib/country';
 import ChevronDownIcon from '~icons/pixelarticons/chevron-down';
+import CloseIcon from '~icons/pixelarticons/close';
 
-defineProps<{
+const props = defineProps<{
   clicks: Click[];
-  // the Clicks in the range, of which these are the first
+  // the Clicks in the range, or the picked country's, of which these are
+  // the first
   total: number;
+  // the country these Clicks are filtered to, if any
+  country?: string;
   // whether another page follows the Clicks shown
   hasMore: boolean;
   loading: boolean;
   loadingMore: boolean;
 }>();
 
-defineEmits<{ loadMore: [] }>();
+defineEmits<{ clearCountry: []; loadMore: [] }>();
+
+const { t, locale } = useI18n();
+
+const name = (country: string) =>
+  country === UNKNOWN_COUNTRY
+    ? t('links.statistics.clicks.unknown')
+    : countryName(country, locale.value);
+
+const countryLabel = computed(() =>
+  props.country ? name(props.country) : null
+);
+
+// empty on load, so a screen reader hears only the changes
+const announcement = shallowRef('');
+
+watch(countryLabel, (label) => {
+  announcement.value = label
+    ? t('links.statistics.clicks.filter.showing', { country: label })
+    : t('links.statistics.clicks.filter.showingAll');
+});
 
 const HEADER_CLASS =
   'type-chip text-faint-foreground border-border-strong border-b px-3 py-2.5 text-left leading-4 first:pl-4 last:pr-4';
@@ -25,6 +51,18 @@ const HEADER_CLASS =
       <h2 class="type-eyebrow text-faint-foreground">
         {{ $t('links.statistics.clicks.title') }}
       </h2>
+      <button
+        v-if="countryLabel"
+        type="button"
+        :aria-label="
+          $t('links.statistics.clicks.filter.clear', { country: countryLabel })
+        "
+        class="border-signal bg-signal-wash text-signal hover:bg-signal hover:text-background focus-visible:outline-ring type-chip inline-flex h-[22px] max-w-full min-w-0 cursor-pointer items-center gap-1.5 border pr-1 pl-[7px] leading-[11px] whitespace-nowrap transition-colors duration-120 focus-visible:outline-2 focus-visible:outline-offset-2"
+        @click="$emit('clearCountry')"
+      >
+        <span class="truncate">{{ countryLabel }}</span>
+        <CloseIcon aria-hidden="true" class="size-3 shrink-0" />
+      </button>
       <span
         v-if="!loading && clicks.length"
         class="type-chip text-muted-foreground ml-auto whitespace-nowrap"
@@ -37,6 +75,7 @@ const HEADER_CLASS =
         }}
       </span>
     </UiCardHeader>
+    <p class="sr-only" aria-live="polite">{{ announcement }}</p>
 
     <p
       v-if="!loading && !clicks.length"

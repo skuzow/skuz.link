@@ -11,7 +11,12 @@ const props = defineProps<{
   countryClicks: CountryClicks[];
   // the top country's Clicks, which fills a meter
   max: number;
+  // the country the Click list is filtered to, if any
+  picked?: string;
 }>();
+
+// picking the picked country again clears the filter
+defineEmits<{ pick: [country: string] }>();
 
 const hovered = defineModel<string | null>('hovered', { required: true });
 
@@ -27,6 +32,7 @@ const rows = computed(() =>
       country,
       clicks,
       isUnknown,
+      isPicked: country === props.picked,
       name: isUnknown ? null : countryName(country, locale.value),
       share: isUnknown || !props.max ? null : (clicks / props.max) * 100,
       isFolded: !showAll.value && index >= FOLDED_AFTER
@@ -59,18 +65,25 @@ const rows = computed(() =>
       >
         <button
           type="button"
+          :aria-pressed="row.isPicked"
           :class="[
             'focus-visible:outline-ring hover:bg-accent hover:text-foreground relative grid min-h-10 w-full cursor-pointer grid-cols-[auto_22px_minmax(0,1fr)_auto] items-center gap-2 px-4 text-left text-sm/[21px] transition-colors duration-120 focus-visible:outline-2 focus-visible:-outline-offset-2',
-            row.country === hovered
-              ? 'bg-accent text-foreground'
+            { 'bg-accent': row.country === hovered },
+            row.country === hovered || row.isPicked
+              ? 'text-foreground'
               : 'text-muted-foreground'
           ]"
+          @click="$emit('pick', row.country)"
           @pointerenter="hovered = row.country"
           @pointerleave="hovered = null"
         >
+          <!-- lit while its country is picked -->
           <span
             aria-hidden="true"
-            class="led text-border-strong shadow-none!"
+            :class="[
+              'led',
+              row.isPicked ? 'text-signal' : 'text-border-strong shadow-none!'
+            ]"
           />
           <span class="type-chip text-faint-foreground">
             {{ row.isUnknown ? '--' : row.country }}
