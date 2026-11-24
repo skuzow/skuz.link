@@ -54,6 +54,10 @@ const listClicksPage = async (
 const listClicks = async (id: string, headers = alice.headers, query = '') =>
   (await listClicksPage(id, headers, query)).clicks;
 
+// a test request sends no user agent, so the Click it records is a Bot's
+const listRecorded = (id: string, headers = alice.headers) =>
+  listClicks(id, headers, '?bots=true');
+
 const getStatistics = async (id: string, query = '') => {
   const response = await server.fetch(`/api/links/${id}/statistics${query}`, {
     headers: alice.headers
@@ -96,7 +100,7 @@ describe('recording a Click', () => {
 
     expect(response.status).toBe(302);
 
-    const listed = await listClicks(link.id);
+    const listed = await listRecorded(link.id);
     expect(listed).toHaveLength(1);
     expect(listed[0]).toMatchObject(MADRID);
 
@@ -126,7 +130,7 @@ describe('recording a Click', () => {
 
     expect(response.headers.get('location')).toBe(link.redirectUrl);
 
-    const listed = await listClicks(link.id);
+    const listed = await listRecorded(link.id);
     expect(listed.map((click) => click.city)).toEqual(['Paris', 'Madrid']);
     expect((await getLink(link.id)).clicks).toBe(2);
   });
@@ -141,7 +145,7 @@ describe('recording a Click', () => {
     await server.flush();
 
     expect(response.status).toBe(302);
-    expect(await listClicks(link.id)).toEqual([]);
+    expect(await listRecorded(link.id)).toEqual([]);
     expect((await getLink(link.id)).clicks).toBe(0);
   });
 
@@ -175,7 +179,7 @@ describe('recording a Click', () => {
     });
     await server.flush();
 
-    const listed = JSON.stringify(await listClicks(link.id));
+    const listed = JSON.stringify(await listRecorded(link.id));
     const rows = JSON.stringify(
       await server.db.select().from(clicks).where(eq(clicks.linkId, link.id))
     );
@@ -197,7 +201,7 @@ describe('recording a Click', () => {
     });
     await server.flush();
 
-    const [click] = await listClicks(link.id);
+    const [click] = await listRecorded(link.id);
     return click;
   };
 
@@ -340,7 +344,7 @@ describe('recording a Click', () => {
     });
     await server.flush();
 
-    const [person, bot] = await listClicks(link.id);
+    const [person, bot] = await listRecorded(link.id);
     expect(bot).toMatchObject({ bot: true });
     expect(bot?.botName).toBe('x'.repeat(128));
 
@@ -381,7 +385,7 @@ describe('recording a Click', () => {
     });
     await server.flush();
 
-    expect(await listClicks(link.id)).toMatchObject([{ referrer }]);
+    expect(await listRecorded(link.id)).toMatchObject([{ referrer }]);
   });
 
   it('cuts a Referrer host to a fixed length', async () => {
@@ -393,7 +397,7 @@ describe('recording a Click', () => {
     });
     await server.flush();
 
-    const [click] = await listClicks(link.id);
+    const [click] = await listRecorded(link.id);
     expect(click?.referrer).toBe(host.slice(0, 128));
   });
 
@@ -409,7 +413,7 @@ describe('recording a Click', () => {
       await server.fetch('/unknown', { cf });
       await server.flush();
 
-      expect(await listClicks(link.id)).toMatchObject([
+      expect(await listRecorded(link.id)).toMatchObject([
         { country, region: null, city: null }
       ]);
     }
@@ -679,6 +683,126 @@ describe('GET /api/links/:id/statistics', () => {
   });
 });
 
+describe('Bots', () => {
+  const seedBotsAndPeople = async (linkId: string) => {
+    await seedClicks(linkId, [
+      { city: 'person-es', country: 'ES', referrer: 't.co', age: MINUTE_MS },
+      {
+        city: 'bot-fr',
+        country: 'FR',
+        referrer: 'google.com',
+        bot: true,
+        age: 2 * MINUTE_MS
+      },
+      {
+        city: 'bot-de',
+        country: 'DE',
+        referrer: 'google.com',
+        bot: true,
+        age: 3 * MINUTE_MS
+      },
+      { city: 'person-xx', country: 'XX', age: 4 * MINUTE_MS }
+    ]);
+    await setClickCount(linkId, 4);
+  };
+
+  it.each([
+    ['by default', ''],
+    ['with bots=false', '?bots=false']
+  ])(
+    'leaves Bots out of the figures, the countries and the list %s',
+    async (_, query) => {
+      const link = await server.createLink(alice.headers, 'bots-hidden');
+      await seedBotsAndPeople(link.id);
+
+      expect(await getStatistics(link.id, query)).toEqual({
+        rangeClicks: 2,
+        clickCount: 4,
+        countries: 1,
+        topReferrer: 't.co',
+        countryClicks: [
+          { country: 'ES', clicks: 1 },
+          { country: 'XX', clicks: 1 }
+        ]
+      });
+      expect(
+        (await listClicks(link.id, alice.headers, query)).map(
+          (click) => click.city
+        )
+      ).toEqual(['person-es', 'person-xx']);
+    }
+  );
+
+  it('counts Bots with bots=true', async () => {
+    const link = await server.createLink(alice.headers, 'bots-shown');
+    await seedBotsAndPeople(link.id);
+
+    expect(await getStatistics(link.id, '?bots=true')).toEqual({
+      rangeClicks: 4,
+      clickCount: 4,
+      countries: 3,
+      topReferrer: 'google.com',
+      countryClicks: [
+        { country: 'DE', clicks: 1 },
+        { country: 'ES', clicks: 1 },
+        { country: 'FR', clicks: 1 },
+        { country: 'XX', clicks: 1 }
+      ]
+    });
+    expect(
+      (await listClicks(link.id, alice.headers, '?bots=true')).map(
+        (click) => click.city
+      )
+    ).toEqual(['person-es', 'bot-fr', 'bot-de', 'person-xx']);
+  });
+
+  it('keeps Bots out of every page', async () => {
+    const link = await server.createLink(alice.headers, 'bots-paged');
+
+    // a Bot after every person, so a page of 50 people spans 100 Clicks
+    await seedClicks(
+      link.id,
+      Array.from({ length: 120 }, (_, index) => ({
+        city: `c${index}`,
+        bot: index % 2 === 1,
+        age: (index + 1) * MINUTE_MS
+      }))
+    );
+
+    const first = await listClicksPage(link.id);
+    const second = await listClicksPage(
+      link.id,
+      alice.headers,
+      `?cursor=${encodeURIComponent(first.cursor!)}`
+    );
+
+    expect(
+      [first, second].flatMap((page) => page.clicks.map((click) => click.city))
+    ).toEqual(Array.from({ length: 60 }, (_, index) => `c${index * 2}`));
+    expect(second.cursor).toBeNull();
+  });
+
+  it.each(['/clicks', '/statistics'])(
+    'GET /api/links/:id%s returns 400 with the issues for a bad bots',
+    async (suffix) => {
+      const link = await server.createLink(alice.headers, 'bad-bots');
+
+      const response = await server.fetch(
+        `/api/links/${link.id}${suffix}?bots=yes`,
+        { headers: alice.headers }
+      );
+
+      expect(response.status).toBe(400);
+
+      const body = await response.json();
+      expect(body).toMatchObject({ statusMessage: 'Invalid fields' });
+      expect(body.data.map((issue: { path: string[] }) => issue.path)).toEqual([
+        ['bots']
+      ]);
+    }
+  );
+});
+
 describe('access', () => {
   it.each(['', '/clicks', '/statistics'])(
     'GET /api/links/:id%s returns 401 without a session',
@@ -762,7 +886,7 @@ describe('lifecycle', () => {
 
     const second = await server.createLink(bob.headers, 'reused');
 
-    expect(await listClicks(second.id, bob.headers)).toEqual([]);
+    expect(await listRecorded(second.id, bob.headers)).toEqual([]);
     expect((await getLink(second.id, bob.headers)).clicks).toBe(0);
   });
 
@@ -777,7 +901,7 @@ describe('lifecycle', () => {
       json: { slug: 'after', redirectUrl: 'https://example.com/after' }
     });
 
-    expect(await listClicks(link.id)).toMatchObject([MADRID]);
+    expect(await listRecorded(link.id)).toMatchObject([MADRID]);
     expect((await getLink(link.id)).clicks).toBe(1);
   });
 });

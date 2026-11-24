@@ -10,9 +10,11 @@ const {
   clicks,
   hasMore,
   range,
+  bots,
   isLoading,
   isLoadingMore,
   setRange,
+  setBots,
   loadMore
 } = await useLinkStatistics(String(route.params.id));
 
@@ -30,7 +32,9 @@ seoMeta({
     :loading="isLoading"
     :loading-more="isLoadingMore"
     :range="range"
+    :bots="bots"
     @update:range="setRange"
+    @update:bots="setBots"
     @load-more="loadMore"
   />
 </template>

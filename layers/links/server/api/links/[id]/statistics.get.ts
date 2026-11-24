@@ -9,9 +9,9 @@ import {
 export default defineLinkEventHandler(async (event) => {
   const user = await requireUser(event);
   const id = readLinkId(event);
-  const { range } = readClicksQuery(event);
+  const { range, bots } = readClicksQuery(event);
 
   const statisticsService = await useStatisticsService(event);
 
-  return statisticsService.getStatistics(user.id, id, range);
+  return statisticsService.getStatistics(user.id, id, { range, bots });
 });

@@ -1,4 +1,7 @@
-import type { ClickRange } from '#layers/links/shared/domain/click.type';
+import type {
+  ClickFilter,
+  ClickRange
+} from '#layers/links/shared/domain/click.type';
 import { toast } from 'vue-sonner';
 
 import { CLICK_RANGE_DEFAULT } from '#layers/links/shared/domain/click.constant';
@@ -11,6 +14,9 @@ const readRange = (value: unknown): ClickRange => {
   return result.success ? result.data : CLICK_RANGE_DEFAULT;
 };
 
+// only "true" shows Bots
+const readBots = (value: unknown): boolean => value === 'true';
+
 export const useLinkStatistics = async (id: string) => {
   const linkApi = useLinkApi();
   const route = useRoute();
@@ -18,17 +24,18 @@ export const useLinkStatistics = async (id: string) => {
   const { t: $t } = useI18n();
 
   const range = shallowRef(readRange(route.query.range));
+  const bots = shallowRef(readBots(route.query.bots));
   const isLoading = shallowRef(false);
   const isLoadingMore = shallowRef(false);
+
+  const filter = (): ClickFilter => ({ range: range.value, bots: bots.value });
 
   const [linkData, statisticsData, clicksData] = await Promise.all([
     useAsyncData(`links:${id}`, () => linkApi.get(id)),
     useAsyncData(`links:${id}:statistics`, () =>
-      linkApi.getStatistics(id, { range: range.value })
+      linkApi.getStatistics(id, filter())
     ),
-    useAsyncData(`links:${id}:clicks`, () =>
-      linkApi.getClicks(id, { range: range.value })
-    )
+    useAsyncData(`links:${id}:clicks`, () => linkApi.getClicks(id, filter()))
   ]);
 
   // fatal, so a 404 shows the not-found ErrorPage and anything else the
@@ -50,55 +57,71 @@ export const useLinkStatistics = async (id: string) => {
   const clicks = computed(() => clicksData.data.value?.clicks ?? []);
   const hasMore = computed(() => !!clicksData.data.value?.cursor);
 
-  // the default stays out of the address, and a change replaces the current
-  // entry, so Back still returns to the Links page
-  const writeRange = (next: ClickRange) => {
+  // the defaults, 30 days and no Bots, stay out of the address, and a change
+  // replaces the current entry, so Back still returns to the Links page
+  const writeFilter = (next: ClickFilter) => {
     const query = { ...route.query };
-    if (next === CLICK_RANGE_DEFAULT) delete query.range;
-    else query.range = next;
+
+    if (next.range === CLICK_RANGE_DEFAULT) delete query.range;
+    else query.range = next.range;
+
+    if (next.bots) query.bots = 'true';
+    else delete query.bots;
 
     return router.replace({ query });
   };
 
-  // the range of the figures and Clicks on screen; only the latest choice
+  // the filter of the figures and Clicks on screen; only the latest choice
   // lands when several are in flight
-  let shownRange = range.value;
+  let shownFilter = filter();
   let latest = 0;
   // bumped whenever the list starts again from its first page, so a page
   // that was in flight for the old list never lands on the new one
   let listVersion = 0;
 
-  const setRange = async (next: ClickRange) => {
-    if (next === range.value) return;
-
+  const applyFilter = async (next: ClickFilter) => {
     const request = ++latest;
 
-    range.value = next;
+    range.value = next.range;
+    bots.value = next.bots;
     isLoading.value = true;
 
     try {
       const [nextStatistics, nextClicks] = await Promise.all([
-        linkApi.getStatistics(id, { range: next }),
-        linkApi.getClicks(id, { range: next })
+        linkApi.getStatistics(id, next),
+        linkApi.getClicks(id, next)
       ]);
       if (request !== latest) return;
 
       statisticsData.data.value = nextStatistics;
       clicksData.data.value = nextClicks;
       listVersion++;
-      shownRange = next;
+      shownFilter = next;
     } catch {
       if (request !== latest) return;
 
-      // what was shown stays, so the switcher goes back to its range
-      range.value = shownRange;
+      // what was shown stays, so the controls go back to its filter
+      range.value = shownFilter.range;
+      bots.value = shownFilter.bots;
       toast.error($t('toast.links.error'));
       return;
     } finally {
       if (request === latest) isLoading.value = false;
     }
 
-    await writeRange(next);
+    await writeFilter(next);
+  };
+
+  const setRange = async (next: ClickRange) => {
+    if (next === range.value) return;
+
+    await applyFilter({ ...filter(), range: next });
+  };
+
+  const setBots = async (next: boolean) => {
+    if (next === bots.value) return;
+
+    await applyFilter({ ...filter(), bots: next });
   };
 
   // the next page goes under the Clicks shown; on failure they stay
@@ -110,7 +133,7 @@ export const useLinkStatistics = async (id: string) => {
     isLoadingMore.value = true;
 
     try {
-      const page = await linkApi.getClicks(id, { range: shownRange, cursor });
+      const page = await linkApi.getClicks(id, { ...shownFilter, cursor });
       if (version !== listVersion) return;
 
       clicksData.data.value = {
@@ -132,9 +155,11 @@ export const useLinkStatistics = async (id: string) => {
     clicks,
     hasMore,
     range,
+    bots,
     isLoading,
     isLoadingMore,
     setRange,
+    setBots,
     loadMore
   };
 };

@@ -1,4 +1,5 @@
 import type {
+  ClickFilter,
   ClicksPage,
   ClicksQuery,
   LinkStatistics
@@ -25,7 +26,7 @@ class LinkModule extends ApiModule {
     });
   }
 
-  async getStatistics(id: string, query: ClicksQuery) {
+  async getStatistics(id: string, query: ClickFilter) {
     return this.call<LinkStatistics>({
       method: 'GET',
       url: this.ROUTE.LinkStatistics(id),

@@ -48,6 +48,10 @@ registerEndpoint('/api/links/link-1/statistics', {
 const rangesAsked = (route: typeof getClicks | typeof getStatistics) =>
   route.mock.calls.map(([event]) => getQuery(event).range);
 
+// whether each call to a route asked for Bots
+const botsAsked = (route: typeof getClicks | typeof getStatistics) =>
+  route.mock.calls.map(([event]) => getQuery(event).bots);
+
 let mounted: Awaited<ReturnType<typeof mountSuspended>> | undefined;
 
 const mountPage = async (
@@ -110,6 +114,21 @@ const pressedRanges = () =>
 // until the figures and the Clicks of the new range have landed, or failed
 const chooseRange = async (name: string) => {
   rangeButton(name)?.click();
+  await nextTick();
+  await vi.waitFor(() =>
+    expect(document.body.querySelector('[aria-busy="true"]')).toBeNull()
+  );
+  await flushPromises();
+};
+
+const botsToggle = () =>
+  [...document.body.querySelectorAll('button')].find(
+    (button) => button.textContent?.trim() === 'Show bots'
+  );
+
+// until the figures and the Clicks with or without Bots have landed, or failed
+const toggleBots = async () => {
+  botsToggle()?.click();
   await nextTick();
   await vi.waitFor(() =>
     expect(document.body.querySelector('[aria-busy="true"]')).toBeNull()
@@ -422,6 +441,87 @@ describe('Statistics page', () => {
       expect(rows()[0]?.textContent).toContain('Madrid');
       expect(figures()[0]).toEqual(['Clicks · 30 days', '1']);
       expect(pressedRanges()).toEqual(['30 days']);
+      expect(currentQuery()).toEqual({});
+    });
+  });
+
+  describe('Bots', () => {
+    it('leaves Bots out by default', async () => {
+      await mountPage();
+
+      expect(botsToggle()?.getAttribute('aria-pressed')).toBe('false');
+      expect(botsAsked(getStatistics)).toEqual(['false']);
+      expect(botsAsked(getClicks)).toEqual(['false']);
+    });
+
+    it('reads Show bots from the address on load', async () => {
+      await mountPage('/links/link-1?range=7d&bots=true');
+
+      expect(botsToggle()?.getAttribute('aria-pressed')).toBe('true');
+      expect(botsAsked(getStatistics)).toEqual(['true']);
+      expect(botsAsked(getClicks)).toEqual(['true']);
+      expect(rangesAsked(getClicks)).toEqual(['7d']);
+    });
+
+    it('writes Show bots into the address in place, and fetches again', async () => {
+      await mountPage('/links/link-1?range=7d');
+      const historyLength = window.history.length;
+
+      getClicks.mockReturnValue(
+        makeClicksPage([makeClick({ id: 1, bot: true, botName: 'Slackbot' })])
+      );
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 1 }));
+      await toggleBots();
+
+      expect(currentQuery()).toEqual({ range: '7d', bots: 'true' });
+      expect(window.history.length).toBe(historyLength);
+      expect(botsToggle()?.getAttribute('aria-pressed')).toBe('true');
+      expect(figures()[0]).toEqual(['Clicks · 7 days', '1']);
+      expect(clients()).toEqual(['Slackbot Bot']);
+      expect(botsAsked(getStatistics)).toEqual(['false', 'true']);
+      expect(botsAsked(getClicks)).toEqual(['false', 'true']);
+      expect(rangesAsked(getClicks)).toEqual(['7d', '7d']);
+
+      // hidden Bots are left out of the address
+      await toggleBots();
+
+      expect(currentQuery()).toEqual({ range: '7d' });
+      expect(window.history.length).toBe(historyLength);
+      expect(botsToggle()?.getAttribute('aria-pressed')).toBe('false');
+      expect(botsAsked(getClicks)).toEqual(['false', 'true', 'false']);
+    });
+
+    it('keeps Show bots through a new range and Load more', async () => {
+      getClicks.mockReturnValue(makeClicksPage([makeClick()], 'page-2'));
+      await mountPage('/links/link-1?bots=true');
+
+      await chooseRange('7 days');
+      await loadMore();
+
+      expect(currentQuery()).toEqual({ range: '7d', bots: 'true' });
+      expect(botsAsked(getStatistics)).toEqual(['true', 'true']);
+      expect(botsAsked(getClicks)).toEqual(['true', 'true', 'true']);
+    });
+
+    it('shows the toast and keeps what it showed when Show bots fails', async () => {
+      getClicks.mockReturnValue(
+        makeClicksPage([makeClick({ id: 1, city: 'Madrid' })])
+      );
+      getStatistics.mockReturnValue(makeStatistics({ rangeClicks: 1 }));
+      await mountPage();
+
+      // every time, because $fetch tries a failed GET twice
+      getClicks.mockImplementation(() => {
+        throw createError({ statusCode: 500 });
+      });
+      await toggleBots();
+
+      expect(toast.error).toHaveBeenCalledWith(
+        'Something went wrong with your links'
+      );
+      expect(rows()[0]?.textContent).toContain('Madrid');
+      expect(figures()[0]).toEqual(['Clicks · 30 days', '1']);
+      expect(botsToggle()?.getAttribute('aria-pressed')).toBe('false');
       expect(currentQuery()).toEqual({});
     });
   });

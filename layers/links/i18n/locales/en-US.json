@@ -54,6 +54,7 @@
         "countries": "Countries",
         "topReferrer": "Top referrer"
       },
+      "bots": "Show bots",
       "range": {
         "label": "Time range",
         "24h": "24h",

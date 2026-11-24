@@ -37,8 +37,19 @@ const clickColumns = {
   botName: clicks.botName
 };
 
-const inRange = (linkId: string, since: Date) =>
-  and(eq(clicks.linkId, linkId), gte(clicks.createdAt, since));
+// the Clicks of one Link since a time; without bots, only people's Clicks
+interface ClickScope {
+  linkId: string;
+  since: Date;
+  bots: boolean;
+}
+
+const inScope = ({ linkId, since, bots }: ClickScope) =>
+  and(
+    eq(clicks.linkId, linkId),
+    gte(clicks.createdAt, since),
+    bots ? undefined : eq(clicks.bot, false)
+  );
 
 class ClickRepository {
   constructor(private db: Database) {}
@@ -78,8 +89,7 @@ class ClickRepository {
   // keep one order; after a cursor, only the Clicks older than it. One Click
   // past the page tells whether another page follows
   async findPage(
-    linkId: string,
-    since: Date,
+    scope: ClickScope,
     cursor: ClickCursor | null
   ): Promise<{ clicks: Click[]; hasMore: boolean }> {
     const rows = await this.db
@@ -87,7 +97,7 @@ class ClickRepository {
       .from(clicks)
       .where(
         and(
-          inRange(linkId, since),
+          inScope(scope),
           cursor
             ? or(
                 lt(clicks.createdAt, cursor.createdAt),
@@ -110,23 +120,22 @@ class ClickRepository {
 
   // by the country as Cloudflare sent it, so XX, T1 and none stay apart
   async countByCountry(
-    linkId: string,
-    since: Date
+    scope: ClickScope
   ): Promise<{ country: string | null; clicks: number }[]> {
     return this.db
       .select({ country: clicks.country, clicks: count() })
       .from(clicks)
-      .where(inRange(linkId, since))
+      .where(inScope(scope))
       .groupBy(clicks.country);
   }
 
   // Direct Clicks have no host, so they never count; a tie goes to the
   // first host alphabetically
-  async findTopReferrer(linkId: string, since: Date): Promise<string | null> {
+  async findTopReferrer(scope: ClickScope): Promise<string | null> {
     const [top] = await this.db
       .select({ referrer: clicks.referrer })
       .from(clicks)
-      .where(and(inRange(linkId, since), isNotNull(clicks.referrer)))
+      .where(and(inScope(scope), isNotNull(clicks.referrer)))
       .groupBy(clicks.referrer)
       .orderBy(desc(count()), asc(clicks.referrer))
       .limit(1);

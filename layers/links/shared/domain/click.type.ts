@@ -29,6 +29,9 @@ export type ClickRange = z.infer<typeof ClickRangeSchema>;
 
 export type ClicksQuery = z.infer<typeof ClicksQuerySchema>;
 
+// which of a Link's Clicks Statistics count and list
+export type ClickFilter = Pick<ClicksQuery, 'range' | 'bots'>;
+
 // where the next page of a Click list starts: the last Click shown, by time
 // and id
 export type ClickCursor = Pick<Click, 'createdAt' | 'id'>;

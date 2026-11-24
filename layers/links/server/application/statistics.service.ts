@@ -1,4 +1,5 @@
 import type {
+  ClickFilter,
   ClickRange,
   ClicksPage,
   CountryClicks,
@@ -57,19 +58,20 @@ class StatisticsService {
   async getStatistics(
     ownerId: string,
     id: string,
-    range: ClickRange
+    { range, bots }: ClickFilter
   ): Promise<LinkStatistics> {
     const link = await this.linkService.findOwned(ownerId, id);
-    const since = rangeStart(range);
+    const scope = { linkId: link.id, since: rangeStart(range), bots };
 
     const [counts, topReferrer] = await Promise.all([
-      this.clickRepository.countByCountry(link.id, since),
-      this.clickRepository.findTopReferrer(link.id, since)
+      this.clickRepository.countByCountry(scope),
+      this.clickRepository.findTopReferrer(scope)
     ]);
     const countryClicks = toCountryClicks(counts);
 
     return {
       rangeClicks: countryClicks.reduce((sum, entry) => sum + entry.clicks, 0),
+      // every Click, Bots included, whatever the filter
       clickCount: link.clicks,
       countries: countryClicks.filter(
         (entry) => entry.country !== UNKNOWN_COUNTRY
@@ -83,14 +85,13 @@ class StatisticsService {
   async listClicks(
     ownerId: string,
     id: string,
-    range: ClickRange,
+    { range, bots }: ClickFilter,
     cursor?: string
   ): Promise<ClicksPage> {
     const link = await this.linkService.findOwned(ownerId, id);
 
     const { clicks, hasMore } = await this.clickRepository.findPage(
-      link.id,
-      rangeStart(range),
+      { linkId: link.id, since: rangeStart(range), bots },
       cursor ? decodeClickCursor(cursor) : null
     );
     const last = clicks.at(-1);

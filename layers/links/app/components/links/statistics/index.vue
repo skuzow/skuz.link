@@ -20,6 +20,7 @@ defineProps<{
 defineEmits<{ loadMore: [] }>();
 
 const range = defineModel<ClickRange>('range', { required: true });
+const bots = defineModel<boolean>('bots', { required: true });
 </script>
 
 <template>
@@ -41,6 +42,7 @@ const range = defineModel<ClickRange>('range', { required: true });
 
     <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
       <LinksStatisticsRangeSwitcher v-model="range" />
+      <LinksStatisticsBotsToggle v-model="bots" />
     </div>
 
     <LinksStatisticsClickList
