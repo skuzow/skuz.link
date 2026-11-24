@@ -10,7 +10,7 @@ const bots = defineModel<boolean>({ required: true });
   <UiButton
     variant="outline"
     :aria-pressed="bots"
-    class="aria-pressed:bg-accent aria-pressed:text-foreground"
+    class="aria-pressed:bg-accent aria-pressed:text-foreground aria-pressed:[--lit-icon-rest:var(--lit-icon-on)] aria-pressed:[&_svg]:drop-shadow-[0_0_4px_var(--lit-icon-on)]"
     @click="bots = !bots"
   >
     <RobotIcon />

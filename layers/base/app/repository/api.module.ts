@@ -14,7 +14,7 @@ abstract class ApiModule {
     this.$fetch = fetcher;
   }
 
-  async call<T>({ method, url, body, query }: HttpRequest) {
+  call<T>({ method, url, body, query }: HttpRequest) {
     return this.$fetch<T, string, HttpRequest['method']>(url, {
       method,
       body,

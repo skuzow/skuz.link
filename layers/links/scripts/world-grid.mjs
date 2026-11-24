@@ -172,7 +172,7 @@ async function readShapes() {
 }
 
 function buildCells(shapes) {
-  const cells = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  const cells = Array.from({ length: ROWS }, () => new Array(COLS).fill(null));
 
   for (let row = 0; row < ROWS; row++)
     for (let col = 0; col < COLS; col++) {

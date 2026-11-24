@@ -534,8 +534,6 @@
   &:hover [data-lit],
   &:focus-visible svg[shape-rendering],
   &:focus-visible [data-lit],
-  &[aria-pressed='true'] svg[shape-rendering],
-  &[aria-pressed='true'] [data-lit],
   &[data-highlighted] svg[shape-rendering],
   &[data-highlighted] [data-lit] {
     color: var(--lit-icon-on, currentColor);

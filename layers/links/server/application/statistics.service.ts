@@ -52,7 +52,7 @@ class StatisticsService {
     private readonly clickRepository: ClickRepository
   ) {}
 
-  async findLink(ownerId: string, id: string): Promise<Link> {
+  findLink(ownerId: string, id: string): Promise<Link> {
     return this.linkService.findOwned(ownerId, id);
   }
 

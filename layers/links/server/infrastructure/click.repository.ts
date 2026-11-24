@@ -75,7 +75,7 @@ const inCountry = (country: string) =>
     : eq(clicks.country, country);
 
 class ClickRepository {
-  constructor(private db: Database) {}
+  constructor(private readonly db: Database) {}
 
   // one batch, so the Click count and the Clicks never disagree; the Click
   // finds its Link by Slug, so a cached Redirect needs no Link id, and a Link
@@ -137,7 +137,7 @@ class ClickRepository {
   }
 
   // by the country as Cloudflare sent it, so XX, T1 and none stay apart
-  async countByCountry(
+  countByCountry(
     scope: ClickScope
   ): Promise<{ country: string | null; clicks: number }[]> {
     return this.db

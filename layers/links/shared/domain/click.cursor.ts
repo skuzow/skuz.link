@@ -5,7 +5,10 @@ import type { ClickCursor } from './click.type';
 const CURSOR_PATTERN = /^(\d{1,15})-(\d{1,15})$/;
 
 const toBase64Url = (value: string): string =>
-  btoa(value).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+  btoa(value)
+    .replaceAll('+', '-')
+    .replaceAll('/', '_')
+    .replace(/={1,2}$/, '');
 
 const fromBase64Url = (value: string): string | null => {
   if (!/^[\w-]+$/.test(value)) return null;

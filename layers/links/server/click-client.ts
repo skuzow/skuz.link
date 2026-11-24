@@ -54,7 +54,7 @@ const BROWSER_RULES: [RegExp, string][] = [
   [/\bSamsungBrowser\//, 'Samsung Internet'],
   [/\b(?:Firefox|FxiOS)\//, 'Firefox'],
   [/\b(?:Chrome|CriOS)\//, 'Chrome'],
-  [/\bVersion\/[\d.]+.*\bSafari\//, 'Safari']
+  [/\bVersion\/[\d.]+ .*\bSafari\//, 'Safari']
 ];
 
 // an iPad that asks for the desktop site sends a Mac's user agent, so it

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useEventListener } from '@vueuse/core';
 import type { CountryClicks } from '#layers/links/shared/domain/click.type';
 import { countryName } from '#layers/links/app/lib/country';
 import {
@@ -97,10 +98,11 @@ const point = (event: PointerEvent) => {
   hovered.value = pointed.value?.code ?? null;
 };
 
-const pick = (event: MouseEvent) => {
+// the country list beside the map is the keyboard's way to pick
+useEventListener(useTemplateRef('mapSvg'), 'click', (event: MouseEvent) => {
   const code = litCountryAt(event);
   if (code) emit('pick', code);
-};
+});
 
 const leave = () => {
   pointed.value = null;
@@ -113,6 +115,7 @@ const leave = () => {
     <!-- the transparent stroke fills the gaps between a country's dots, so
          the pointer never falls through them -->
     <svg
+      ref="mapSvg"
       role="img"
       :aria-label="$t('links.statistics.countries.map')"
       :viewBox="MAP_VIEW_BOX"
@@ -121,7 +124,6 @@ const leave = () => {
       @pointerover="point"
       @pointermove="point"
       @pointerleave="leave"
-      @click="pick"
     >
       <path
         v-for="country in countries"

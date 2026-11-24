@@ -12,21 +12,21 @@ import Routes from '#layers/links/app/repository/routes.client';
 class LinkModule extends ApiModule {
   private readonly ROUTE = Routes.Link;
 
-  async getAll() {
+  getAll() {
     return this.call<Link[]>({
       method: 'GET',
       url: this.ROUTE.Links()
     });
   }
 
-  async get(id: string) {
+  get(id: string) {
     return this.call<Link>({
       method: 'GET',
       url: this.ROUTE.LinkById(id)
     });
   }
 
-  async getStatistics(id: string, query: ClickFilter) {
+  getStatistics(id: string, query: ClickFilter) {
     return this.call<LinkStatistics>({
       method: 'GET',
       url: this.ROUTE.LinkStatistics(id),
@@ -34,7 +34,7 @@ class LinkModule extends ApiModule {
     });
   }
 
-  async getClicks(id: string, query: ClicksQuery) {
+  getClicks(id: string, query: ClicksQuery) {
     return this.call<ClicksPage>({
       method: 'GET',
       url: this.ROUTE.LinkClicks(id),
