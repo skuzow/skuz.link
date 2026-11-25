@@ -1,5 +1,8 @@
 export const LINKS_ROUTE: string = '/links';
 
+// how often Statistics brings in new Clicks while its tab shows
+export const STATISTICS_REFRESH_MS: number = 30_000;
+
 export const LINKS_GRID_LIST_CLASS: string =
   'grid grid-cols-1 gap-3 @min-[33rem]:grid-cols-2 @min-[50rem]:grid-cols-3';
 

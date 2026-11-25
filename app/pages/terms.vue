@@ -15,7 +15,7 @@ seoMeta({
 <template>
   <LegalDocument
     :title="$t('legal.terms.title')"
-    updated="2026-10-30"
+    updated="2026-11-23"
     :content="{
       en: { body: TermsEn, sections: termsEnSections },
       es: { body: TermsEs, sections: termsEsSections }

@@ -39,7 +39,74 @@
     "card": {
       "label": "Link",
       "clicks": "Clics",
-      "created": "Creado"
+      "created": "Creado",
+      "statistics": "Estadísticas de /{slug}: {clicks} clic | Estadísticas de /{slug}: {clicks} clics"
+    },
+    "statistics": {
+      "title": "Estadísticas",
+      "back": "Links",
+      "meta": {
+        "title": "Estadísticas de skuz.link/{slug}"
+      },
+      "figures": {
+        "rangeClicks": "Clics · {range}",
+        "lifetimeClicks": "Clics totales",
+        "countries": "Países",
+        "topReferrer": "Referente principal"
+      },
+      "live": {
+        "on": "En directo",
+        "paused": "En pausa"
+      },
+      "bots": "Mostrar bots",
+      "range": {
+        "label": "Periodo",
+        "24h": "24 h",
+        "7d": "7 días",
+        "30d": "30 días",
+        "12m": "12 meses",
+        "short": {
+          "24h": "24 h",
+          "7d": "7 d",
+          "30d": "30 d",
+          "12m": "12 m"
+        }
+      },
+      "countries": {
+        "title": "Clics por país",
+        "count": "{count} países | {count} país | {count} países",
+        "map": "Mapa del mundo con los clics por país. La lista de países tiene las mismas cifras.",
+        "legend": "Leyenda del mapa",
+        "none": "Ninguno",
+        "tip": "{country} · {clicks} clic | {country} · {clicks} clics",
+        "list": "Países, de más a menos clics",
+        "showAll": "Mostrar todos",
+        "showFewer": "Mostrar menos"
+      },
+      "clicks": {
+        "title": "Clics",
+        "time": "Hora",
+        "where": "Dónde",
+        "unknown": "Desconocido",
+        "from": "Desde",
+        "direct": "Directo",
+        "client": "Cliente",
+        "bot": "Bot",
+        "other": "Otro",
+        "device": {
+          "desktop": "Escritorio",
+          "mobile": "Móvil",
+          "tablet": "Tableta"
+        },
+        "empty": "No hay clics en este periodo",
+        "filter": {
+          "showing": "Mostrando clics de {country}",
+          "showingAll": "Mostrando clics de todos los países",
+          "clear": "Quitar el filtro: {country}"
+        },
+        "shown": "{shown} de {total}",
+        "loadMore": "Cargar más"
+      }
     }
   },
   "alert": {

@@ -23,3 +23,34 @@ export const links = sqliteTable(
   },
   (table) => [index('links_userId_idx').on(table.userId)]
 );
+
+// a Click keeps no IP address and no full user agent (ADR-0007)
+export const clicks = sqliteTable(
+  'clicks',
+  {
+    id: integer('id').primaryKey(),
+    linkId: text('link_id')
+      .notNull()
+      .references(() => links.id, { onDelete: 'cascade' }),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    country: text('country'),
+    region: text('region'),
+    city: text('city'),
+    referrer: text('referrer'),
+    browser: text('browser'),
+    os: text('os'),
+    device: text('device'),
+    bot: integer('bot', { mode: 'boolean' }).notNull().default(false),
+    botName: text('bot_name')
+  },
+  (table) => [
+    // the ranges and the cursor, newest first
+    index('clicks_linkId_createdAt_id_idx').on(
+      table.linkId,
+      table.createdAt,
+      table.id
+    ),
+    // the purge of Clicks older than 12 months
+    index('clicks_createdAt_idx').on(table.createdAt)
+  ]
+);

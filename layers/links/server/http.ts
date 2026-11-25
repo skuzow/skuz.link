@@ -1,4 +1,6 @@
 import type { EventHandler, EventHandlerRequest, H3Event } from 'h3';
+import { ClicksQuerySchema } from '#layers/links/shared/domain/click.schema';
+import type { ClicksQuery } from '#layers/links/shared/domain/click.type';
 import { LinkInputSchema } from '#layers/links/shared/domain/link.schema';
 import type { LinkInput } from '#layers/links/shared/domain/link.type';
 import {
@@ -25,6 +27,16 @@ export const readLinkInput = async (
   event: H3Event<EventHandlerRequest>
 ): Promise<LinkInput> => {
   const result = LinkInputSchema.safeParse(await readBody(event));
+
+  if (!result.success) throw invalidFields(result.error.issues);
+
+  return result.data;
+};
+
+export const readClicksQuery = (
+  event: H3Event<EventHandlerRequest>
+): ClicksQuery => {
+  const result = ClicksQuerySchema.safeParse(getQuery(event));
 
   if (!result.success) throw invalidFields(result.error.issues);
 

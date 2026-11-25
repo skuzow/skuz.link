@@ -16,7 +16,7 @@ En la [Política de privacidad](/es/privacidad) explico qué datos guardo de tu 
 
 - Eres responsable de los enlaces que creas.
 - Las URLs cortas son públicas: cualquiera que tenga una, o que la adivine, puede abrirla. No acortes direcciones privadas.
-- Solo tú ves cuántos clics tiene cada uno de tus enlaces.
+- Solo tú ves las estadísticas de tus enlaces. Puedes usarlas solo para ver cómo se usan tus enlaces, nunca para averiguar quién los abrió.
 
 ## 5. Qué no está permitido
 

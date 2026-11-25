@@ -21,8 +21,8 @@ A Slug kept for skuz.link's own pages. No Link can use it, and it never redirect
 _Avoid_: blocked slug, forbidden slug
 
 **Slug mark**:
-A small pixel picture drawn from a Slug, which helps tell Links apart at a glance. It follows the Slug, so changing the Slug changes the mark, and two Slugs can share one.
-_Avoid_: identicon, avatar
+A small pixel picture drawn from a Slug, which helps tell Links apart at a glance. It follows the Slug, so changing the Slug changes the mark, and two Slugs can share one. The mark's colour also stands for its Link wherever the Link is shown on its own, such as its Statistics.
+_Avoid_: identicon, avatar, Link colour
 
 **Short URL**:
 The address people share: `skuz.link/` followed by a Slug.
@@ -40,11 +40,27 @@ The User who created a Link. Only the Owner can list or edit it, and only the Ow
 _Avoid_: creator, author
 
 **Visitor**:
-Anyone who opens a Short URL, signed in or not.
+A person who opens a Short URL, signed in or not.
 
 **Click**:
-A Redirect served to a Visitor. Repeat visits and link-preview fetches count; checks that only ask whether a Short URL exists do not.
+A Redirect served to a Visitor or a Bot. Repeat visits count; checks that only ask whether a Short URL exists do not.
 _Avoid_: visit, hit, view
+
+**Click count**:
+How many Clicks a Link has had since it was created, Bots included. Deleting old Clicks never lowers it. Statistics labels it "Lifetime Clicks".
+_Avoid_: total clicks
+
+**Bot**:
+A program that opens a Short URL by itself, such as a link-preview fetcher, a crawler or a script. Its Clicks count, but they are kept apart from people's.
+_Avoid_: robot, crawler, spider
+
+**Referrer**:
+The site a Visitor came from, as their browser reports it. skuz.link keeps only its host. A Click with no Referrer is Direct.
+_Avoid_: source, origin
+
+**Statistics**:
+A Link's page where its Owner sees when and where its Clicks came from. Only the Owner can open it.
+_Avoid_: stats, analytics, dashboard, insights
 
 ### Auth
 

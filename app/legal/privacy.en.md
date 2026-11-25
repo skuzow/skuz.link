@@ -12,7 +12,15 @@ Cloudflare handles every request that reaches skuz.link. To serve it, it receive
 
 ### Anyone who opens a short URL
 
-Opening a short URL also adds one to its link's click count. I store nothing about you with the link.
+Opening a short URL also adds one to its link's click count, and I keep these details about the click:
+
+- the time;
+- the country, region and city that Cloudflare places the request in;
+- the browser, operating system and kind of device;
+- whether a bot made it, and the bot's name;
+- the host of the site you came from, such as `news.ycombinator.com`, never its full address.
+
+I never keep your IP address or your full user agent with a click. The user agent is the text your browser sends to describe itself. The link's owner sees each click's details, and they are deleted after 12 months.
 
 The site a short URL redirects to has its own privacy rules.
 
@@ -23,7 +31,7 @@ When you sign in with Google or GitHub, I store:
 - your name, your email address and the address of your avatar, which I receive from Google or GitHub. Your browser loads the avatar from their servers;
 - your connected accounts: your account id at Google or GitHub, and the tokens they issue when you sign in;
 - your sessions: the browser (user agent), the IP address, and when they were created and when they expire;
-- your links: the slug, the address they redirect to and their click count.
+- your links: the slug, the address they redirect to and their click count. When you delete a link, its clicks go with it.
 
 I take each session's IP address from the `CF-Connecting-IP` header, where Cloudflare puts your real address. I keep IPv4 addresses in full and shorten IPv6 addresses to their /64 network. I use it only to investigate abuse and to keep accounts secure, for example to find out where your account was used from if someone broke into it. It is deleted with its session: when you sign out, when you revoke the session or, at the latest, 30 days after the session expires.
 
@@ -42,6 +50,7 @@ If you write to [contact@skuz.link](mailto:contact@skuz.link) or [abuse@skuz.lin
 | Serving requests, request logs and traces    | Legitimate interest: delivering the site, keeping it secure and fixing errors (GDPR art. 6.1.f)                      |
 | Account, connected accounts, sessions, links | Contract: providing you the service under the Terms of use (GDPR art. 6.1.b)                                         |
 | Session IP addresses                         | Legitimate interest: investigating abuse and keeping accounts secure (GDPR art. 6.1.f)                               |
+| Click details                                | Legitimate interest: showing owners how their links are used (GDPR art. 6.1.f)                                       |
 | Handling abuse, bans                         | Legitimate interest: keeping skuz.link free of abuse (GDPR art. 6.1.f)                                               |
 | Emails                                       | Legitimate interest in answering you (GDPR art. 6.1.f); for data-rights requests, legal obligation (GDPR art. 6.1.c) |
 
@@ -63,13 +72,14 @@ You can delete them at any time in your browser's settings. If you delete the se
 
 ## 5. Who else receives data
 
-| Recipient                   | What it does                                                                                | Where       | Transfer safeguard           |
-| --------------------------- | ------------------------------------------------------------------------------------------- | ----------- | ---------------------------- |
-| Cloudflare, Inc.            | Processor: hosting, database, request logs and traces, and email forwarding                 | USA, global | EU–US Data Privacy Framework |
-| Google LLC and GitHub, Inc. | Separate controllers for sign-in and for serving your avatar, only if you sign in with them | USA         | EU–US Data Privacy Framework |
-| Proton AG                   | Processor: the inbox for `contact@skuz.link` and `abuse@skuz.link`                          | Switzerland | EU adequacy decision         |
+| Recipient                   | What it does                                                                                | Where             | Transfer safeguard           |
+| --------------------------- | ------------------------------------------------------------------------------------------- | ----------------- | ---------------------------- |
+| Cloudflare, Inc.            | Processor: hosting, database, request logs and traces, and email forwarding                 | USA, global       | EU–US Data Privacy Framework |
+| Google LLC and GitHub, Inc. | Separate controllers for sign-in and for serving your avatar, only if you sign in with them | USA               | EU–US Data Privacy Framework |
+| Proton AG                   | Processor: the inbox for `contact@skuz.link` and `abuse@skuz.link`                          | Switzerland       | EU adequacy decision         |
+| The link's owner            | Sees the details of the clicks on their own links                                           | Wherever they are | —                            |
 
-I never sell your data, use it for ads or run analytics on it.
+I never sell your data or use it for ads. The only statistics are the ones each owner sees about their own links.
 
 ## 6. How long I keep it
 
@@ -78,6 +88,7 @@ I never sell your data, use it for ads or run analytics on it.
 | Request logs and traces at Cloudflare                        | Up to 7 days                                                                   |
 | Account data (user, connected accounts, links)               | Until you delete your account, then up to 30 days in database backups          |
 | Sessions, including their IP address                         | Until you sign out or revoke them, and at the latest 30 days after they expire |
+| Click details                                                | 12 months, or until their link is deleted if that comes first                  |
 | Ban record (name, email address, reason, connected accounts) | As long as skuz.link runs                                                      |
 | Emails to `contact@skuz.link`                                | Until handled                                                                  |
 | Abuse reports to `abuse@skuz.link`                           | 1 year                                                                         |
@@ -93,13 +104,15 @@ You can exercise some of them yourself in Settings:
 - edit your name;
 - revoke your sessions;
 - disconnect a connected account;
-- delete your account, which also deletes your links and your sessions.
+- delete your account, which also deletes your links, their clicks and your sessions.
 
 For anything else, write to [contact@skuz.link](mailto:contact@skuz.link) from your account's email address. If you can't, I will ask you to prove in another way that the account is yours. I will answer within one month.
 
 Your email address is the one of your Google or GitHub account. If you need it corrected, write to me.
 
 If I have banned you and you ask me to erase your data, I erase everything except the ban record, which I need so that you can't sign up again.
+
+Click details hold nothing that identifies a visitor, so I can't find, show or delete one person's clicks when they ask (GDPR art. 11).
 
 If you think I haven't handled your request properly, you can complain to the Spanish Data Protection Agency (AEPD) at [aepd.es](https://www.aepd.es).
 

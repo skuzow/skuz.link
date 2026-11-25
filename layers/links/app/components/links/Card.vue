@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { linkHueStyle } from '#layers/links/app/lib/slugMark';
+import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
+import ChartBarIcon from '~icons/pixelarticons/chart-bar';
 import CopyIcon from '~icons/pixelarticons/copy';
 import MoreHorizontalIcon from '~icons/pixelarticons/more-horizontal';
 import PencilIcon from '~icons/pixelarticons/pencil';
@@ -18,6 +20,8 @@ const emit = defineEmits<{
 const { copyShortUrl } = useLinkCopy();
 
 const shortPath = computed(() => `/${props.link.slug}`);
+// links, not events, so the Spanish card opens the Spanish Statistics
+const statisticsPath = computed(() => `${LINKS_ROUTE}/${props.link.id}`);
 const hueStyle = computed(() => linkHueStyle(props.link.slug));
 </script>
 
@@ -44,6 +48,12 @@ const hueStyle = computed(() => linkHueStyle(props.link.slug));
               <UiDropdownMenuItem @click="copyShortUrl(link.slug)">
                 <CopyIcon />
                 {{ $t('links.copy') }}
+              </UiDropdownMenuItem>
+              <UiDropdownMenuItem as-child>
+                <NuxtLinkLocale :to="statisticsPath">
+                  <ChartBarIcon />
+                  {{ $t('links.statistics.title') }}
+                </NuxtLinkLocale>
               </UiDropdownMenuItem>
               <UiDropdownMenuItem @click="emit('edit', link)">
                 <PencilIcon />
@@ -74,7 +84,19 @@ const hueStyle = computed(() => linkHueStyle(props.link.slug));
     <UiCardFooter>
       <span class="flex gap-1.5">
         <span class="text-faint-foreground">{{ $t('links.card.clicks') }}</span>
-        <span>{{ $n(link.clicks) }}</span>
+        <NuxtLinkLocale
+          :to="statisticsPath"
+          :aria-label="
+            $t(
+              'links.card.statistics',
+              { slug: link.slug, clicks: $n(link.clicks) },
+              link.clicks
+            )
+          "
+          class="hover:text-signal focus-visible:outline-ring decoration-1 underline-offset-3 transition-colors duration-120 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          {{ $n(link.clicks) }}
+        </NuxtLinkLocale>
       </span>
       <span class="flex gap-1.5">
         <span class="text-faint-foreground">

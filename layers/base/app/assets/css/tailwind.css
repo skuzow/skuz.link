@@ -36,6 +36,8 @@
   --animate-pixel-step: pixel-step 0.6s steps(1) infinite;
   --animate-skeleton-blink: skeleton-blink 1.2s steps(1) infinite;
   --animate-cursor-blink: cursor-blink 1.06s steps(1) infinite;
+  --animate-led-tick: led-tick 0.4s steps(1) 1;
+  --animate-click-flash: click-flash 1.2s steps(1, end) 1;
 
   @keyframes pixel-step {
     0% {
@@ -56,6 +58,26 @@
   @keyframes cursor-blink {
     50% {
       opacity: 0;
+    }
+  }
+
+  /* dim for its whole run, then lit again in one step */
+  @keyframes led-tick {
+    0% {
+      opacity: 0.2;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* washed for its whole run, then clear in one step */
+  @keyframes click-flash {
+    0% {
+      background: var(--signal-wash);
+    }
+    100% {
+      background: transparent;
     }
   }
 }
@@ -540,9 +562,12 @@
   --primary-foreground: var(--hue-foreground);
   --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #000);
   --primary-edge: color-mix(in srgb, var(--link-hue) 60%, #000);
+  /* above 6%, the chip's text in lime, coral, mint and gold fails 4.5:1 */
+  --signal-wash: color-mix(in srgb, var(--link-hue) 6%, transparent);
 
   @variant dark {
     --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #fff);
+    --signal-wash: color-mix(in srgb, var(--link-hue) 8%, transparent);
   }
 }
 

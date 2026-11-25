@@ -36,6 +36,8 @@ interface TestRequestInit extends Omit<RequestInit, 'body'> {
   // false leaves out the Cloudflare context, like the internal fetch that
   // renders Nuxt's error page on the Worker
   cloudflare?: boolean;
+  // the request's Cloudflare properties, such as its country; left out by default
+  cf?: Record<string, unknown>;
 }
 
 // Nitro's scan order: root first, then layers in reverse alphabetical order
@@ -181,6 +183,7 @@ export const setupTestServer = async () => {
       json,
       origin = TEST_ORIGIN,
       cloudflare = true,
+      cf,
       headers,
       ...init
     }: TestRequestInit = {}
@@ -200,10 +203,14 @@ export const setupTestServer = async () => {
       body: json === undefined ? undefined : JSON.stringify(json)
     });
 
+    // Nitro puts request.cf on the event context, beside the Cloudflare context
     return handle(
       request,
       cloudflare
-        ? { cloudflare: { env: platform.env, context: executionContext } }
+        ? {
+            cf,
+            cloudflare: { env: platform.env, context: executionContext }
+          }
         : undefined
     );
   };

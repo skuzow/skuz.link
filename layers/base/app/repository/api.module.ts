@@ -4,6 +4,7 @@ interface HttpRequest {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: object;
+  query?: Record<string, string | number | boolean>;
 }
 
 abstract class ApiModule {
@@ -13,8 +14,12 @@ abstract class ApiModule {
     this.$fetch = fetcher;
   }
 
-  async call<T>({ method, url, body }: HttpRequest) {
-    return this.$fetch<T, string, HttpRequest['method']>(url, { method, body });
+  call<T>({ method, url, body, query }: HttpRequest) {
+    return this.$fetch<T, string, HttpRequest['method']>(url, {
+      method,
+      body,
+      query
+    });
   }
 }
 

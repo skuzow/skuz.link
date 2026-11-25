@@ -39,7 +39,74 @@
     "card": {
       "label": "Link",
       "clicks": "Clicks",
-      "created": "Created"
+      "created": "Created",
+      "statistics": "Statistics for /{slug}: {clicks} Click | Statistics for /{slug}: {clicks} Clicks"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "back": "Links",
+      "meta": {
+        "title": "Statistics for skuz.link/{slug}"
+      },
+      "figures": {
+        "rangeClicks": "Clicks · {range}",
+        "lifetimeClicks": "Lifetime Clicks",
+        "countries": "Countries",
+        "topReferrer": "Top referrer"
+      },
+      "live": {
+        "on": "Live",
+        "paused": "Paused"
+      },
+      "bots": "Show bots",
+      "range": {
+        "label": "Time range",
+        "24h": "24h",
+        "7d": "7 days",
+        "30d": "30 days",
+        "12m": "12 months",
+        "short": {
+          "24h": "24h",
+          "7d": "7d",
+          "30d": "30d",
+          "12m": "12m"
+        }
+      },
+      "countries": {
+        "title": "Clicks by country",
+        "count": "{count} countries | {count} country | {count} countries",
+        "map": "World map of Clicks by country. The country list holds the same numbers.",
+        "legend": "Map legend",
+        "none": "None",
+        "tip": "{country} · {clicks} Click | {country} · {clicks} Clicks",
+        "list": "Countries, most Clicks first",
+        "showAll": "Show all",
+        "showFewer": "Show fewer"
+      },
+      "clicks": {
+        "title": "Clicks",
+        "time": "Time",
+        "where": "Where",
+        "unknown": "Unknown",
+        "from": "From",
+        "direct": "Direct",
+        "client": "Client",
+        "bot": "Bot",
+        "other": "Other",
+        "device": {
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "tablet": "Tablet"
+        },
+        "empty": "No Clicks in this range",
+        "filter": {
+          "showing": "Showing Clicks from {country}",
+          "showingAll": "Showing Clicks from every country",
+          "clear": "Clear the filter: {country}"
+        },
+        "shown": "{shown} of {total}",
+        "loadMore": "Load more"
+      }
     }
   },
   "alert": {

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { links } from '#layers/links/server/infrastructure/schema';
+import { clicks, links } from '#layers/links/server/infrastructure/schema';
 import { setupTestServer } from '../../testing/server';
 
 const server = await setupTestServer();
@@ -30,5 +30,27 @@ describe('POST /api/auth/delete-user', () => {
     ).toEqual([]);
     expect(await server.redirectTarget('first-link')).toBeNull();
     expect(await server.redirectTarget('second-link')).toBeNull();
+  });
+
+  it("deletes the Clicks of the user's links", async () => {
+    const { headers } = await server.login();
+    const link = await server.createLink(headers, 'clicked-link');
+
+    await server.fetch('/clicked-link');
+    await server.flush();
+
+    const findClicks = () =>
+      server.db.select().from(clicks).where(eq(clicks.linkId, link.id));
+
+    expect(await findClicks()).toHaveLength(1);
+
+    await server.fetch('/api/auth/delete-user', {
+      method: 'POST',
+      headers,
+      json: {}
+    });
+    await server.flush();
+
+    expect(await findClicks()).toEqual([]);
   });
 });
