@@ -238,6 +238,16 @@ describe('Statistics page', () => {
     expect(backLink()?.getAttribute('href')).toBe('/links');
   });
 
+  it("carries the Slug mark's hue on the whole page", async () => {
+    await mountPage();
+
+    // the page holds the way back, so the hue reaches everything under it
+    const page = backLink()?.parentElement;
+
+    expect(page?.classList).toContain('link-hue');
+    expect(page?.style.getPropertyValue('--link-hue')).toBe('var(--hue-gold)');
+  });
+
   it('names the Short URL in the title', async () => {
     await mountPage();
 

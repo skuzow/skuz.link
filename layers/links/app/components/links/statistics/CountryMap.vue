@@ -125,6 +125,8 @@ const leave = () => {
       @pointermove="point"
       @pointerleave="leave"
     >
+      <!-- a hovered or picked country dims the rest: in dark, bone's top
+           step is close to foreground, so its fill alone wouldn't show -->
       <path
         v-for="country in countries"
         :key="country.code"
@@ -135,7 +137,13 @@ const leave = () => {
             ? 1
             : country.opacity
         "
-        :opacity="picked && country.code !== picked ? 0.3 : undefined"
+        :opacity="
+          (hovered || picked) &&
+          country.code !== hovered &&
+          country.code !== picked
+            ? 0.3
+            : undefined
+        "
         stroke="transparent"
         stroke-width="0.25"
         :class="[

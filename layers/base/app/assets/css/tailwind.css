@@ -562,9 +562,12 @@
   --primary-foreground: var(--hue-foreground);
   --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #000);
   --primary-edge: color-mix(in srgb, var(--link-hue) 60%, #000);
+  /* above 6%, the chip's text in lime, coral, mint and gold fails 4.5:1 */
+  --signal-wash: color-mix(in srgb, var(--link-hue) 6%, transparent);
 
   @variant dark {
     --primary-hover: color-mix(in srgb, var(--link-hue) 85%, #fff);
+    --signal-wash: color-mix(in srgb, var(--link-hue) 8%, transparent);
   }
 }
 

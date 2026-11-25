@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import type { Link } from '#layers/links/shared/domain/link.type';
-import { linkHueStyle } from '#layers/links/app/lib/slugMark';
 import ArrowRightIcon from '~icons/pixelarticons/arrow-right';
 import CopyIcon from '~icons/pixelarticons/copy';
 
-const props = defineProps<{
+defineProps<{
   link: Link;
   // the tab is hidden, so nothing refreshes
   paused: boolean;
@@ -13,12 +12,10 @@ const props = defineProps<{
 }>();
 
 const { copyShortUrl } = useLinkCopy();
-
-const hueStyle = computed(() => linkHueStyle(props.link.slug));
 </script>
 
 <template>
-  <UiCard :style="hueStyle">
+  <UiCard>
     <UiCardHeader class="flex-wrap gap-y-1.5 py-1.5">
       <span class="led text-(color:--link-hue)" />
       <span class="type-eyebrow text-faint-foreground">

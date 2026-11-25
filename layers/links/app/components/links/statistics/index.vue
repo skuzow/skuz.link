@@ -6,6 +6,7 @@ import type {
 } from '#layers/links/shared/domain/click.type';
 import type { Link } from '#layers/links/shared/domain/link.type';
 import { LINKS_ROUTE } from '#layers/links/app/constants/links.constant';
+import { linkHueStyle } from '#layers/links/app/lib/slugMark';
 import ArrowLeftIcon from '~icons/pixelarticons/arrow-left';
 
 const props = defineProps<{
@@ -45,10 +46,16 @@ const total = computed(() =>
       )?.clicks ?? 0)
     : props.statistics.rangeClicks
 );
+
+// the whole page takes its Slug mark's colour in place of cyan
+const hueStyle = computed(() => linkHueStyle(props.link.slug));
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
+  <div
+    class="link-hue selection:bg-signal selection:text-background flex flex-col gap-3"
+    :style="hueStyle"
+  >
     <UiButton variant="link" as-child class="mb-3 self-start">
       <NuxtLinkLocale :to="LINKS_ROUTE">
         <ArrowLeftIcon />
