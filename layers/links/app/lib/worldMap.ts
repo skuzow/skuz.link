@@ -29,8 +29,9 @@ export const COUNTRY_DOTS: Readonly<Record<string, string>> = (() => {
 
 export const MAP_VIEW_BOX = `0 0 ${WORLD_GRID.cols} ${WORLD_GRID.rows}`;
 
-// the fill-opacity of steps 1 to 4
-const STEP_OPACITIES = [0.32, 0.55, 0.78, 1] as const;
+// the fill-opacity of steps 1 to 4; the lowest starts at 0.46 so that bone,
+// the one grey colour, still stands apart from unlit land in light
+const STEP_OPACITIES = [0.46, 0.64, 0.82, 1] as const;
 const STEPS = STEP_OPACITIES.length;
 
 export const mapStepOpacity = (step: number): number | undefined =>
