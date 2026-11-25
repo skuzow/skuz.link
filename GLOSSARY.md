@@ -21,8 +21,8 @@ A Slug kept for skuz.link's own pages. No Link can use it, and it never redirect
 _Avoid_: blocked slug, forbidden slug
 
 **Slug mark**:
-A small pixel picture drawn from a Slug, which helps tell Links apart at a glance. It follows the Slug, so changing the Slug changes the mark, and two Slugs can share one.
-_Avoid_: identicon, avatar
+A small pixel picture drawn from a Slug, which helps tell Links apart at a glance. It follows the Slug, so changing the Slug changes the mark, and two Slugs can share one. The mark's colour also stands for its Link wherever the Link is shown on its own, such as its Statistics.
+_Avoid_: identicon, avatar, Link colour
 
 **Short URL**:
 The address people share: `skuz.link/` followed by a Slug.
